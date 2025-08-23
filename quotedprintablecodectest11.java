@@ -1,37 +1,36 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest11 {
-
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+class QuotedPrintableCodecTest {
 
     @Test
-    void testEncodeUrlWithNullBitSet() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "1+1 = 2";
-        final String encoded = new String(QuotedPrintableCodec.encodeQuotedPrintable(null, plain.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("1+1 =3D 2", encoded, "Basic quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Basic quoted-printable decoding test");
+    @DisplayName("Static encode with null BitSet should use default printable characters and correctly encode special characters")
+    void testStaticEncodingWithDefaultCharacters() throws DecoderException {
+        // Arrange
+        final String plainText = "1+1 = 2";
+        final String expectedEncodedText = "1+1 =3D 2";
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        // Act:
+        // Encode using the static method. Passing 'null' for the BitSet
+        // triggers the use of the default set of printable characters.
+        final byte[] encodedBytes = QuotedPrintableCodec.encodeQuotedPrintable(null, plainText.getBytes(StandardCharsets.UTF_8));
+        final String actualEncodedText = new String(encodedBytes, StandardCharsets.UTF_8);
+
+        // Decode using a codec instance to test the round trip.
+        final String decodedText = codec.decode(actualEncodedText);
+
+        // Assert
+        assertEquals(expectedEncodedText, actualEncodedText, "The '=' character should be encoded as '=3D'.");
+        assertEquals(plainText, decodedText, "Decoding the encoded string should yield the original plain text.");
     }
 }
