@@ -1,27 +1,28 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest38 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for the QuotedPrintableCodec class, focusing on exception handling.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.encode("org.apache.commons.codec.net.Utils", (Charset) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that encode(String, Charset) throws a NullPointerException when the provided Charset is null.
+     * This is the expected behavior as the method relies on the Charset to convert the input string to bytes.
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeStringWithNullCharsetShouldThrowNullPointerException() {
+        // Arrange
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        String plainText = "This is a test string.";
+
+        // Act
+        // The cast to Charset is necessary to resolve method ambiguity between
+        // encode(String, Charset) and encode(String, String).
+        codec.encode(plainText, (Charset) null);
+
+        // Assert (is handled by the 'expected' attribute of the @Test annotation)
     }
 }
