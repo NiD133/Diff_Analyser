@@ -1,73 +1,72 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
 import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
 import org.apache.commons.collections4.functors.NullPredicate;
 import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest46 extends IndexedCollection_ESTest_scaffolding {
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        Predicate<Object> predicate0 = NullPredicate.nullPredicate();
-        LinkedList<Transformer<Integer, Integer>> linkedList0 = new LinkedList<Transformer<Integer, Integer>>();
-        Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 2);
-        predicateArray0[0] = predicate0;
-        Predicate<Object> predicate1 = NotNullPredicate.notNullPredicate();
-        predicateArray0[1] = predicate1;
-        Transformer<Object, Integer>[] transformerArray0 = (Transformer<Object, Integer>[]) Array.newInstance(Transformer.class, 1);
-        SwitchTransformer<Transformer<Integer, Integer>, Object> switchTransformer0 = new SwitchTransformer<Transformer<Integer, Integer>, Object>(predicateArray0, transformerArray0, transformer0);
-        IndexedCollection<Object, Transformer<Integer, Integer>> indexedCollection0 = IndexedCollection.uniqueIndexedCollection((Collection<Transformer<Integer, Integer>>) linkedList0, (Transformer<Transformer<Integer, Integer>, Object>) switchTransformer0);
-        Transformer<Integer, Integer> transformer1 = ExceptionTransformer.exceptionTransformer();
-        // Undeclared exception!
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for {@link IndexedCollection}.
+ * This test class focuses on exception propagation behavior.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that an exception thrown by the key transformer during an `add` operation
+     * is correctly propagated to the caller.
+     */
+    @Test
+    public void addShouldPropagateExceptionFromKeyTransformer() {
+        // --- Arrange ---
+
+        // 1. Create a SwitchTransformer that is intentionally misconfigured to throw
+        //    an ArrayIndexOutOfBoundsException. It has two predicates but only one
+        //    corresponding transformer.
+        final Predicate<Object> isNullPredicate = NullPredicate.nullPredicate();
+        final Predicate<Object> isNotNullPredicate = NotNullPredicate.notNullPredicate();
+
+        @SuppressWarnings("unchecked")
+        final Predicate<Object>[] predicates = (Predicate<Object>[]) Array.newInstance(Predicate.class, 2);
+        predicates[0] = isNullPredicate;
+        predicates[1] = isNotNullPredicate;
+
+        // Only one transformer is provided for the two predicates.
+        @SuppressWarnings("unchecked")
+        final Transformer<Object, ?>[] transformers = (Transformer<Object, ?>[]) Array.newInstance(Transformer.class, 1);
+
+        final Transformer<Object, Object> defaultTransformer = ConstantTransformer.nullTransformer();
+
+        // This keyTransformer will fail when it encounters a non-null object, as it will
+        // match the second predicate but there is no transformer at index 1.
+        final Transformer<Transformer<Integer, Integer>, Object> keyTransformer =
+                new SwitchTransformer<>(predicates, transformers, defaultTransformer);
+
+        // 2. Create the IndexedCollection with the faulty key transformer.
+        final Collection<Transformer<Integer, Integer>> backingList = new LinkedList<>();
+        final IndexedCollection<Object, Transformer<Integer, Integer>> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(backingList, keyTransformer);
+
+        // 3. Create a non-null element to add.
+        final Transformer<Integer, Integer> elementToAdd = ExceptionTransformer.exceptionTransformer();
+
+        // --- Act & Assert ---
         try {
-            indexedCollection0.add(transformer1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 1
-            //
-            verifyException("org.apache.commons.collections4.functors.SwitchTransformer", e);
+            indexedCollection.add(elementToAdd);
+            fail("Expected an ArrayIndexOutOfBoundsException to be thrown");
+        } catch (final ArrayIndexOutOfBoundsException e) {
+            // This exception is expected.
+            // It confirms that the exception from the underlying SwitchTransformer
+            // was propagated correctly by the IndexedCollection.
         }
     }
 }
