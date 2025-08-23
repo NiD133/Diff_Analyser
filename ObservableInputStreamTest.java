@@ -37,49 +37,25 @@ import org.apache.commons.io.test.CustomIOException;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link ObservableInputStream}.
+ * Unit tests for {@link ObservableInputStream}.
+ * 
+ * The tests use small helper observers to record what notifications are sent and
+ * to count how often each callback is invoked.
  */
 class ObservableInputStreamTest {
 
-    private static final class DataViewObserver extends MethodCountObserver {
-        private byte[] buffer;
-        private int lastValue = -1;
-        private int length = -1;
-        private int offset = -1;
+    // --------------------
+    // Test helpers
+    // --------------------
 
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.buffer = buffer;
-            this.offset = offset;
-            this.length = length;
-        }
+    private static final int RANDOM_DATA_SIZE = IOUtils.DEFAULT_BUFFER_SIZE;
+    private static final int READ_BUFFER_SIZE = 23;
+    private static final int PARTIAL_READ_LEN = 11;
+    private static final String RESOURCE_MORE_THAN_16K =
+            "src/test/resources/org/apache/commons/io/abitmorethan16k.txt";
 
-        @Override
-        public void data(final int value) throws IOException {
-            super.data(value);
-            lastValue = value;
-        }
-    }
-
-    private static final class LengthObserver extends Observer {
-        private long total;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.total += length;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            total++;
-        }
-
-        public long getTotal() {
-            return total;
-        }
-    }
-
-    private static class MethodCountObserver extends Observer {
+    /** Records callback invocations for easier assertions. */
+    private static class CountingObserver extends Observer {
         private long closedCount;
         private long dataBufferCount;
         private long dataCount;
@@ -111,279 +87,372 @@ class ObservableInputStreamTest {
             finishedCount++;
         }
 
-        public long getClosedCount() {
+        long getClosedCount() {
             return closedCount;
         }
 
-        public long getDataBufferCount() {
+        long getDataBufferCount() {
             return dataBufferCount;
         }
 
-        public long getDataCount() {
+        long getDataCount() {
             return dataCount;
         }
 
-        public long getErrorCount() {
+        long getErrorCount() {
             return errorCount;
         }
 
-        public long getFinishedCount() {
+        long getFinishedCount() {
             return finishedCount;
         }
-
     }
 
-    private ObservableInputStream brokenObservableInputStream() {
+    /** Records the last values passed to data(...) callbacks. */
+    private static final class RecordingObserver extends CountingObserver {
+        private byte[] lastBuffer;
+        private int lastOffset = -1;
+        private int lastLength = -1;
+        private int lastValue = -1;
+
+        @Override
+        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
+            super.data(buffer, offset, length);
+            lastBuffer = buffer;
+            lastOffset = offset;
+            lastLength = length;
+        }
+
+        @Override
+        public void data(final int value) throws IOException {
+            super.data(value);
+            lastValue = value;
+        }
+    }
+
+    /** Sums up bytes observed through either data(int) or data(byte[],o,l). */
+    private static final class ByteCountingObserver extends Observer {
+        private long total;
+
+        @Override
+        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
+            total += length;
+        }
+
+        @Override
+        public void data(final int value) throws IOException {
+            total++;
+        }
+
+        long getTotal() {
+            return total;
+        }
+    }
+
+    private static byte[] randomData() {
+        return MessageDigestInputStreamTest.generateRandomByteStream(RANDOM_DATA_SIZE);
+    }
+
+    private static ObservableInputStream observableFrom(final InputStream in, final Observer... observers) {
+        return new ObservableInputStream(in, observers);
+    }
+
+    private static ObservableInputStream observableFromRandomBytes(final Observer... observers) {
+        return observableFrom(new ByteArrayInputStream(randomData()), observers);
+    }
+
+    private static ObservableInputStream brokenObservableInputStream() {
         return new ObservableInputStream(BrokenInputStream.INSTANCE);
     }
 
-    private InputStream createInputStream() {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        return createInputStream(new ByteArrayInputStream(buffer));
-    }
+    // --------------------
+    // Tests
+    // --------------------
 
-    private ObservableInputStream createInputStream(final InputStream origin) {
-        return new ObservableInputStream(origin);
-    }
-
+    /**
+     * Verifies that the builder's afterRead callback is invoked and that any
+     * exception thrown by it is propagated.
+     */
     @Test
-    void testAfterReadConsumer() throws Exception {
-        final AtomicBoolean boolRef = new AtomicBoolean();
-        // @formatter:off
-        try (InputStream bounded = new ObservableInputStream.Builder()
+    void builder_afterReadConsumer_isInvoked_andExceptionsPropagate() throws Exception {
+        final AtomicBoolean called = new AtomicBoolean(false);
+
+        try (InputStream in = new ObservableInputStream.Builder()
                 .setCharSequence("Hi")
-                .setAfterRead(i -> boolRef.set(true))
+                .setAfterRead(i -> called.set(true))
                 .get()) {
-            IOUtils.consume(bounded);
+            IOUtils.consume(in);
         }
-        // @formatter:on
-        assertTrue(boolRef.get());
-        // Throwing
+        assertTrue(called.get(), "afterRead consumer should have been invoked");
+
         final String message = "test exception message";
-        // @formatter:off
-        try (InputStream bounded = new ObservableInputStream.Builder()
+        try (InputStream in = new ObservableInputStream.Builder()
                 .setCharSequence("Hi")
-                .setAfterRead(i -> {
-                    throw new CustomIOException(message);
-                })
+                .setAfterRead(i -> { throw new CustomIOException(message); })
                 .get()) {
-            assertEquals(message, assertThrowsExactly(CustomIOException.class, () -> IOUtils.consume(bounded)).getMessage());
+            assertEquals(message,
+                    assertThrowsExactly(CustomIOException.class, () -> IOUtils.consume(in)).getMessage());
         }
-        // @formatter:on
     }
 
+    /**
+     * available() should return 0 after close on a ByteArrayInputStream-based ObservableInputStream.
+     */
     @SuppressWarnings("resource")
     @Test
-    void testAvailableAfterClose() throws Exception {
+    void available_returnsZero_afterClose() throws Exception {
         final InputStream shadow;
-        try (InputStream in = createInputStream()) {
+        try (InputStream in = observableFromRandomBytes()) {
             assertTrue(in.available() > 0);
             shadow = in;
         }
         assertEquals(0, shadow.available());
     }
 
+    /**
+     * available() should be positive before first read and remain positive after reading one byte.
+     */
     @Test
-    void testAvailableAfterOpen() throws Exception {
-        try (InputStream in = createInputStream()) {
+    void available_isPositive_beforeAndAfterFirstRead() throws Exception {
+        try (InputStream in = observableFromRandomBytes()) {
             assertTrue(in.available() > 0);
             assertNotEquals(IOUtils.EOF, in.read());
             assertTrue(in.available() > 0);
         }
     }
 
+    /**
+     * read() on a broken underlying stream should propagate IOException.
+     */
     @Test
-    void testBrokenInputStreamRead() throws IOException {
+    void read_throws_onBrokenStream_singleByte() throws IOException {
         try (ObservableInputStream ois = brokenObservableInputStream()) {
             assertThrows(IOException.class, ois::read);
         }
     }
 
+    /**
+     * read(byte[]) on a broken underlying stream should propagate IOException.
+     */
     @Test
-    void testBrokenInputStreamReadBuffer() throws IOException {
+    void read_throws_onBrokenStream_buffer() throws IOException {
         try (ObservableInputStream ois = brokenObservableInputStream()) {
             assertThrows(IOException.class, () -> ois.read(new byte[1]));
         }
     }
 
+    /**
+     * read(byte[],o,l) on a broken underlying stream should propagate IOException.
+     */
     @Test
-    void testBrokenInputStreamReadSubBuffer() throws IOException {
+    void read_throws_onBrokenStream_subBuffer() throws IOException {
         try (ObservableInputStream ois = brokenObservableInputStream()) {
             assertThrows(IOException.class, () -> ois.read(new byte[2], 0, 1));
         }
     }
 
     /**
-     * Tests that {@link Observer#data(int)} is called.
+     * Observer#data(int) should be called for single-byte reads when the observer is added after some reads.
      */
     @Test
-    void testDataByteCalled_add() throws Exception {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        final DataViewObserver lko = new DataViewObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer))) {
-            assertEquals(-1, lko.lastValue);
-            ois.read();
-            assertEquals(-1, lko.lastValue);
-            assertEquals(0, lko.getFinishedCount());
-            assertEquals(0, lko.getClosedCount());
-            ois.add(lko);
-            for (int i = 1; i < buffer.length; i++) {
-                final int result = ois.read();
-                assertEquals((byte) result, buffer[i]);
-                assertEquals(result, lko.lastValue);
-                assertEquals(0, lko.getFinishedCount());
-                assertEquals(0, lko.getClosedCount());
-            }
-            final int result = ois.read();
-            assertEquals(-1, result);
-            assertEquals(1, lko.getFinishedCount());
-            assertEquals(0, lko.getClosedCount());
-            ois.close();
-            assertEquals(1, lko.getFinishedCount());
-            assertEquals(1, lko.getClosedCount());
-        }
-    }
+    void observerNotified_singleByteReads_whenAddedAfterFirstRead() throws Exception {
+        final byte[] data = randomData();
+        final RecordingObserver observer = new RecordingObserver();
 
-    /**
-     * Tests that {@link Observer#data(int)} is called.
-     */
-    @Test
-    void testDataByteCalled_ctor() throws Exception {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        final DataViewObserver lko = new DataViewObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lko)) {
-            assertEquals(-1, lko.lastValue);
-            ois.read();
-            assertNotEquals(-1, lko.lastValue);
-            assertEquals(0, lko.getFinishedCount());
-            assertEquals(0, lko.getClosedCount());
-            for (int i = 1; i < buffer.length; i++) {
-                final int result = ois.read();
-                assertEquals((byte) result, buffer[i]);
-                assertEquals(result, lko.lastValue);
-                assertEquals(0, lko.getFinishedCount());
-                assertEquals(0, lko.getClosedCount());
-            }
-            final int result = ois.read();
-            assertEquals(-1, result);
-            assertEquals(1, lko.getFinishedCount());
-            assertEquals(0, lko.getClosedCount());
-            ois.close();
-            assertEquals(1, lko.getFinishedCount());
-            assertEquals(1, lko.getClosedCount());
-        }
-    }
+        try (ObservableInputStream ois = observableFrom(new ByteArrayInputStream(data))) {
+            // Before adding the observer, nothing should be recorded.
+            assertEquals(-1, observer.lastValue);
+            ois.read(); // consume one byte
+            assertEquals(-1, observer.lastValue);
+            assertEquals(0, observer.getFinishedCount());
+            assertEquals(0, observer.getClosedCount());
 
-    /**
-     * Tests that {@link Observer#data(byte[],int,int)} is called.
-     */
-    @Test
-    void testDataBytesCalled() throws Exception {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-                ObservableInputStream ois = createInputStream(bais)) {
-            final DataViewObserver observer = new DataViewObserver();
-            final byte[] readBuffer = new byte[23];
-            assertNull(observer.buffer);
-            ois.read(readBuffer);
-            assertNull(observer.buffer);
             ois.add(observer);
-            for (;;) {
-                if (bais.available() >= 2048) {
-                    final int result = ois.read(readBuffer);
-                    if (result == -1) {
-                        ois.close();
-                        break;
-                    }
-                    assertEquals(readBuffer, observer.buffer);
-                    assertEquals(0, observer.offset);
-                    assertEquals(readBuffer.length, observer.length);
-                } else {
-                    final int res = Math.min(11, bais.available());
-                    final int result = ois.read(readBuffer, 1, 11);
-                    if (result == -1) {
-                        ois.close();
-                        break;
-                    }
-                    assertEquals(readBuffer, observer.buffer);
-                    assertEquals(1, observer.offset);
-                    assertEquals(res, observer.length);
-                }
+
+            // From now on, every single-byte read should be observed.
+            for (int i = 1; i < data.length; i++) {
+                final int value = ois.read();
+                assertEquals((byte) value, data[i], "read value should match underlying data");
+                assertEquals(value, observer.lastValue, "observer should be notified with read value");
+                assertEquals(0, observer.getFinishedCount());
+                assertEquals(0, observer.getClosedCount());
             }
+
+            // EOF should trigger finished, and close should then trigger closed.
+            assertEquals(-1, ois.read());
+            assertEquals(1, observer.getFinishedCount(), "finished should be signaled once at EOF");
+            assertEquals(0, observer.getClosedCount());
+            ois.close();
+            assertEquals(1, observer.getClosedCount(), "closed should be signaled once on close");
         }
     }
 
+    /**
+     * Observer#data(int) should be called for single-byte reads when the observer is provided in the constructor.
+     */
     @Test
-    void testGetObservers0() throws IOException {
+    void observerNotified_singleByteReads_whenProvidedInConstructor() throws Exception {
+        final byte[] data = randomData();
+        final RecordingObserver observer = new RecordingObserver();
+
+        try (ObservableInputStream ois = observableFrom(new ByteArrayInputStream(data), observer)) {
+            assertEquals(-1, observer.lastValue);
+            ois.read();
+            assertNotEquals(-1, observer.lastValue, "observer should be notified on first read");
+            assertEquals(0, observer.getFinishedCount());
+            assertEquals(0, observer.getClosedCount());
+
+            for (int i = 1; i < data.length; i++) {
+                final int value = ois.read();
+                assertEquals((byte) value, data[i], "read value should match underlying data");
+                assertEquals(value, observer.lastValue, "observer should be notified with read value");
+                assertEquals(0, observer.getFinishedCount());
+                assertEquals(0, observer.getClosedCount());
+            }
+
+            assertEquals(-1, ois.read());
+            assertEquals(1, observer.getFinishedCount(), "finished should be signaled once at EOF");
+            assertEquals(0, observer.getClosedCount());
+            ois.close();
+            assertEquals(1, observer.getClosedCount(), "closed should be signaled once on close");
+        }
+    }
+
+    /**
+     * Observer#data(byte[],o,l) should be called with the actual buffer, offset, and length for bulk reads.
+     */
+    @Test
+    void observerNotified_bufferReads_bulk() throws Exception {
+        final byte[] data = randomData();
+        final RecordingObserver observer = new RecordingObserver();
+        final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
+
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
+             ObservableInputStream ois = observableFrom(bais, observer)) {
+
+            int result;
+            while ((result = ois.read(readBuffer)) != -1) {
+                assertEquals(readBuffer, observer.lastBuffer, "observer should receive the same buffer instance");
+                assertEquals(0, observer.lastOffset, "offset should be 0 for bulk reads");
+                assertEquals(result, observer.lastLength, "length should match bytes read");
+            }
+            ois.close();
+        }
+    }
+
+    /**
+     * Observer#data(byte[],o,l) should be called with the actual buffer, offset, and length for partial reads.
+     */
+    @Test
+    void observerNotified_bufferReads_partial() throws Exception {
+        final byte[] data = randomData();
+        final RecordingObserver observer = new RecordingObserver();
+        final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
+
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
+             ObservableInputStream ois = observableFrom(bais, observer)) {
+
+            int result;
+            while ((result = ois.read(readBuffer, 1, PARTIAL_READ_LEN)) != -1) {
+                assertEquals(readBuffer, observer.lastBuffer, "observer should receive the same buffer instance");
+                assertEquals(1, observer.lastOffset, "offset should be the requested offset");
+                assertEquals(result, observer.lastLength, "length should match bytes read");
+            }
+            ois.close();
+        }
+    }
+
+    /**
+     * getObservers() should return an empty list when no observers were registered.
+     */
+    @Test
+    void getObservers_returnsEmptyList_whenNoneRegistered() throws IOException {
         try (ObservableInputStream ois = new ObservableInputStream(new NullInputStream())) {
             assertTrue(ois.getObservers().isEmpty());
         }
     }
 
+    /**
+     * getObservers() should contain the observer provided in the constructor.
+     */
     @Test
-    void testGetObservers1() throws IOException {
-        final DataViewObserver observer0 = new DataViewObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new NullInputStream(), observer0)) {
-            assertEquals(observer0, ois.getObservers().get(0));
+    void getObservers_containsSingleObserver_whenOneRegistered() throws IOException {
+        final RecordingObserver observer = new RecordingObserver();
+        try (ObservableInputStream ois = new ObservableInputStream(new NullInputStream(), observer)) {
+            assertEquals(observer, ois.getObservers().get(0));
         }
     }
 
+    /**
+     * getObservers() should preserve registration order.
+     */
     @Test
-    void testGetObserversOrder() throws IOException {
-        final DataViewObserver observer0 = new DataViewObserver();
-        final DataViewObserver observer1 = new DataViewObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new NullInputStream(), observer0, observer1)) {
-            assertEquals(observer0, ois.getObservers().get(0));
-            assertEquals(observer1, ois.getObservers().get(1));
+    void getObservers_preservesOrder() throws IOException {
+        final RecordingObserver o0 = new RecordingObserver();
+        final RecordingObserver o1 = new RecordingObserver();
+        try (ObservableInputStream ois = new ObservableInputStream(new NullInputStream(), o0, o1)) {
+            assertEquals(o0, ois.getObservers().get(0));
+            assertEquals(o1, ois.getObservers().get(1));
         }
     }
 
-    private void testNotificationCallbacks(final int bufferSize) throws IOException {
-        final byte[] buffer = IOUtils.byteArray();
-        final LengthObserver lengthObserver = new LengthObserver();
-        final MethodCountObserver methodCountObserver = new MethodCountObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lengthObserver, methodCountObserver)) {
-            assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize));
+    /**
+     * Copies the entire input with the given buffer size and verifies callback counts and totals.
+     */
+    private void assertNotificationCallbacksForBufferSize(final int bufferSize) throws IOException {
+        final byte[] buffer = IOUtils.byteArray(); // size == IOUtils.DEFAULT_BUFFER_SIZE
+        final ByteCountingObserver byteCounter = new ByteCountingObserver();
+        final CountingObserver counter = new CountingObserver();
+
+        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), byteCounter, counter)) {
+            final long copied = IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize);
+            assertEquals(RANDOM_DATA_SIZE, copied, "all bytes should be copied");
         }
-        assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, lengthObserver.getTotal());
-        assertEquals(1, methodCountObserver.getClosedCount());
-        assertEquals(1, methodCountObserver.getFinishedCount());
-        assertEquals(0, methodCountObserver.getErrorCount());
-        assertEquals(0, methodCountObserver.getDataCount());
-        assertEquals(buffer.length / bufferSize, methodCountObserver.getDataBufferCount());
+
+        assertEquals(RANDOM_DATA_SIZE, byteCounter.getTotal(), "observer should count all bytes");
+        assertEquals(1, counter.getClosedCount(), "closed should be signaled once");
+        assertEquals(1, counter.getFinishedCount(), "finished should be signaled once");
+        assertEquals(0, counter.getErrorCount(), "no errors expected");
+        assertEquals(0, counter.getDataCount(), "no single-byte reads expected");
+        assertEquals(buffer.length / bufferSize, counter.getDataBufferCount(),
+                "number of buffer reads should match copy iterations");
     }
 
     @Test
-    void testNotificationCallbacksBufferSize1() throws Exception {
-        testNotificationCallbacks(1);
+    void notificationCallbacks_withBufferSize1() throws Exception {
+        assertNotificationCallbacksForBufferSize(1);
     }
 
     @Test
-    void testNotificationCallbacksBufferSize2() throws Exception {
-        testNotificationCallbacks(2);
+    void notificationCallbacks_withBufferSize2() throws Exception {
+        assertNotificationCallbacksForBufferSize(2);
     }
 
     @Test
-    void testNotificationCallbacksBufferSizeDefault() throws Exception {
-        testNotificationCallbacks(IOUtils.DEFAULT_BUFFER_SIZE);
+    void notificationCallbacks_withDefaultBufferSize() throws Exception {
+        assertNotificationCallbacksForBufferSize(IOUtils.DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * For ByteArrayInputStream, read() after close still works.
+     */
     @Test
-    void testReadAfterClose_ByteArrayInputStream() throws Exception {
-        try (InputStream in = createInputStream()) {
+    void readAfterClose_stillWorks_forByteArrayInputStream() throws Exception {
+        try (InputStream in = observableFromRandomBytes()) {
             in.close();
             assertNotEquals(IOUtils.EOF, in.read());
         }
     }
 
+    /**
+     * For ChannelInputStream (opened from a real file), read() after close throws.
+     */
     @SuppressWarnings("resource")
     @Test
-    void testReadAfterClose_ChannelInputStream() throws Exception {
-        try (InputStream in = createInputStream(Files.newInputStream(Paths.get("src/test/resources/org/apache/commons/io/abitmorethan16k.txt")))) {
+    void readAfterClose_throws_forChannelInputStream() throws Exception {
+        try (InputStream in = observableFrom(Files.newInputStream(Paths.get(RESOURCE_MORE_THAN_16K)))) {
             in.close();
-            // ChannelInputStream throws when closed
-            assertThrows(IOException.class, in::read);
+            assertThrows(IOException.class, in::read, "ChannelInputStream should throw when closed");
         }
     }
-
 }
