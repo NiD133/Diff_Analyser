@@ -1,20 +1,27 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class JsonTypeInfo_ESTestTest1 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTypeInfo.Id} enum.
+ */
+public class JsonTypeInfoIdTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.CUSTOM;
-        String string0 = jsonTypeInfo_Id0.getDefaultPropertyName();
-        assertNull(string0);
+    /**
+     * Verifies that the CUSTOM Id type returns null for its default property name.
+     * This is the expected behavior, as a custom type resolver is responsible for
+     * defining its own property name and semantics.
+     */
+    @Test
+    public void getDefaultPropertyName_forCustomId_shouldReturnNull() {
+        // Arrange: The Id type under test is CUSTOM.
+        JsonTypeInfo.Id customId = JsonTypeInfo.Id.CUSTOM;
+
+        // Act: Retrieve the default property name.
+        String propertyName = customId.getDefaultPropertyName();
+
+        // Assert: The result should be null.
+        assertNull("The default property name for Id.CUSTOM should be null.", propertyName);
     }
 }
