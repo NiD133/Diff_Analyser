@@ -1,23 +1,24 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CompactLinkedHashSet_ESTestTest29 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Test for {@link CompactLinkedHashSet#clear()}.
+ */
+public class CompactLinkedHashSetClearTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Locale.Category[] locale_CategoryArray0 = new Locale.Category[1];
-        CompactLinkedHashSet<Object> compactLinkedHashSet0 = CompactLinkedHashSet.create((Object[]) locale_CategoryArray0);
-        compactLinkedHashSet0.clear();
-        assertEquals(0, compactLinkedHashSet0.size());
+    @Test
+    public void clear_onNonEmptySet_shouldMakeTheSetEmpty() {
+        // Arrange: Create a set with a single element to make it non-empty.
+        CompactLinkedHashSet<String> set = CompactLinkedHashSet.create("an element");
+
+        // Act: Call the clear() method, which is the action under test.
+        set.clear();
+
+        // Assert: Verify the set is empty after being cleared.
+        assertTrue("The set should be empty after calling clear().", set.isEmpty());
+        assertEquals("The set size should be 0 after calling clear().", 0, set.size());
     }
 }
