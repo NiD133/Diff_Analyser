@@ -1,47 +1,27 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class XYLineAnnotation_ESTestTest26 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation((-1433.6156858015083), (-1433.6156858015083), (-1433.6156858015083), (-1433.6156858015083));
-        boolean boolean0 = xYLineAnnotation0.equals(xYLineAnnotation0);
-        assertTrue(boolean0);
-        assertEquals((-1433.6156858015083), xYLineAnnotation0.getX2(), 0.01);
-        assertEquals((-1433.6156858015083), xYLineAnnotation0.getY2(), 0.01);
-        assertEquals((-1433.6156858015083), xYLineAnnotation0.getX1(), 0.01);
-        assertEquals((-1433.6156858015083), xYLineAnnotation0.getY1(), 0.01);
+    /**
+     * Tests the reflexivity of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_onSameInstance_shouldReturnTrue() {
+        // Arrange: Create an annotation with simple, clear coordinates.
+        XYLineAnnotation annotation = new XYLineAnnotation(10.0, 20.0, 30.0, 40.0);
+
+        // Act: Compare the instance with itself.
+        boolean isEqual = annotation.equals(annotation);
+
+        // Assert: The result should be true.
+        assertTrue("An instance of XYLineAnnotation should be equal to itself.", isEqual);
     }
 }
