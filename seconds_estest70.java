@@ -2,17 +2,29 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest70 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        Seconds seconds0 = Seconds.MAX_VALUE;
-        Duration duration0 = seconds0.toStandardDuration();
-        assertEquals(24855L, duration0.getStandardDays());
+    /**
+     * Tests that converting Seconds.MAX_VALUE to a standard duration
+     * correctly calculates the equivalent number of standard days.
+     */
+    @Test
+    public void toStandardDuration_withMaxValue_convertsToCorrectNumberOfDays() {
+        // Arrange
+        Seconds maxSeconds = Seconds.MAX_VALUE;
+        // A standard day has 24 hours * 60 minutes * 60 seconds = 86400 seconds.
+        final int SECONDS_PER_DAY = 86400;
+        long expectedDays = (long) Integer.MAX_VALUE / SECONDS_PER_DAY;
+
+        // Act
+        Duration duration = maxSeconds.toStandardDuration();
+        long actualDays = duration.getStandardDays();
+
+        // Assert
+        assertEquals(expectedDays, actualDays);
     }
 }
