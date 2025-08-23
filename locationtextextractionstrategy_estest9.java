@@ -1,35 +1,50 @@
 package com.itextpdf.text.pdf.parser;
 
+import com.itextpdf.text.pdf.parser.LocationTextExtractionStrategy.TextChunkLocationDefaultImp;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocationTextExtractionStrategy_ESTestTest9 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LocationTextExtractionStrategy.TextChunkLocationDefaultImp} class.
+ */
+public class TextChunkLocationDefaultImpTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Vector vector0 = new Vector(1518.243F, 1518.243F, (-2451.2717F));
-        LocationTextExtractionStrategy.TextChunkLocationDefaultImp locationTextExtractionStrategy_TextChunkLocationDefaultImp0 = new LocationTextExtractionStrategy.TextChunkLocationDefaultImp(vector0, vector0, (-1477.5446F));
-        locationTextExtractionStrategy_TextChunkLocationDefaultImp0.getStartLocation();
-        assertEquals(1518.243F, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.distParallelStart(), 0.01F);
-        assertEquals(1518.243F, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.distParallelEnd(), 0.01F);
-        assertEquals(0, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.orientationMagnitude());
-        assertEquals((-1477.5446F), locationTextExtractionStrategy_TextChunkLocationDefaultImp0.getCharSpaceWidth(), 0.01F);
-        assertEquals((-1518), locationTextExtractionStrategy_TextChunkLocationDefaultImp0.distPerpendicular());
+    /**
+     * Tests that the constructor correctly calculates location properties for a zero-length chunk,
+     * where the start and end locations are the same.
+     *
+     * In this scenario, the implementation should default to a standard horizontal orientation
+     * vector (1, 0, 0) and calculate all derived properties based on that assumption.
+     */
+    @Test
+    public void constructorShouldCalculateCorrectPropertiesForZeroLengthChunk() {
+        // ARRANGE: Define the input data and expected outcomes.
+        final float x = 1518.243f;
+        final float y = 1518.243f;
+        final float z = -2451.2717f;
+        final float charSpaceWidth = -1477.5446f; // An arbitrary value for testing.
+
+        // For a zero-length chunk, the start and end locations are the same point.
+        Vector locationPoint = new Vector(x, y, z);
+
+        // Expected values are derived from the constructor's logic for a zero-length chunk:
+        // - Orientation vector defaults to (1, 0, 0).
+        // - Parallel distance is the dot product with (1, 0, 0), which equals the x-coordinate.
+        final float expectedDistParallel = x;
+        // - Perpendicular distance is derived from the cross product, resulting in the negative y-coordinate.
+        final int expectedDistPerpendicular = (int) -y; // Becomes -1518 after casting to int.
+        // - Orientation magnitude for a horizontal vector (atan2(0,1)) is 0.
+        final int expectedOrientationMagnitude = 0;
+
+        // ACT: Create the TextChunkLocation instance.
+        TextChunkLocationDefaultImp chunkLocation = new TextChunkLocationDefaultImp(locationPoint, locationPoint, charSpaceWidth);
+
+        // ASSERT: Verify that all calculated properties match the expected values.
+        assertEquals("Parallel start distance should equal the x-coordinate.", expectedDistParallel, chunkLocation.distParallelStart(), 0.01f);
+        assertEquals("Parallel end distance should equal the x-coordinate.", expectedDistParallel, chunkLocation.distParallelEnd(), 0.01f);
+        assertEquals("Perpendicular distance should be based on the y-coordinate.", expectedDistPerpendicular, chunkLocation.distPerpendicular());
+        assertEquals("Orientation magnitude should be zero for default horizontal orientation.", expectedOrientationMagnitude, chunkLocation.orientationMagnitude());
+        assertEquals("Character space width should be stored correctly.", charSpaceWidth, chunkLocation.getCharSpaceWidth(), 0.01f);
+        assertEquals("Start location should be the original vector.", locationPoint, chunkLocation.getStartLocation());
     }
 }
