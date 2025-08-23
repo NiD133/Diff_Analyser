@@ -1,19 +1,48 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest47 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("CGH");
-        assertEquals("K", string0);
-        assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests that a new Metaphone instance is configured with the correct
+     * default maximum code length.
+     */
+    @Test
+    public void shouldHaveDefaultMaxCodeLengthOfFour() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final int expectedMaxCodeLen = 4;
+
+        // Act
+        final int actualMaxCodeLen = metaphone.getMaxCodeLen();
+
+        // Assert
+        assertEquals("Default max code length should be 4", expectedMaxCodeLen, actualMaxCodeLen);
+    }
+
+    /**
+     * Tests the Metaphone encoding for the string "CGH".
+     * According to the Metaphone algorithm rules:
+     * - 'C' at the beginning of a word is encoded as 'K'.
+     * - 'GH' at the end of a word is silent.
+     * Therefore, "CGH" should be encoded as "K".
+     */
+    @Test
+    public void metaphoneShouldEncodeCghAsK() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "CGH";
+        final String expectedEncoding = "K";
+
+        // Act
+        final String actualEncoding = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("The metaphone encoding for 'CGH' should be 'K'", expectedEncoding, actualEncoding);
     }
 }
