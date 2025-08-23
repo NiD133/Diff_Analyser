@@ -1,18 +1,41 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSetUtils_ESTestTest2 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSetUtils}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        String[] stringArray0 = new String[13];
-        stringArray0[0] = "uk{Z^6e/S>lTbb#wl";
-        String string0 = CharSetUtils.squeeze("Aborting to protect against StackOverflowError - output of one loop is the input of another", stringArray0);
-        assertEquals("Aborting to protect against StackOverflowEror - output of one lop is the input of another", string0);
+    @Test
+    // The test method name clearly describes the behavior being tested:
+    // what the method does (squeezes repeated characters) and under what condition
+    // (when the characters are in the provided set).
+    public void squeeze_shouldSqueezeRepeatedCharacters_whenTheyAreInTheProvidedSet() {
+        // --- Arrange ---
+        // Use clear, descriptive variable names and simple, focused test data.
+        // The input string contains repeated characters:
+        // - 'll' and 'oo' (which are in the set to be squeezed)
+        // - 'pp' (which is NOT in the set)
+        final String input = "ballooning applications";
+
+        // The expected output after squeezing 'll' to 'l' and 'oo' to 'o'.
+        // The repeated 'pp' in "applications" should remain unchanged because 'p' is not in the set.
+        final String expected = "baloning applications";
+
+        // --- Act ---
+        // Call the method under test. Using varargs for the character set is cleaner
+        // than creating an explicit array.
+        final String actual = CharSetUtils.squeeze(input, "l", "o");
+
+        // --- Assert ---
+        // Verify that the actual result matches the expected outcome.
+        // An assertion message is added for clarity in case the test fails.
+        assertEquals(
+            "Squeezing 'l' and 'o' should reduce 'll' and 'oo' to single characters.",
+            expected,
+            actual
+        );
     }
 }
