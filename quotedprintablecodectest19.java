@@ -1,39 +1,54 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
+
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest19 {
+/**
+ * Tests for QuotedPrintableCodec in "strict" mode, focusing on soft line breaks.
+ * In strict mode, the codec must insert soft line breaks (=\r\n) to ensure
+ * that encoded lines do not exceed the 76-character limit.
+ */
+public class QuotedPrintableCodecStrictLineBreakTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private QuotedPrintableCodec strictCodec;
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        // The 'true' argument enables strict encoding, which includes soft line breaks.
+        strictCodec = new QuotedPrintableCodec(true);
     }
 
     @Test
-    void testTrailingSpecial() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-        String plain = "This is a example of a quoted-printable text file. This might contain sp=cial chars.";
-        String expected = "This is a example of a quoted-printable text file. This might contain sp=3D=\r\ncial chars.";
-        assertEquals(expected, qpcodec.encode(plain));
-        plain = "This is a example of a quoted-printable text file. This might contain ta\tbs as well.";
-        expected = "This is a example of a quoted-printable text file. This might contain ta=09=\r\nbs as well.";
-        assertEquals(expected, qpcodec.encode(plain));
+    @DisplayName("Encoding '=' near line limit in strict mode should insert a soft line break")
+    void testEqualsSignNearLineLimitIsEncodedWithSoftLineBreak() throws EncoderException {
+        // Arrange
+        // The '=' character is at a position that requires a soft line break after encoding in strict mode.
+        final String inputString = "This is a example of a quoted-printable text file. This might contain sp=cial chars.";
+        final String expectedEncoding = "This is a example of a quoted-printable text file. This might contain sp=3D=\r\ncial chars.";
+
+        // Act
+        final String actualEncoding = strictCodec.encode(inputString);
+
+        // Assert
+        assertEquals(expectedEncoding, actualEncoding);
+    }
+
+    @Test
+    @DisplayName("Encoding a TAB near line limit in strict mode should insert a soft line break")
+    void testTabNearLineLimitIsEncodedWithSoftLineBreak() throws EncoderException {
+        // Arrange
+        // The TAB character ('\t') is at a position that requires a soft line break after encoding in strict mode.
+        final String inputString = "This is a example of a quoted-printable text file. This might contain ta\tbs as well.";
+        final String expectedEncoding = "This is a example of a quoted-printable text file. This might contain ta=09=\r\nbs as well.";
+
+        // Act
+        final String actualEncoding = strictCodec.encode(inputString);
+
+        // Assert
+        assertEquals(expectedEncoding, actualEncoding);
     }
 }
