@@ -3,51 +3,84 @@ package org.apache.commons.compress.utils;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SeekableInMemoryByteChannelTestTest8 {
+@DisplayName("Tests for SeekableInMemoryByteChannel")
+class SeekableInMemoryByteChannelTest {
 
-    private final byte[] testData = "Some data".getBytes(UTF_8);
+    private static final byte[] TEST_DATA = "Some data".getBytes(UTF_8);
 
-    /*
-     * <q>Setting the position to a value that is greater than the current size is legal but does not change the size of the entity. A later attempt to write
-     * bytes at such a position will cause the entity to grow to accommodate the new bytes; the values of any bytes between the previous end-of-file and the
-     * newly-written bytes are unspecified.</q>
-     */
-    public void writingToAPositionAfterEndGrowsChannel() throws Exception {
-        try (SeekableByteChannel c = new SeekableInMemoryByteChannel()) {
-            c.position(2);
-            assertEquals(2, c.position());
-            final ByteBuffer inData = ByteBuffer.wrap(testData);
-            assertEquals(testData.length, c.write(inData));
-            assertEquals(testData.length + 2, c.size());
-            c.position(2);
-            final ByteBuffer readBuffer = ByteBuffer.allocate(testData.length);
-            c.read(readBuffer);
-            assertArrayEquals(testData, Arrays.copyOf(readBuffer.array(), testData.length));
+    @Test
+    @DisplayName("Writing at a position beyond the current size should grow the channel, leaving a gap")
+    void shouldGrowChannelWhenWritingPastCurrentSize() throws IOException {
+        // Arrange
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel()) {
+            final int gapSize = 2;
+            final ByteBuffer writeBuffer = ByteBuffer.wrap(TEST_DATA);
+            final long expectedSize = gapSize + TEST_DATA.length;
+            final long expectedPositionAfterWrite = gapSize + TEST_DATA.length;
+
+            // Act
+            channel.position(gapSize);
+            int bytesWritten = channel.write(writeBuffer);
+
+            // Assert
+            assertEquals(TEST_DATA.length, bytesWritten, "The number of bytes written should match the buffer size");
+            assertEquals(expectedSize, channel.size(), "Channel size should grow to accommodate the gap and new data");
+            assertEquals(expectedPositionAfterWrite, channel.position(), "Position should be at the end of the newly written data");
+
+            // Verify the gap (bytes 0 and 1) is filled with null bytes
+            byte[] gapData = new byte[gapSize];
+            channel.position(0);
+            channel.read(ByteBuffer.wrap(gapData));
+            assertArrayEquals(new byte[]{0, 0}, gapData, "The gap should be filled with null bytes");
+
+            // Verify the written data is correct
+            byte[] writtenData = new byte[TEST_DATA.length];
+            channel.position(gapSize);
+            channel.read(ByteBuffer.wrap(writtenData));
+            assertArrayEquals(TEST_DATA, writtenData, "The data read back should match the data written");
         }
     }
 
     @Test
-    void testShouldSignalEOFWhenPositionAtTheEnd() throws IOException {
-        // given
-        try (SeekableInMemoryByteChannel c = new SeekableInMemoryByteChannel(testData)) {
-            final ByteBuffer readBuffer = ByteBuffer.allocate(testData.length);
-            // when
-            c.position(testData.length + 1);
-            final int readCount = c.read(readBuffer);
-            // then
-            assertEquals(0L, readBuffer.position());
-            assertEquals(-1, readCount);
-            assertEquals(-1, c.read(readBuffer));
+    @DisplayName("Read should return -1 (EOF) when the position is exactly at the end of the channel")
+    void readShouldReturnEOFWhenPositionIsAtSize() throws IOException {
+        // Arrange
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel(TEST_DATA)) {
+            ByteBuffer readBuffer = ByteBuffer.allocate(10);
+            channel.position(channel.size()); // Position at the very end
+
+            // Act
+            int bytesRead = channel.read(readBuffer);
+
+            // Assert
+            assertEquals(-1, bytesRead, "read() should return -1 for EOF");
+            assertEquals(0, readBuffer.position(), "Buffer position should not change on EOF");
+        }
+    }
+
+    @Test
+    @DisplayName("Read should return -1 (EOF) when the position is beyond the end of the channel")
+    void readShouldReturnEOFWhenPositionIsBeyondSize() throws IOException {
+        // Arrange
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel(TEST_DATA)) {
+            ByteBuffer readBuffer = ByteBuffer.allocate(10);
+            channel.position(channel.size() + 1); // Position past the end
+
+            // Act
+            int firstReadCount = channel.read(readBuffer);
+            int secondReadCount = channel.read(readBuffer); // Subsequent read should also be EOF
+
+            // Assert
+            assertEquals(-1, firstReadCount, "First read should return -1 for EOF");
+            assertEquals(-1, secondReadCount, "Subsequent read should also return -1");
+            assertEquals(0, readBuffer.position(), "Buffer position should not change on EOF");
         }
     }
 }
