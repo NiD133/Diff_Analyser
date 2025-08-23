@@ -1,26 +1,23 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BigDecimalParser_ESTestTest17 extends BigDecimalParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BigDecimalParser} class, focusing on its dependency handling.
+ */
+public class BigDecimalParserTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        // Undeclared exception!
-        try {
-            BigDecimalParser.parseWithFastParser("");
-            fail("Expecting exception: NoClassDefFoundError");
-        } catch (NoClassDefFoundError e) {
-            //
-            // ch/randelshofer/fastdoubleparser/JavaBigDecimalParser
-            //
-            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-        }
+    /**
+     * Verifies that calling {@code parseWithFastParser} throws a {@code NoClassDefFoundError}
+     * when its required dependency (the 'fastdoubleparser' library) is not available on the classpath.
+     * <p>
+     * This test simulates a specific runtime environment to ensure the code fails predictably
+     * when its dependencies are not met.
+     */
+    @Test(timeout = 4000, expected = NoClassDefFoundError.class)
+    public void parseWithFastParserShouldThrowErrorWhenDependencyIsMissing() {
+        // This call is expected to fail because the test is configured to run
+        // without the 'ch.randelshofer.fastdoubleparser.JavaBigDecimalParser' class.
+        BigDecimalParser.parseWithFastParser("");
     }
 }
