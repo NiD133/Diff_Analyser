@@ -1,24 +1,38 @@
 package org.jfree.chart;
 
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import org.jfree.chart.entity.ChartEntity;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ChartRenderingInfoTestTest4 {
+import java.awt.geom.Rectangle2D;
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+/**
+ * Tests for the serialization of the {@link ChartRenderingInfo} class.
+ */
+class ChartRenderingInfoSerializationTest {
+
     @Test
-    public void testSerialization2() {
-        ChartRenderingInfo i1 = new ChartRenderingInfo();
-        i1.getPlotInfo().setDataArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        ChartRenderingInfo i2 = TestUtils.serialised(i1);
-        assertEquals(i1, i2);
-        assertEquals(i2, i2.getPlotInfo().getOwner());
+    @DisplayName("A deserialized ChartRenderingInfo object should be equal to the original")
+    void serialization_restoresObjectStateAndInternalOwnerReference() {
+        // Arrange: Create an instance and set a property to ensure it's not in a default state.
+        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
+        originalInfo.getPlotInfo().setDataArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+
+        // Act: Serialize and then deserialize the object.
+        ChartRenderingInfo deserializedInfo = TestUtils.serialised(originalInfo);
+
+        // Assert: Verify that the deserialized object is a faithful copy.
+
+        // 1. The deserialized object should be equal to the original based on the equals() method.
+        assertEquals(originalInfo, deserializedInfo,
+                "Deserialized object should be equal to the original.");
+
+        // 2. The internal 'owner' reference in PlotRenderingInfo must point to the new
+        //    deserialized ChartRenderingInfo instance. This verifies that the object graph
+        //    is correctly reconstructed after deserialization.
+        assertSame(deserializedInfo, deserializedInfo.getPlotInfo().getOwner(),
+                "The owner of the plot info should be the new deserialized instance.");
     }
 }
