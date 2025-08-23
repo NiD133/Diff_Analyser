@@ -1,22 +1,27 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class IslamicChronology_ESTestTest56 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        boolean boolean0 = islamicChronology0.equals(islamicChronology0);
-        assertTrue(boolean0);
+    /**
+     * Tests that an instance of IslamicChronology is equal to itself,
+     * verifying the reflexive property of the equals() method.
+     */
+    @Test
+    public void testEqualsIsReflexive() {
+        // Arrange
+        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
+
+        // Assert: An object must be equal to itself.
+        assertTrue("A chronology instance must be equal to itself.", chronology.equals(chronology));
+        
+        // A reflexive object's hash code must be consistent with equals.
+        assertEquals(chronology.hashCode(), chronology.hashCode());
     }
 }
