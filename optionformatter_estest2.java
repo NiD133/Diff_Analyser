@@ -1,26 +1,42 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link OptionFormatter} class.
+ * This class focuses on improving the understandability of an auto-generated test case.
+ */
 public class OptionFormatter_ESTestTest2 extends OptionFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Option option0 = new Option((String) null, (String) null, true, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
-        OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setDefaultArgName("[Deprecated");
-        OptionFormatter optionFormatter1 = optionFormatter_Builder1.build(option0);
-        String string0 = optionFormatter1.toSyntaxOption();
-        assertEquals("[ <[Deprecated>]", string0);
+    /**
+     * Tests that the syntax for an optional option, which has an argument but no name,
+     * is formatted correctly when a custom default argument name is provided.
+     */
+    @Test
+    public void toSyntaxOption_forOptionalOptionWithNoNameAndCustomArgName_returnsCorrectlyFormattedString() {
+        // Arrange
+        // Create an option that has an argument but no short or long name.
+        // By default, an option is not required, so this will be treated as optional.
+        final Option optionWithArgButNoName = new Option(null, null, true, null);
+        final String customArgName = "[Deprecated";
+
+        // Build a formatter with a custom default argument name.
+        final OptionFormatter formatter = OptionFormatter.builder()
+                .setDefaultArgName(customArgName)
+                .build(optionWithArgButNoName);
+
+        // The expected format for an optional option with no name is:
+        // "[ optArgSeparator<defaultArgName>]" which defaults to "[ <arg>]".
+        // With our custom defaultArgName, it becomes "[ <[Deprecated>]".
+        final String expectedSyntax = "[ <[Deprecated>]";
+
+        // Act
+        final String actualSyntax = formatter.toSyntaxOption();
+
+        // Assert
+        assertEquals(expectedSyntax, actualSyntax);
     }
 }
