@@ -1,29 +1,37 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test class contains an improved version of a test for the IslamicChronology class.
+ * The original class name and inheritance structure are preserved to demonstrate the refactoring.
+ */
 public class IslamicChronology_ESTestTest29 extends IslamicChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        IslamicChronology islamicChronology0 = new IslamicChronology((Chronology) null, (Object) null, (IslamicChronology.LeapYearPatternType) null);
-        // Undeclared exception!
-        try {
-            islamicChronology0.getYear(1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling getYear() throws a NullPointerException if the
+     * IslamicChronology instance was constructed with a null LeapYearPatternType.
+     *
+     * This test covers the scenario where the package-private constructor is used
+     * to create an object in an invalid state. It ensures that methods relying on
+     * the leap year pattern fail predictably instead of returning incorrect data.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getYear_whenConstructedWithNullLeapYearPattern_throwsNullPointerException() {
+        // Arrange: Create an IslamicChronology instance with a null leap year pattern.
+        // The constructor does not validate this argument, deferring the failure
+        // until a calculation method is called. The other constructor arguments are
+        // not relevant to this specific test case.
+        IslamicChronology.LeapYearPatternType nullPattern = null;
+        IslamicChronology chronologyWithNullPattern = new IslamicChronology(
+                (Chronology) null, null, nullPattern);
+
+        // Act: Attempt to get the year. This action requires the leap year pattern
+        // for its calculation and is expected to throw the exception.
+        chronologyWithNullPattern.getYear(1L);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // in the @Test annotation.
     }
 }
