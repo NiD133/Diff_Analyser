@@ -1,35 +1,26 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class YearsTestTest8 extends TestCase {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that getFieldType() returns the correct field type, which is 'years'.
+     */
+    @Test
+    public void getFieldType_shouldReturnYearsType() {
+        // Arrange
+        Years yearsInstance = Years.years(20);
+        DurationFieldType expectedType = DurationFieldType.years();
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act
+        DurationFieldType actualType = yearsInstance.getFieldType();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testGetFieldType() {
-        Years test = Years.years(20);
-        assertEquals(DurationFieldType.years(), test.getFieldType());
+        // Assert
+        assertEquals(expectedType, actualType);
     }
 }
