@@ -1,37 +1,37 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
+/**
+ * This test class focuses on verifying the behavior of the {@link Elements} collection.
+ */
 public class Elements_ESTestTest94 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test093() throws Throwable {
-        Document document0 = new Document("Bb,76");
-        Elements elements0 = document0.getAllElements();
-        boolean boolean0 = elements0.remove((Object) document0);
-        assertTrue(elements0.isEmpty());
-        assertTrue(boolean0);
+    /**
+     * Verifies that calling remove(Object) on an Elements collection successfully
+     * removes the specified element and returns true.
+     */
+    @Test
+    public void removeObjectShouldSucceedForExistingElement() {
+        // Arrange: Create a document and get all its elements.
+        // A new document contains the root, <html>, <head>, and <body> elements.
+        Document doc = new Document("");
+        Elements elements = doc.getAllElements();
+        int initialSize = elements.size();
+
+        // Pre-condition check: Ensure the element to be removed is present.
+        assertTrue("Pre-condition failed: The document element should be in the list.", elements.contains(doc));
+
+        // Act: Remove the document object itself from the Elements collection.
+        // The remove(Object) method should remove the element from the list and also from the DOM.
+        boolean wasRemoved = elements.remove(doc);
+
+        // Assert: Verify the removal was successful and the list is in the correct state.
+        assertTrue("The remove operation should return true to indicate success.", wasRemoved);
+        assertEquals("The list size should be reduced by one.", initialSize - 1, elements.size());
+        assertFalse("The removed element should no longer be in the list.", elements.contains(doc));
     }
 }
