@@ -1,46 +1,34 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
-public class W3CDom_ESTestTest16 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        // Undeclared exception!
-        try {
-            w3CDom0.fromJsoup((Element) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+/**
+ * Tests for the {@link W3CDom} class, focusing on input validation.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that calling fromJsoup(Element) with a null input
+     * correctly throws an IllegalArgumentException.
+     */
+    @Test
+    public void fromJsoupElementShouldThrowExceptionWhenInputIsNull() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+        String expectedErrorMessage = "Object must not be null";
+
+        // Act & Assert
+        // The method call is expected to throw an exception.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> w3cDom.fromJsoup((Element) null)
+        );
+
+        // Verify that the exception message is as expected.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
