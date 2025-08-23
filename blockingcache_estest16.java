@@ -1,29 +1,27 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest16 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Test suite for the {@link BlockingCache} decorator.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        BlockingCache blockingCache0 = new BlockingCache((Cache) null);
-        // Undeclared exception!
-        try {
-            blockingCache0.getObject((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.concurrent.ConcurrentHashMap", e);
-        }
+    /**
+     * Verifies that getObject throws a NullPointerException when the key is null.
+     * This is because the underlying lock mechanism (a ConcurrentHashMap) does not permit null keys.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getObjectWithNullKeyShouldThrowNPE() {
+        // Given: A BlockingCache with a valid delegate cache.
+        Cache delegate = new PerpetualCache("test-delegate");
+        Cache blockingCache = new BlockingCache(delegate);
+
+        // When: getObject is called with a null key.
+        blockingCache.getObject(null);
+
+        // Then: A NullPointerException is expected, as declared in the @Test annotation.
     }
 }
