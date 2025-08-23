@@ -1,22 +1,59 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtils_ESTestTest10 extends StringUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link StringUtils} class, focusing on PDF string escaping logic.
+ */
+public class StringUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        byte[] byteArray0 = new byte[4];
-        byteArray0[1] = (byte) 9;
-        ByteBuffer byteBuffer0 = new ByteBuffer(71);
-        byte[] byteArray1 = StringUtils.escapeString(byteArray0);
-        StringUtils.escapeString(byteArray1, byteBuffer0);
-        assertEquals(12, byteBuffer0.size());
-        assertArrayEquals(new byte[] { (byte) 40, (byte) 0, (byte) 92, (byte) 116, (byte) 0, (byte) 0, (byte) 41 }, byteArray1);
+    /**
+     * Tests that the escapeString(byte[]) method correctly escapes a horizontal tab character
+     * and wraps the entire byte array in parentheses, as required by the PDF specification for
+     * string literals. Null bytes are expected to be passed through without modification.
+     */
+    @Test
+    public void escapeString_withByteArrayOverload_shouldEscapeTabAndWrapInParentheses() {
+        // Arrange: Create an input byte array containing a null byte, a tab character, and two more nulls.
+        byte[] inputBytes = {0, (byte) '\t', 0, 0};
+
+        // Expected output: The input wrapped in parentheses with the tab character escaped as "\\t".
+        // PDF string literals are enclosed in '()'.
+        // The tab character (byte 9) is escaped to the two-byte sequence for backslash and 't'.
+        // The resulting string is: ( \0 \t \0 \0 )
+        byte[] expectedEscapedBytes = {'(', 0, '\\', 't', 0, 0, ')'};
+
+        // Act: Call the method under test.
+        byte[] actualEscapedBytes = StringUtils.escapeString(inputBytes);
+
+        // Assert: Verify that the output matches the expected escaped byte array.
+        assertArrayEquals(expectedEscapedBytes, actualEscapedBytes);
+    }
+
+    /**
+     * Tests that the escapeString(byte[], ByteBuffer) method correctly escapes characters
+     * that have special meaning in PDF strings, such as parentheses and backslashes.
+     * This test uses an already-escaped string as input to simulate a double-escaping scenario.
+     */
+    @Test
+    public void escapeString_withByteBufferOverload_shouldEscapeParenthesesAndBackslash() {
+        // Arrange: Create an input byte array that already contains special PDF characters: '(', ')', and '\\'.
+        // This input corresponds to the PDF string literal "(\0\t\0\0)".
+        byte[] inputBytes = {'(', 0, '\\', 't', 0, 0, ')'};
+        ByteBuffer outputBuffer = new ByteBuffer();
+
+        // Expected output: The input string wrapped in parentheses, with its own special characters escaped.
+        // Original input: ( \0 \ t \0 \0 )
+        // Expected escaped output: ( \( \0 \\ t \0 \0 \) )
+        byte[] expectedEscapedBytes = {'(', '\\', '(', 0, '\\', '\\', 't', 0, 0, '\\', ')', ')'};
+
+        // Act: Call the method under test to write the escaped string into the buffer.
+        StringUtils.escapeString(inputBytes, outputBuffer);
+
+        // Assert: Verify that the buffer contains the correctly double-escaped byte array and has the correct size.
+        assertArrayEquals(expectedEscapedBytes, outputBuffer.toByteArray());
+        assertEquals(expectedEscapedBytes.length, outputBuffer.size());
     }
 }
