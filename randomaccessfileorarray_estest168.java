@@ -1,40 +1,30 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import org.junit.Test;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest168 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test167() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.close();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that calling close() on an instance created with a null RandomAccessSource
+     * throws a NullPointerException.
+     *
+     * This test ensures that the class correctly handles null dependencies passed
+     * during construction, failing fast when subsequent operations are attempted.
+     */
+    @Test(expected = NullPointerException.class)
+    public void close_whenConstructedWithNullSource_throwsNullPointerException() throws IOException {
+        // Arrange: Create an instance of RandomAccessFileOrArray with a null underlying source.
+        RandomAccessFileOrArray randomAccessFileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act: Attempt to close the instance.
+        // The test expects this call to throw a NullPointerException.
+        randomAccessFileOrArray.close();
+
+        // Assert: The expected exception is declared in the @Test annotation.
     }
 }
