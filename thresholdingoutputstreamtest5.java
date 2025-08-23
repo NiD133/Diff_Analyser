@@ -2,62 +2,105 @@ package org.apache.commons.io.output;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ThresholdingOutputStreamTestTest5 {
+/**
+ * Tests for {@link ThresholdingOutputStream} focusing on the constructor that accepts
+ * an IOConsumer and IOFunction.
+ */
+class ThresholdingOutputStreamTest {
 
     /**
-     * Asserts initial state without changing it.
+     * Asserts the initial state of a ThresholdingOutputStream.
      *
-     * @param out the stream to test.
+     * @param stream the stream to test.
      * @param expectedThreshold the expected threshold.
-     * @param expectedByeCount the expected byte count.
      */
-    static void assertThresholdingInitialState(final ThresholdingOutputStream out, final int expectedThreshold, final int expectedByeCount) {
-        assertFalse(out.isThresholdExceeded());
-        assertEquals(expectedThreshold, out.getThreshold());
-        assertEquals(expectedByeCount, out.getByteCount());
+    private void assertInitialState(final ThresholdingOutputStream stream, final int expectedThreshold) {
+        assertFalse(stream.isThresholdExceeded(), "Threshold should not be exceeded initially.");
+        assertEquals(expectedThreshold, stream.getThreshold(), "Initial threshold should match the constructor argument.");
+        assertEquals(0, stream.getByteCount(), "Initial byte count should be zero.");
     }
 
     @Test
-    void testThresholdIOConsumer() throws IOException {
+    @DisplayName("Thresholding should work correctly when the threshold consumer is null")
+    void shouldExceedThresholdWhenThresholdConsumerIsNull() throws IOException {
+        // Given
         final int threshold = 1;
-        // Null threshold consumer
+        // A null thresholdConsumer should be handled gracefully (as a no-op).
         try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, null, os -> new ByteArrayOutputStream(4))) {
-            assertThresholdingInitialState(out, threshold, 0);
+            assertInitialState(out, threshold);
+
+            // When: write one byte, meeting the threshold but not exceeding it
             out.write('a');
+
+            // Then: the threshold is not yet exceeded
+            assertFalse(out.isThresholdExceeded(), "Threshold is not exceeded at the boundary.");
+            assertEquals(1, out.getByteCount());
+
+            // When: write a second byte, crossing the threshold
+            out.write('a');
+
+            // Then: the threshold is now exceeded
+            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded after writing past the boundary.");
+            assertEquals(2, out.getByteCount());
+        }
+    }
+
+    @Test
+    @DisplayName("Threshold consumer should be invoked when the stream getter is null")
+    void shouldInvokeConsumerWhenStreamGetterIsNull() throws IOException {
+        // Given
+        final int threshold = 1;
+        final AtomicBoolean consumerCalled = new AtomicBoolean(false);
+        // A null outputStreamGetter should default to a NullOutputStream.
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> consumerCalled.set(true), null)) {
+            assertInitialState(out, threshold);
+
+            // When: write one byte, meeting the threshold
+            out.write('a');
+
+            // Then: the consumer has not been called yet
+            assertFalse(consumerCalled.get(), "Consumer should not be called at the threshold boundary.");
             assertFalse(out.isThresholdExceeded());
+
+            // When: write a second byte, crossing the threshold
             out.write('a');
+
+            // Then: the consumer is invoked and the threshold is exceeded
+            assertTrue(consumerCalled.get(), "Consumer should be called after exceeding the threshold.");
             assertTrue(out.isThresholdExceeded());
         }
-        // Null output stream function
-        final AtomicBoolean reached = new AtomicBoolean();
-        reached.set(false);
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> reached.set(true), null)) {
-            assertThresholdingInitialState(out, threshold, 0);
+    }
+
+    @Test
+    @DisplayName("Threshold consumer should be invoked with non-null constructor arguments")
+    void shouldInvokeConsumerWithNonNullArguments() throws IOException {
+        // Given
+        final int threshold = 1;
+        final AtomicBoolean consumerCalled = new AtomicBoolean(false);
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> consumerCalled.set(true), os -> new ByteArrayOutputStream(4))) {
+            assertInitialState(out, threshold);
+
+            // When: write one byte, meeting the threshold
             out.write('a');
-            assertFalse(reached.get());
+
+            // Then: the consumer has not been called yet
+            assertFalse(consumerCalled.get(), "Consumer should not be called at the threshold boundary.");
             assertFalse(out.isThresholdExceeded());
+
+            // When: write a second byte, crossing the threshold
             out.write('a');
-            assertTrue(reached.get());
-            assertTrue(out.isThresholdExceeded());
-        }
-        // non-null inputs.
-        reached.set(false);
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> reached.set(true), os -> new ByteArrayOutputStream(4))) {
-            assertThresholdingInitialState(out, threshold, 0);
-            out.write('a');
-            assertFalse(reached.get());
-            assertFalse(out.isThresholdExceeded());
-            out.write('a');
-            assertTrue(reached.get());
+
+
+
+            // Then: the consumer is invoked and the threshold is exceeded
+            assertTrue(consumerCalled.get(), "Consumer should be called after exceeding the threshold.");
             assertTrue(out.isThresholdExceeded());
         }
     }
