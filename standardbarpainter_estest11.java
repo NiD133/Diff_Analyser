@@ -1,27 +1,25 @@
 package org.jfree.chart.renderer.category;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StandardBarPainter_ESTestTest11 extends StandardBarPainter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardBarPainter} class.
+ */
+public class StandardBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        boolean boolean0 = standardBarPainter0.equals(standardBarPainter0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that an instance of StandardBarPainter is equal to itself.
+     * This test checks for the reflexive property of the equals() contract.
+     */
+    @Test
+    public void equals_onSameInstance_returnsTrue() {
+        // Arrange
+        StandardBarPainter painter = new StandardBarPainter();
+
+        // Act & Assert
+        // An object must always be equal to itself.
+        assertTrue("A StandardBarPainter instance should be equal to itself.",
+                painter.equals(painter));
     }
 }
