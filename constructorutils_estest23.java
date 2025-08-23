@@ -1,21 +1,26 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class ConstructorUtils_ESTestTest23 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        ConstructorUtils constructorUtils0 = new ConstructorUtils();
+    /**
+     * Tests that the public, no-argument constructor can be called without error.
+     *
+     * The constructor for this utility class is marked as deprecated and is intended
+     * only for use by tools that require a JavaBean instance. This test confirms
+     * that instantiation is possible, fulfilling the contract for such tools and
+     * ensuring test coverage.
+     */
+    @Test
+    public void testPublicConstructorInstantiation() {
+        // The main purpose is to ensure the constructor doesn't throw an exception.
+        // An explicit assertion makes the test's success condition clear.
+        final ConstructorUtils instance = new ConstructorUtils();
+        assertNotNull("A new instance should be successfully created.", instance);
     }
 }
