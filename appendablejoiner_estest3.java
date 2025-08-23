@@ -1,37 +1,43 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class AppendableJoiner_ESTestTest3 extends AppendableJoiner_ESTest_scaffolding {
+/**
+ * Tests for {@link AppendableJoiner}.
+ */
+public class AppendableJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        AppendableJoiner.Builder<StringBuilder> appendableJoiner_Builder0 = AppendableJoiner.builder();
-        StringBuilder stringBuilder0 = new StringBuilder();
-        StringBuilder[] stringBuilderArray0 = new StringBuilder[4];
-        stringBuilderArray0[2] = stringBuilder0;
-        StringBuffer stringBuffer0 = new StringBuffer(stringBuilder0);
-        AppendableJoiner.Builder<StringBuilder> appendableJoiner_Builder1 = appendableJoiner_Builder0.setDelimiter(stringBuffer0);
-        AppendableJoiner<StringBuilder> appendableJoiner0 = appendableJoiner_Builder1.get();
-        appendableJoiner0.join(stringBuilderArray0[2], stringBuilderArray0);
-        assertEquals("nullnullnullnullnull", stringBuilder0.toString());
+    @Test
+    public void joinShouldCorrectlyAppendElementsIncludingNullsAndTheTargetBuilderItself() {
+        // Arrange
+        // Create a joiner with an empty string as the delimiter.
+        final AppendableJoiner<StringBuilder> joiner = AppendableJoiner.<StringBuilder>builder()
+                .setDelimiter("")
+                .get();
+
+        final StringBuilder targetBuilder = new StringBuilder();
+        
+        // The array of elements to join contains nulls and, crucially, the target StringBuilder itself.
+        final StringBuilder[] elementsToJoin = new StringBuilder[4];
+        elementsToJoin[2] = targetBuilder; // elementsToJoin is now [null, null, targetBuilder, null]
+
+        // Act
+        // Join the elements into the targetBuilder.
+        joiner.join(targetBuilder, elementsToJoin);
+
+        // Assert
+        // The expected result is formed by concatenating the string representation of each element.
+        // The process is as follows:
+        // 1. Append String.valueOf(elementsToJoin[0]=null) -> "null"
+        //    targetBuilder is now "null"
+        // 2. Append String.valueOf(elementsToJoin[1]=null) -> "null"
+        //    targetBuilder is now "nullnull"
+        // 3. Append String.valueOf(elementsToJoin[2]=targetBuilder) -> targetBuilder.toString() -> "nullnull"
+        //    targetBuilder is now "nullnullnullnull"
+        // 4. Append String.valueOf(elementsToJoin[3]=null) -> "null"
+        //    targetBuilder is now "nullnullnullnullnull"
+        final String expected = "nullnullnullnullnull";
+        assertEquals(expected, targetBuilder.toString());
     }
 }
