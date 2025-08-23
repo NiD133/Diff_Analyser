@@ -1,31 +1,24 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest20 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Shape shape0 = Shape.fromKM(18, 18);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            sparseBloomFilter0.merge((BloomFilter<?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // other
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that attempting to merge a null BloomFilter throws a NullPointerException.
+     * The merge operation requires a non-null filter argument to ensure correctness.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testMergeWithNullFilterThrowsException() {
+        // Arrange: Create a standard shape and an empty filter.
+        Shape shape = Shape.fromKM(18, 18);
+        SparseBloomFilter filter = new SparseBloomFilter(shape);
+
+        // Act: Attempt to merge with a null filter.
+        // The @Test(expected=...) annotation will assert that a NullPointerException is thrown.
+        filter.merge((BloomFilter<?>) null);
     }
 }
