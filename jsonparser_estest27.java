@@ -1,32 +1,47 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.Reader;
+import com.google.gson.stream.MalformedJsonException;
+import org.junit.Test;
+
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonParser_ESTestTest27 extends JsonParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        StringReader stringReader0 = new StringReader("MUB_qz@d");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        Strictness strictness0 = Strictness.STRICT;
-        jsonReader0.setStrictness(strictness0);
+// The test class name has been simplified to follow standard conventions.
+public class JsonParserTest {
+
+    /**
+     * Tests that `parseReader(JsonReader)` throws a `JsonSyntaxException`
+     * when the provided reader is in STRICT mode and encounters malformed JSON.
+     * This verifies that the parser respects the strictness setting of the reader.
+     */
+    @Test
+    public void parseReader_withStrictReaderAndMalformedJson_throwsJsonSyntaxException() {
+        // Arrange: Create a JsonReader in STRICT mode with an unquoted string,
+        // which is an invalid JSON literal.
+        String malformedJson = "unquoted_string";
+        JsonReader jsonReader = new JsonReader(new StringReader(malformedJson));
+        jsonReader.setStrictness(Strictness.STRICT);
+
+        // Act & Assert
         try {
-            JsonParser.parseReader(jsonReader0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // org.evosuite.runtime.mock.java.lang.MockThrowable: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 1 path $
-            // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
-            //
-            verifyException("com.google.gson.internal.Streams", e);
+            JsonParser.parseReader(jsonReader);
+            fail("Expected JsonSyntaxException for malformed JSON in strict mode, but no exception was thrown.");
+        } catch (JsonSyntaxException e) {
+            // Verify that the exception is caused by a MalformedJsonException,
+            // as expected from the underlying strict reader.
+            Throwable cause = e.getCause();
+            assertNotNull("JsonSyntaxException should have a cause.", cause);
+            assertTrue("The cause should be a MalformedJsonException.", cause instanceof MalformedJsonException);
+
+            // Verify the error message to ensure it provides helpful feedback to the user.
+            String expectedMessage = "Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON"
+                + " at line 1 column 1 path $";
+            assertEquals(expectedMessage, cause.getMessage());
         }
     }
 }
