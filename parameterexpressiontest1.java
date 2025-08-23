@@ -1,15 +1,25 @@
 package org.apache.ibatis.builder;
 
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ParameterExpressionTestTest1 {
+import java.util.Map;
+
+/**
+ * Tests for {@link ParameterExpression}.
+ */
+class ParameterExpressionTest {
 
     @Test
-    void simpleProperty() {
-        Map<String, String> result = new ParameterExpression("id");
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals("id", result.get("property"));
+    void shouldParseSimpleProperty() {
+        // Arrange
+        String expression = "id";
+        Map<String, String> expectedMap = Map.of("property", "id");
+
+        // Act
+        Map<String, String> actualMap = new ParameterExpression(expression);
+
+        // Assert
+        Assertions.assertEquals(expectedMap, actualMap);
     }
 }
