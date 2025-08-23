@@ -1,21 +1,28 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest20 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ThresholdingOutputStream} class.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream(129);
-        thresholdingOutputStream0.setByteCount((byte) 1);
-        assertEquals(1L, thresholdingOutputStream0.getByteCount());
+    /**
+     * Tests that the setByteCount() method correctly updates the internal byte counter,
+     * which can be useful for re-opening a stream.
+     */
+    @Test
+    public void testSetByteCount() {
+        // Arrange: Create a stream with an arbitrary threshold.
+        final int arbitraryThreshold = 100;
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(arbitraryThreshold);
+        final long newByteCount = 1L;
+
+        // Act: Set the byte count directly.
+        stream.setByteCount(newByteCount);
+
+        // Assert: Verify that the byte count was updated.
+        assertEquals("The byte count should be updated to the new value.", newByteCount, stream.getByteCount());
     }
 }
