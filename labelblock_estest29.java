@@ -1,40 +1,30 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
-public class LabelBlock_ESTestTest29 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method in the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock(" xof?pcOt?!");
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM;
-        labelBlock0.setTextAnchor(rectangleAnchor0);
-        LabelBlock labelBlock1 = new LabelBlock(" xof?pcOt?!");
-        boolean boolean0 = labelBlock0.equals(labelBlock1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false for two LabelBlock instances
+     * that have the same text but different text anchors.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenTextAnchorsDiffer() {
+        // Arrange: Create two LabelBlock instances with the same text.
+        // By default, their text anchor is RectangleAnchor.CENTER.
+        String labelText = "Test Label";
+        LabelBlock block1 = new LabelBlock(labelText);
+        LabelBlock block2 = new LabelBlock(labelText);
+
+        // Act: Modify the text anchor of the first block to be different from the second.
+        block1.setTextAnchor(RectangleAnchor.BOTTOM);
+
+        // Assert: The two blocks should no longer be considered equal.
+        assertFalse("Blocks with different text anchors should not be equal", block1.equals(block2));
     }
 }
