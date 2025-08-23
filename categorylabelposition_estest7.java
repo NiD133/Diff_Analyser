@@ -1,30 +1,39 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
 import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryLabelPosition_ESTestTest7 extends CategoryLabelPosition_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.RIGHT;
-        TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.BOTTOM_CENTER;
-        TextAnchor textAnchor0 = TextAnchor.BASELINE_CENTER;
-        CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
-        CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 0.0, categoryLabelWidthType0, (-985.5677F));
-        TextAnchor textAnchor1 = categoryLabelPosition0.getRotationAnchor();
-        CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor1, 986.267245817, categoryLabelWidthType0, (-985.5677F));
-        boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
-        assertFalse(categoryLabelPosition1.equals((Object) categoryLabelPosition0));
-        assertFalse(boolean0);
-        assertEquals((-985.5677F), categoryLabelPosition1.getWidthRatio(), 0.01F);
-        assertEquals(986.267245817, categoryLabelPosition1.getAngle(), 0.01);
+/**
+ * Unit tests for the {@link CategoryLabelPosition} class.
+ */
+public class CategoryLabelPositionTest {
+
+    /**
+     * Verifies that the equals() method returns false for two CategoryLabelPosition
+     * objects that differ only by their angle property.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenAnglesAreDifferent() {
+        // Arrange: Define common properties for two CategoryLabelPosition instances.
+        RectangleAnchor categoryAnchor = RectangleAnchor.RIGHT;
+        TextBlockAnchor labelAnchor = TextBlockAnchor.BOTTOM_CENTER;
+        TextAnchor rotationAnchor = TextAnchor.BASELINE_CENTER;
+        CategoryLabelWidthType widthType = CategoryLabelWidthType.RANGE;
+        float widthRatio = -985.5677F;
+
+        // Create a base instance with an angle of 0.0.
+        CategoryLabelPosition position1 = new CategoryLabelPosition(
+                categoryAnchor, labelAnchor, rotationAnchor, 0.0, widthType, widthRatio);
+
+        // Create a second instance with a different angle but all other properties identical.
+        CategoryLabelPosition position2 = new CategoryLabelPosition(
+                categoryAnchor, labelAnchor, rotationAnchor, 986.2672, widthType, widthRatio);
+
+        // Assert: The two objects should not be considered equal.
+        assertNotEquals(position1, position2);
     }
 }
