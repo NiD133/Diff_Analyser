@@ -1,30 +1,40 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest93 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test092() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Float float0 = xNode0.getFloatAttribute("9>K6|", (Float) null);
-        assertNull(float0);
+import static org.junit.Assert.assertNull;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getFloatAttribute returns the specified default value
+     * when the requested attribute does not exist on the node.
+     */
+    @Test
+    public void getFloatAttributeShouldReturnDefaultValueWhenAttributeIsMissing() {
+        // Arrange
+        // Create a simple DOM node without any attributes.
+        // IIOMetadataNode is a concrete implementation of org.w3c.dom.Node.
+        Node domNode = new IIOMetadataNode();
+        
+        // The XPathParser is not used by the get*Attribute methods, so it can be null for this test.
+        XNode xNode = new XNode(null, domNode, new Properties());
+
+        String nonExistentAttribute = "height";
+        Float defaultValue = null;
+
+        // Act
+        Float actualValue = xNode.getFloatAttribute(nonExistentAttribute, defaultValue);
+
+        // Assert
+        // The method should return the provided default value because the attribute is not found.
+        assertNull("Expected default value (null) for a missing attribute", actualValue);
     }
 }
