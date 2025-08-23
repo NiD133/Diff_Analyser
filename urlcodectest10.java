@@ -1,47 +1,80 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest10 {
+/**
+ * Tests the {@code encode(Object)} method of {@link URLCodec}.
+ */
+class URLCodecEncodeObjectTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private URLCodec urlCodec;
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
+    @BeforeEach
+    void setUp() {
+        // The URLCodec is stateless, but we initialize it before each test
+        // to ensure test isolation.
+        this.urlCodec = new URLCodec();
     }
 
     @Test
-    void testEncodeObjects() throws Exception {
-        final URLCodec urlCodec = new URLCodec();
-        final String plain = "Hello there!";
-        String encoded = (String) urlCodec.encode((Object) plain);
-        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
-        final byte[] plainBA = plain.getBytes(StandardCharsets.UTF_8);
-        final byte[] encodedBA = (byte[]) urlCodec.encode((Object) plainBA);
-        encoded = new String(encodedBA);
-        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
-        final Object result = urlCodec.encode((Object) null);
-        assertNull(result, "Encoding a null Object should return null");
-        assertThrows(EncoderException.class, () -> urlCodec.encode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
-        validateState(urlCodec);
+    @DisplayName("Encoding a String object should produce a URL-encoded string")
+    void encodeObjectShouldCorrectlyEncodeString() throws Exception {
+        // Arrange
+        final String plainText = "Hello there!";
+        final String expectedEncodedText = "Hello+there%21";
+
+        // Act
+        final Object result = urlCodec.encode(plainText);
+
+        // Assert
+        assertEquals(expectedEncodedText, result, "The encoded string should match the expected URL-encoded format.");
+    }
+
+    @Test
+    @DisplayName("Encoding a byte array object should produce a URL-encoded byte array")
+    void encodeObjectShouldCorrectlyEncodeByteArray() throws Exception {
+        // Arrange
+        final byte[] plainBytes = "Hello there!".getBytes(StandardCharsets.UTF_8);
+        final byte[] expectedEncodedBytes = "Hello+there%21".getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        final Object result = urlCodec.encode(plainBytes);
+
+        // Assert
+        assertArrayEquals(expectedEncodedBytes, (byte[]) result, "The encoded byte array should match the expected URL-encoded format.");
+    }
+
+    @Test
+    @DisplayName("Encoding a null object should return null")
+    void encodeObjectShouldReturnNullForNullInput() throws Exception {
+        // Arrange
+        final Object input = null;
+
+        // Act
+        final Object result = urlCodec.encode(input);
+
+        // Assert
+        assertNull(result, "Encoding a null object should result in null.");
+    }
+
+    @Test
+    @DisplayName("Encoding an unsupported object type should throw EncoderException")
+    void encodeObjectShouldThrowExceptionForUnsupportedType() {
+        // Arrange
+        final Double unsupportedObject = 3.0d;
+
+        // Act & Assert
+        assertThrows(EncoderException.class, () -> {
+            urlCodec.encode(unsupportedObject);
+        }, "An EncoderException should be thrown for unsupported types like Double.");
     }
 }
