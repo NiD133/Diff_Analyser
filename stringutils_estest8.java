@@ -1,20 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class StringUtils_ESTestTest8 extends StringUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtils} class.
+ */
+public class StringUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[3] = (byte) 8;
-        ByteBuffer byteBuffer0 = new ByteBuffer();
-        StringUtils.escapeString(byteArray0, byteBuffer0);
-        assertEquals(11, byteBuffer0.size());
+    /**
+     * Tests that the escapeString method correctly escapes the backspace character ('\b')
+     * while leaving other bytes unchanged.
+     *
+     * In PDF string literals, a backspace must be represented by the two-character
+     * sequence '\b'. This test verifies that transformation.
+     */
+    @Test
+    public void escapeString_shouldEscapeBackspaceAndPassThroughOtherBytes() {
+        // Arrange: Define an input byte array containing a backspace character
+        // and other non-special bytes (in this case, null bytes).
+        byte[] inputBytes = new byte[]{0, 'A', '\b', 'C', 0};
+
+        // The backspace character '\b' should be escaped to the two-byte sequence of '\\' and 'b'.
+        // All other bytes should be passed through unchanged.
+        byte[] expectedBytes = new byte[]{0, 'A', '\\', 'b', 'C', 0};
+
+        ByteBuffer outputBuffer = new ByteBuffer();
+
+        // Act: Call the method under test to escape the input bytes.
+        StringUtils.escapeString(inputBytes, outputBuffer);
+
+        // Assert: Verify that the content of the output buffer exactly matches the
+        // expected byte sequence, rather than just checking its size.
+        assertArrayEquals(expectedBytes, outputBuffer.toByteArray());
     }
 }
