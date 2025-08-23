@@ -1,17 +1,28 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest33 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the CSS selector parser in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":last-child");
-        assertEquals(":last-child", evaluator0.toString());
+    /**
+     * Verifies that the {@code :last-child} pseudo-selector is parsed correctly.
+     * The test ensures that the resulting {@link Evaluator} object can be represented
+     * as the original query string.
+     */
+    @Test
+    public void shouldCorrectlyParseLastChildPseudoSelector() {
+        // Arrange
+        String query = ":last-child";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert
+        assertEquals("The evaluator's string representation should match the original query.",
+            query, evaluator.toString());
     }
 }
