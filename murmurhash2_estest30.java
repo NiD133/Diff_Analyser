@@ -1,18 +1,36 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest30 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Test suite for the MurmurHash2 class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        int int0 = MurmurHash2.hash32(byteArray0, 1, 615);
-        assertEquals(1161250932, int0);
+    /**
+     * Tests that the hash32 method correctly computes a hash for a portion of a byte array
+     * using a specific seed. This test case verifies the algorithm's output against a known,
+     * pre-computed "golden" value.
+     */
+    @Test
+    public void hash32ShouldProduceKnownHashForPortionOfByteArray() {
+        // Arrange
+        // Input data is an array of six zero-bytes.
+        final byte[] dataToHash = new byte[6];
+        
+        // However, we instruct the method to only process the first byte of the array.
+        final int lengthToHash = 1;
+        final int seed = 615;
+        
+        // This is the pre-computed "golden" value for hashing a single zero-byte
+        // with the specified seed.
+        final int expectedHash = 1161250932;
+
+        // Act
+        final int actualHash = MurmurHash2.hash32(dataToHash, lengthToHash, seed);
+
+        // Assert
+        assertEquals(expectedHash, actualHash);
     }
 }
