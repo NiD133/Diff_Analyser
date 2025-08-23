@@ -1,23 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest87 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test86() throws Throwable {
-        int int0 = FieldUtils.safeNegate(2147483639);
-        assertEquals((-2147483639), int0);
+    /**
+     * Tests that safeNegate correctly negates a valid, positive integer.
+     * The method should behave like the standard unary minus operator for any integer
+     * except Integer.MIN_VALUE.
+     */
+    @Test
+    public void safeNegate_shouldReturnCorrectlyNegatedValue_forPositiveInteger() {
+        // Arrange
+        final int positiveValue = 2147483639;
+        final int expectedNegatedValue = -2147483639;
+
+        // Act
+        final int actualNegatedValue = FieldUtils.safeNegate(positiveValue);
+
+        // Assert
+        assertEquals(expectedNegatedValue, actualNegatedValue);
     }
 }
