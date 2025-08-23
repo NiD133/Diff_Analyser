@@ -1,30 +1,39 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BCodec_ESTestTest17 extends BCodec_ESTest_scaffolding {
+import java.nio.charset.Charset;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-        BCodec bCodec0 = null;
-        try {
-            bCodec0 = new BCodec((Charset) null, codecPolicy0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // charset
-            //
-            verifyException("java.util.Objects", e);
-        }
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+/**
+ * Test suite for {@link BCodec}.
+ */
+public class BCodecTest {
+
+    @Test
+    public void constructorWithNullCharsetShouldThrowNullPointerException() {
+        // Arrange: Define the invalid input (a null charset) and a valid policy.
+        final Charset nullCharset = null;
+        final CodecPolicy policy = CodecPolicy.STRICT;
+
+        // Act & Assert: Verify that calling the constructor with a null charset
+        // throws a NullPointerException. We use assertThrows for clear and concise
+        // exception testing.
+        final NullPointerException exception = assertThrows(
+            "Constructor should reject a null charset.",
+            NullPointerException.class,
+            () -> new BCodec(nullCharset, policy)
+        );
+
+        // Further assert that the exception message correctly identifies the problematic parameter.
+        // This confirms the validation is working as expected.
+        assertEquals(
+            "The exception message should indicate the 'charset' parameter is the cause.",
+            "charset",
+            exception.getMessage()
+        );
     }
 }
