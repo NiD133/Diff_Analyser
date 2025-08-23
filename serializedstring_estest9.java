@@ -1,28 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest9 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its interaction with ByteBuffers.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(0);
-        int int0 = serializedString0.putQuotedUTF8(byteBuffer0);
-        assertEquals(0, int0);
+    /**
+     * Verifies that putQuotedUTF8() correctly handles a ByteBuffer with zero capacity
+     * by writing no bytes and returning 0.
+     */
+    @Test
+    public void putQuotedUTF8ShouldReturnZeroWhenBufferHasNoCapacity() {
+        // Arrange: Create a SerializedString and a destination buffer with no available space.
+        // The content of the string is not critical here, as any attempt to write to a
+        // zero-capacity buffer should result in zero bytes written.
+        SerializedString serializedString = new SerializedString("any content");
+        ByteBuffer zeroCapacityBuffer = ByteBuffer.allocate(0);
+
+        // Act: Attempt to write the quoted UTF-8 representation into the buffer.
+        int bytesWritten = serializedString.putQuotedUTF8(zeroCapacityBuffer);
+
+        // Assert: The method should report that zero bytes were written.
+        assertEquals("Should write 0 bytes to a buffer with no capacity", 0, bytesWritten);
     }
 }
