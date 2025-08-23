@@ -1,32 +1,44 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest92 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class, focusing on the toString() method.
+ */
+public class XNodeToStringTest {
 
-    @Test(timeout = 4000)
-    public void test091() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("2iY", "2iY");
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        String string0 = xNode0.toString();
-        assertEquals("<null 2iY=\"2iY\" />\n", string0);
+    /**
+     * Verifies that the toString() method correctly formats an XNode
+     * that represents a simple XML element with a single attribute.
+     */
+    @Test
+    public void toStringShouldRenderNodeWithAttribute() {
+        // Arrange: Set up the test objects.
+
+        // 1. Create a DOM Node. IIOMetadataNode is a concrete implementation from the JDK.
+        // The default constructor creates a node with a null name, which is part of this test's scenario.
+        IIOMetadataNode node = new IIOMetadataNode();
+        node.setAttribute("id", "test-node");
+
+        // 2. Create a dummy XPathParser and an empty Properties object, as required by the XNode constructor.
+        // The parser is initialized with null because it is not used by the toString() method.
+        XPathParser dummyParser = new XPathParser((Document) null, false);
+        Properties variables = new Properties();
+
+        // 3. Create the XNode instance to be tested.
+        XNode xNode = new XNode(dummyParser, node, variables);
+
+        // Act: Call the method under test.
+        String actualXmlString = xNode.toString();
+
+        // Assert: Verify the result.
+        // The expected format is "<[nodeName] [attrName]=\"[attrValue]\" />\n"
+        String expectedXmlString = "<null id=\"test-node\" />\n";
+        assertEquals(expectedXmlString, actualXmlString);
     }
 }
