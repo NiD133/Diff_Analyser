@@ -1,39 +1,27 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite focuses on the behavior of the DefaultPieDataset class,
+ * particularly its handling of invalid arguments.
+ */
+// The original test class name and inheritance from a scaffolding class are preserved.
+// For a new test suite, a more conventional name would be DefaultPieDatasetTest.
 public class DefaultPieDataset_ESTestTest19 extends DefaultPieDataset_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultPieDataset0.getIndex((Integer) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'key' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that the getIndex() method throws an IllegalArgumentException
+     * when a null key is provided, as specified by the method's contract.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void getIndex_whenKeyIsNull_throwsIllegalArgumentException() {
+        // Arrange: Create an empty dataset.
+        DefaultPieDataset<Integer> dataset = new DefaultPieDataset<>();
+
+        // Act: Attempt to get the index of a null key.
+        // The @Test annotation asserts that this action must throw an
+        // IllegalArgumentException for the test to pass.
+        dataset.getIndex(null);
     }
 }
