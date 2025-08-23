@@ -1,236 +1,96 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest13 extends TestCase {
+import java.util.Locale;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+import static org.junit.Assert.assertEquals;
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
-    }
+/**
+ * Tests the text representation methods of {@link PreciseDurationDateTimeField}.
+ */
+public class PreciseDurationDateTimeFieldTest {
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+    /**
+     * A minimal mock implementation of the abstract SUT (PreciseDurationDateTimeField).
+     * The key behavior for this test is the get(long) method, which is defined
+     * to return the instant divided by the unit millis.
+     */
+    private static class MockDateTimeField extends PreciseDurationDateTimeField {
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+        // The original test used a unit of 60 milliseconds. We preserve that logic.
+        static final long MOCK_UNIT_MILLIS = 60L;
 
-    //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
-
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+        MockDateTimeField() {
+            super(DateTimeFieldType.secondOfMinute(),
+                  new PreciseDurationField(DurationFieldType.seconds(), MOCK_UNIT_MILLIS));
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
+        /**
+         * Returns the field value, which is calculated directly from the instant.
+         * The parent class's getAsShortText() method relies on this implementation.
+         */
         @Override
         public int get(long instant) {
-            return (int) (instant / 60L);
+            return (int) (instant / MOCK_UNIT_MILLIS);
+        }
+
+        // --- Stubbed methods required by the abstract class, not relevant to this test ---
+
+        @Override
+        public long set(long instant, int value) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+            return null; // Not needed for this test
         }
 
         @Override
         public int getMaximumValue() {
-            return 59;
-        }
-    }
-
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
+            return 59; // An arbitrary but valid maximum value
         }
 
         @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
+        public boolean isLenient() {
             return false;
         }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
     }
 
-    //-----------------------------------------------------------------------
-    public void test_getAsShortText_long_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("29", field.getAsShortText(60L * 29, Locale.ENGLISH));
-        assertEquals("29", field.getAsShortText(60L * 29, null));
+    @Test
+    public void getAsShortText_shouldReturnStringRepresentationOfFieldValue() {
+        // Arrange
+        final int fieldValue = 29;
+        final String expectedText = "29";
+
+        // Create a field where get(instant) is defined as (instant / 60ms).
+        BaseDateTimeField field = new MockDateTimeField();
+
+        // Calculate an instant that will produce the desired field value based on the mock's logic.
+        long instant = fieldValue * MockDateTimeField.MOCK_UNIT_MILLIS;
+
+        // Act
+        String actualTextWithLocale = field.getAsShortText(instant, Locale.ENGLISH);
+        String actualTextWithNullLocale = field.getAsShortText(instant, null);
+
+        // Assert
+        // The getAsShortText method for a numerical field should simply convert the
+        // integer value returned by get(instant) to a String.
+        assertEquals(
+            "The short text should be the string representation of the field's value.",
+            expectedText,
+            actualTextWithLocale
+        );
+
+        // The result should be independent of the Locale for a simple numerical field.
+        assertEquals(
+            "The short text should not be affected by a null locale.",
+            expectedText,
+            actualTextWithNullLocale
+        );
     }
 }
