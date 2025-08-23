@@ -1,41 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
+
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest11 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test010() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) 0);
-        try {
-            randomAccessFileOrArray0.readFloat();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that readFloat() throws an EOFException if fewer than 4 bytes are available,
+     * even when some of the available bytes were pushed back.
+     */
+    @Test(expected = EOFException.class)
+    public void readFloat_whenFewerThanFourBytesAvailableWithPushBack_throwsEOFException() throws IOException {
+        // Arrange: A float requires 4 bytes. We create a source with only 3 bytes available
+        // for reading (2 bytes in the initial array + 1 byte pushed back).
+        byte[] insufficientBytesForFloat = new byte[2];
+        RandomAccessFileOrArray randomAccess = new RandomAccessFileOrArray(insufficientBytesForFloat);
+        randomAccess.pushBack((byte) 0);
+
+        // Act & Assert: Attempting to read a float should throw an EOFException because
+        // there is not enough data. The assertion is handled by the @Test(expected=...) annotation.
+        randomAccess.readFloat();
     }
 }
