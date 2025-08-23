@@ -2,18 +2,29 @@ package org.apache.commons.lang3;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest5 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * This test case evaluates the {@link CharSequenceUtils#lastIndexOf(CharSequence, int, int)} method.
+ */
+public class CharSequenceUtils_ESTestTest5 {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("', is neither of type Map.Entry nor an Array");
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuilder0, 116, 13);
-        assertEquals(9, int0);
+    /**
+     * Tests that lastIndexOf finds the correct character when the search
+     * starts from an index that is after the character to be found.
+     */
+    @Test
+    public void testLastIndexOfCharWithStartIndexFindsPreviousOccurrence() {
+        // Arrange
+        // The character 't' appears at indices 0, 3, and 8.
+        CharSequence text = new StringBuilder("testing the test");
+        char searchChar = 't';
+        int startIndex = 10; // Start searching backwards from index 10 ('e').
+        int expectedIndex = 8; // The method should find the 't' at index 8 and ignore the one at index 12.
+
+        // Act
+        int actualIndex = CharSequenceUtils.lastIndexOf(text, searchChar, startIndex);
+
+        // Assert
+        assertEquals(expectedIndex, actualIndex);
     }
 }
