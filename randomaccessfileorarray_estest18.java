@@ -1,36 +1,31 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest18 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray#readShort()} method.
+ */
+public class RandomAccessFileOrArrayReadShortTest {
 
-    @Test(timeout = 4000)
-    public void test017() throws Throwable {
-        byte[] byteArray0 = new byte[20];
-        byteArray0[0] = (byte) 16;
-        byteArray0[1] = (byte) 16;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        short short0 = randomAccessFileOrArray0.readShort();
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals((short) 4112, short0);
+    @Test
+    public void readShort_shouldReadTwoBytesAsBigEndianShort_andAdvancePointer() throws IOException {
+        // Arrange
+        // The readShort() method reads a 16-bit signed integer in big-endian format.
+        // The byte sequence {0x10, 0x10} represents the value (0x10 * 256) + 0x10 = 4112.
+        byte[] inputData = new byte[]{(byte) 0x10, (byte) 0x10, (byte) 0xFF}; // Added extra byte to ensure only two are read
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputData);
+
+        short expectedValue = 4112;
+        long expectedPointerPosition = 2L;
+
+        // Act
+        short actualValue = reader.readShort();
+        long actualPointerPosition = reader.getFilePointer();
+
+        // Assert
+        assertEquals("The read short value should match the expected big-endian interpretation.", expectedValue, actualValue);
+        assertEquals("The file pointer should advance by 2 bytes after reading a short.", expectedPointerPosition, actualPointerPosition);
     }
 }
