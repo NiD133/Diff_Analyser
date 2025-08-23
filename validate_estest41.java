@@ -1,32 +1,28 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest41 extends Validate_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for {@link Validate}.
+ * Note: The original test class was auto-generated and has been renamed for clarity.
+ */
+public class ValidateTest {
+
+    @Test
+    public void notNullWithCustomMessage_shouldThrowException_whenObjectIsNull() {
+        // Arrange
+        String expectedMessage = ""; // The specific scenario tests an empty message.
+
+        // Act & Assert
         try {
-            Validate.notNull((Object) null, "");
-            fail("Expecting exception: IllegalArgumentException");
+            Validate.notNull(null, expectedMessage);
+            fail("Expected an IllegalArgumentException to be thrown for a null object, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            //
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception was thrown and its message matches the one provided.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
