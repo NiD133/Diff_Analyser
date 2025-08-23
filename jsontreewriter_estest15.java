@@ -1,25 +1,25 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This class contains tests for the JsonTreeWriter.
+ * The original test class name `JsonTreeWriter_ESTestTest15` suggests it was
+ * automatically generated. A more conventional name would be `JsonTreeWriterTest`.
+ */
 public class JsonTreeWriter_ESTestTest15 extends JsonTreeWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setSerializeNulls(false);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value(27L);
-        assertFalse(jsonWriter0.isLenient());
+    /**
+     * Verifies that a new JsonTreeWriter instance is configured to be strict by default.
+     * Strict writers enforce the JSON specification more rigorously than lenient ones.
+     */
+    @Test
+    public void newJsonTreeWriterIsStrictByDefault() {
+        // Arrange: Create a new instance of the writer.
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Assert: Check that the writer is not in lenient mode.
+        assertFalse("A new JsonTreeWriter should be strict (not lenient) by default.", writer.isLenient());
     }
 }
