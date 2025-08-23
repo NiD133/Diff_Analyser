@@ -1,35 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest21 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class.
+ * This version is refactored for improved clarity and maintainability.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("X fh]-BVE2`Wh");
-        // Undeclared exception!
-        try {
-            serializedString0.putUnquotedUTF8((ByteBuffer) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.SerializedString", e);
-        }
+    /**
+     * Verifies that calling putUnquotedUTF8 with a null ByteBuffer
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void putUnquotedUTF8_whenBufferIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create a SerializedString instance. The actual string content
+        // is not relevant for this null-check test.
+        SerializedString serializedString = new SerializedString("test-string");
+
+        // Act: Attempt to write the string to a null ByteBuffer.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        serializedString.putUnquotedUTF8((ByteBuffer) null);
     }
 }
