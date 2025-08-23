@@ -1,23 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest7 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharRange}.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        CharRange charRange0 = CharRange.isNot('k');
-        boolean boolean0 = charRange0.isNegated();
-        assertEquals('k', charRange0.getStart());
-        assertTrue(boolean0);
-        assertEquals('k', charRange0.getEnd());
+    /**
+     * Tests that the CharRange.isNot() factory method correctly creates a
+     * negated range for a single character.
+     */
+    @Test
+    public void isNot_shouldCreateNegatedRangeForSingleCharacter() {
+        // Arrange
+        final char testChar = 'k';
+
+        // Act: Create a negated range for a single character.
+        final CharRange negatedRange = CharRange.isNot(testChar);
+
+        // Assert: Verify the properties of the created range.
+        // It should be marked as negated, and its start and end should be the specified character.
+        assertTrue("The range should be negated.", negatedRange.isNegated());
+        assertEquals("The start character should match the input.", testChar, negatedRange.getStart());
+        assertEquals("The end character should match the input.", testChar, negatedRange.getEnd());
     }
 }
