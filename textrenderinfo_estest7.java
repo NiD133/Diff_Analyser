@@ -1,42 +1,56 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextRenderInfo_ESTestTest7 extends TextRenderInfo_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        graphicsState0.rise = (-3505.32F);
-        Matrix matrix0 = graphicsState0.ctm;
-        PdfString pdfString0 = new PdfString();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
-        float float0 = textRenderInfo0.getRise();
-        assertEquals(3505.32F, float0, 0.01F);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains improved tests for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Tests that getRise() correctly calculates the text rise in user space.
+     * <p>
+     * The original auto-generated test asserted that a negative rise value in the
+     * graphics state would result in a positive value from getRise(). This improved
+     * test clarifies that apparent intent: to check if the absolute value is returned
+     * when the coordinate transformation matrix (CTM) is an identity matrix (i.e., no scaling or rotation).
+     * </p>
+     */
+    @Test
+    public void getRiseShouldReturnAbsoluteValueForNegativeInputWithIdentityTransform() {
+        // Arrange
+        final float negativeRiseInTextSpace = -3505.32f;
+        // The original test expected the absolute value of the input rise.
+        final float expectedRiseInUserSpace = 3505.32f;
+        final float delta = 0.01f;
+
+        // Set up the graphics state with a specific rise and a default identity CTM.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.rise = negativeRiseInTextSpace;
+        // A font is required by the TextRenderInfo constructor, so we provide a dummy one.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        // The text matrix is also an identity matrix for this simple test case.
+        Matrix identityTextMatrix = new Matrix();
+        PdfString dummyString = new PdfString();
+
+        // Act
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                dummyString,
+                graphicsState,
+                identityTextMatrix,
+                Collections.emptyList() // Marked content is not relevant for this test.
+        );
+        float actualRise = renderInfo.getRise();
+
+        // Assert
+        assertEquals(expectedRiseInUserSpace, actualRise, delta);
     }
 }
