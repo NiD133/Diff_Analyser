@@ -1,31 +1,39 @@
 package org.apache.commons.io.function;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Uncheck_ESTestTest11 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn(2726).when(iOIntSupplier0).getAsInt();
-        int int0 = Uncheck.getAsInt(iOIntSupplier0, (Supplier<String>) null);
-        assertEquals(2726, int0);
+    /**
+     * Tests that Uncheck.getAsInt() successfully returns the integer from the
+     * underlying IOIntSupplier when no IOException is thrown.
+     */
+    @Test
+    public void testGetAsIntReturnsValueOnSuccess() throws IOException {
+        // Arrange
+        final int expectedValue = 2726;
+        final IOIntSupplier mockSupplier = mock(IOIntSupplier.class);
+
+        // Configure the mock to return a specific value.
+        // The 'throws IOException' is necessary for the mock setup.
+        when(mockSupplier.getAsInt()).thenReturn(expectedValue);
+
+        // Act
+        // Call the method under test. The second argument is a message supplier,
+        // which is intentionally null for this test case.
+        final int actualValue = Uncheck.getAsInt(mockSupplier, (Supplier<String>) null);
+
+        // Assert
+        assertEquals("The returned value should match the one from the supplier.",
+                expectedValue, actualValue);
     }
 }
