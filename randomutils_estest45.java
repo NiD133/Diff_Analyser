@@ -1,20 +1,26 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest45 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.secure();
-        String string0 = randomUtils0.toString();
-        assertNotNull(string0);
+    /**
+     * Tests that the toString() method on an instance created via
+     * RandomUtils.secure() returns a non-null string.
+     */
+    @Test
+    public void toString_onSecureInstance_shouldReturnNonNull() {
+        // Arrange: Get a secure instance of RandomUtils.
+        RandomUtils secureRandomUtils = RandomUtils.secure();
+
+        // Act: Call the toString() method.
+        String result = secureRandomUtils.toString();
+
+        // Assert: The result should not be null.
+        assertNotNull("The toString() method should always return a non-null string.", result);
     }
 }
