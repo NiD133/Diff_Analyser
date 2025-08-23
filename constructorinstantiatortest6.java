@@ -1,38 +1,41 @@
 package org.mockito.internal.creation.instance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.mockito.creation.instance.InstantiationException;
 import org.mockitoutil.TestBase;
 
-public class ConstructorInstantiatorTestTest6 extends TestBase {
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-    static class SomeClass {
-    }
+/**
+ * Tests for {@link ConstructorInstantiator}.
+ *
+ * This class focuses on scenarios involving constructor argument matching and instantiation failures.
+ */
+public class ConstructorInstantiatorTest extends TestBase {
 
-    class SomeInnerClass {
-    }
-
-    class ChildOfThis extends ConstructorInstantiatorTest {
-    }
-
-    static class SomeClass2 {
-
-        SomeClass2(String x) {
+    // A simple class with a constructor that accepts a primitive type.
+    // Used to test argument type mismatch scenarios.
+    static class ClassWithPrimitiveConstructor {
+        ClassWithPrimitiveConstructor(int value) {
+            // This constructor is not expected to be successfully invoked in the test.
         }
     }
 
-    static class SomeClass3 {
-
-        SomeClass3(int i) {
-        }
-    }
-
+    /**
+     * This test verifies that the ConstructorInstantiator throws an InstantiationException
+     * when attempting to instantiate a class with a primitive constructor argument (e.g., int)
+     * by passing 'null'. Since 'null' cannot be unboxed to a primitive type, this should
+     * lead to an internal reflection error, which is wrapped in Mockito's exception.
+     */
     @Test
-    public void fails_when_null_is_passed_for_a_primitive() {
-        assertThatThrownBy(() -> {
-            new ConstructorInstantiator(false, new Object[] { null }).newInstance(SomeClass3.class).getClass();
-        }).isInstanceOf(org.mockito.creation.instance.InstantiationException.class).hasMessageContaining("Unable to create instance of 'SomeClass3'.");
+    public void shouldThrowExceptionWhenPassingNullForPrimitiveArgument() {
+        // Arrange: Create an instantiator with a 'null' argument, intended for a primitive parameter.
+        // The 'hasOuterClassInstance' flag is false because the target class is a static inner class.
+        ConstructorInstantiator instantiator = new ConstructorInstantiator(false, new Object[]{null});
+
+        // Act & Assert: Verify that attempting to instantiate the class throws the expected exception.
+        assertThatThrownBy(() -> instantiator.newInstance(ClassWithPrimitiveConstructor.class))
+            .isInstanceOf(InstantiationException.class)
+            .hasMessageContaining("Unable to create instance of 'ClassWithPrimitiveConstructor'.");
     }
 }
