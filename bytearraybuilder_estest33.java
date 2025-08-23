@@ -1,26 +1,26 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest33 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on edge cases and exception handling.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.completeAndCoalesce((-270));
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that calling {@link ByteArrayBuilder#completeAndCoalesce(int)} with a negative
+     * length argument correctly throws a {@link NegativeArraySizeException}. This is expected
+     * behavior, as it's impossible to create an array with a negative size.
+     */
+    @Test(expected = NegativeArraySizeException.class)
+    public void completeAndCoalesce_withNegativeLength_shouldThrowException() {
+        // Given: A new ByteArrayBuilder instance
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        int negativeLastBlockLength = -270;
+
+        // When: The method under test is called with an invalid negative argument
+        builder.completeAndCoalesce(negativeLastBlockLength);
+
+        // Then: A NegativeArraySizeException is expected, as declared by the @Test annotation.
     }
 }
