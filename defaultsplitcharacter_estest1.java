@@ -1,32 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.GreekList;
-import com.itextpdf.text.TabSettings;
-import java.util.ArrayList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultSplitCharacter_ESTestTest1 extends DefaultSplitCharacter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultSplitCharacter} class.
+ */
+public class DefaultSplitCharacterTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DefaultSplitCharacter defaultSplitCharacter0 = new DefaultSplitCharacter();
-        char[] charArray0 = new char[2];
-        PdfChunk[] pdfChunkArray0 = new PdfChunk[1];
-        // Undeclared exception!
-        try {
-            defaultSplitCharacter0.getCurrentCharacter(6724, charArray0, pdfChunkArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 6724
-            //
-            verifyException("com.itextpdf.text.pdf.DefaultSplitCharacter", e);
-        }
+    /**
+     * Verifies that getCurrentCharacter() throws an ArrayIndexOutOfBoundsException
+     * when the provided index is outside the bounds of the character array.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void getCurrentCharacter_withOutOfBoundsIndex_shouldThrowException() {
+        // Arrange: Create a DefaultSplitCharacter instance and test data.
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        char[] charArray = {'a', 'b'};
+        PdfChunk[] chunks = null; // The chunk array is not relevant for this test path and can be null.
+        int outOfBoundsIndex = charArray.length; // The first invalid index is the array's length.
+
+        // Act: Call the method with an index that is out of bounds.
+        // The @Test(expected=...) annotation will assert that the correct exception is thrown.
+        splitCharacter.getCurrentCharacter(outOfBoundsIndex, charArray, chunks);
     }
 }
