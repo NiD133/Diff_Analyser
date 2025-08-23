@@ -1,28 +1,31 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest12 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        int int0 = multiInputStream0.read();
-        assertEquals((-1), int0);
+    /**
+     * Verifies that reading from a MultiInputStream created with an empty iterator
+     * immediately returns -1, indicating the end of the stream.
+     */
+    @Test
+    public void read_withEmptyIterator_returnsEndOfStream() throws IOException {
+        // Arrange: Create an iterator that contains no ByteSource elements.
+        Iterator<ByteSource> emptyIterator = Collections.emptyIterator();
+        MultiInputStream stream = new MultiInputStream(emptyIterator);
+
+        // Act: Attempt to read a byte from the stream.
+        int result = stream.read();
+
+        // Assert: The read operation should return -1, the standard indicator for end-of-stream.
+        assertEquals(-1, result);
     }
 }
