@@ -1,38 +1,34 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
+import org.junit.Test;
+
+/**
+ * This is a refactored version of an auto-generated test for the {@link CountingPathVisitor} class.
+ * The focus is on improving clarity, focus, and maintainability.
+ */
+// The original test class name 'CountingPathVisitor_ESTestTest35' and scaffolding are kept
+// to match the original context. In a real-world scenario, these would be simplified.
 public class CountingPathVisitor_ESTestTest35 extends CountingPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters((PathFilter) null, (PathFilter) null);
-        Counters.PathCounters counters_PathCounters0 = accumulatorPathVisitor0.getPathCounters();
-        assertNotNull(counters_PathCounters0);
+    /**
+     * Tests that a {@link CountingPathVisitor} created with the
+     * {@link CountingPathVisitor#withBigIntegerCounters()} factory method
+     * is properly initialized with a non-null counter object.
+     */
+    @Test
+    public void getPathCounters_whenCreatedWithBigIntegerCounters_returnsNonNull() {
+        // Arrange
+        // The original auto-generated test used AccumulatorPathVisitor, a subclass.
+        // This version has been refactored to test the base class CountingPathVisitor
+        // directly, aligning the test with the intended class under test.
+        final CountingPathVisitor visitor = CountingPathVisitor.withBigIntegerCounters();
+
+        // Act
+        final Counters.PathCounters counters = visitor.getPathCounters();
+
+        // Assert
+        assertNotNull("The PathCounters instance should not be null after initialization.", counters);
     }
 }
