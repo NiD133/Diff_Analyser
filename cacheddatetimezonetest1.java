@@ -1,39 +1,46 @@
 package org.joda.time.tz;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CachedDateTimeZoneTestTest1 extends TestCase {
+import static org.junit.Assert.assertSame;
 
-    private DateTimeZone originalDateTimeZone = null;
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    private DateTimeZone originalDefaultZone;
 
-    public static TestSuite suite() {
-        return new TestSuite(TestCachedDateTimeZone.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        originalDateTimeZone = DateTimeZone.getDefault();
+    @Before
+    public void setUp() {
+        // To ensure tests are not affected by the system's time zone,
+        // we save the original and set a consistent one (UTC) for all tests.
+        originalDefaultZone = DateTimeZone.getDefault();
         DateTimeZone.setDefault(DateTimeZone.UTC);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(originalDateTimeZone);
+    @After
+    public void tearDown() {
+        // Restore the original default time zone to avoid side effects on other tests.
+        DateTimeZone.setDefault(originalDefaultZone);
     }
 
-    public void test_caching() throws Exception {
-        CachedDateTimeZone zone1 = CachedDateTimeZone.forZone(DateTimeZone.forID("Europe/Paris"));
-        CachedDateTimeZone zone2 = CachedDateTimeZone.forZone(DateTimeZone.forID("Europe/Paris"));
-        assertSame(zone1, zone2);
+    @Test
+    public void forZone_whenCalledMultipleTimesForSameZone_shouldReturnSameInstance() {
+        // This test verifies that the factory method `forZone` caches and reuses
+        // the wrapper instance for the same underlying DateTimeZone.
+
+        // Arrange: Get a base DateTimeZone instance.
+        DateTimeZone parisZone = DateTimeZone.forID("Europe/Paris");
+
+        // Act: Request a cached wrapper for the same zone twice.
+        DateTimeZone cachedZone1 = CachedDateTimeZone.forZone(parisZone);
+        DateTimeZone cachedZone2 = CachedDateTimeZone.forZone(parisZone);
+
+        // Assert: Verify that both calls returned the exact same object instance.
+        assertSame("Expected the same instance to be returned for the same zone", cachedZone1, cachedZone2);
     }
 }
