@@ -1,51 +1,36 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Symmetry454Chronology_ESTestTest29 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link Symmetry454Chronology} class.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        // Undeclared exception!
+    /**
+     * Tests that creating a date with a month value outside the valid range (1-12)
+     * throws a DateTimeException.
+     */
+    @Test
+    public void date_whenMonthIsInvalid_throwsDateTimeException() {
+        // Arrange: Use the singleton instance of the chronology and define an invalid month.
+        // Other date components are kept valid to isolate the failure condition.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        int year = 2023;
+        int invalidMonth = 1363; // Valid months are 1-12
+        int day = 1;
+
+        // Act & Assert
         try {
-            symmetry454Chronology0.date(1363, 1363, 1363);
-            fail("Expecting exception: DateTimeException");
+            chronology.date(year, invalidMonth, day);
+            fail("Expected a DateTimeException to be thrown for a month value outside the valid range.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for MonthOfYear (valid values 1 - 12): 1363
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception message is clear and correct.
+            String expectedMessage = "Invalid value for MonthOfYear (valid values 1 - 12): " + invalidMonth;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
