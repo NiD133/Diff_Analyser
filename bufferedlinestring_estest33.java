@@ -1,32 +1,47 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Test suite for the {@link BufferedLineString} class.
+ * This specific test file focuses on the equals() method behavior.
+ */
+// Note: The class name and inheritance are preserved from the original EvoSuite-generated code.
 public class BufferedLineString_ESTestTest33 extends BufferedLineString_ESTest_scaffolding {
 
+    /**
+     * Verifies that the equals() method returns false when a BufferedLineString
+     * is compared to a null object, which is the expected contract for any equals() method.
+     */
     @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1.2265789709679984), spatialContext0);
-        boolean boolean0 = bufferedLineString0.equals((Object) null);
-        assertFalse(boolean0);
-        assertEquals((-1.2265789709679984), bufferedLineString0.getBuf(), 0.01);
+    public void equals_whenComparedWithNull_shouldReturnFalse() {
+        // ARRANGE
+        // A negative buffer is used to match the original test's input.
+        // The source code's Javadoc suggests buf >= 0, but the implementation allows negative values.
+        final double buffer = -1.2265789709679984;
+        final SpatialContext spatialContext = SpatialContext.GEO;
+        final List<Point> emptyPoints = Collections.emptyList();
+
+        // Create an empty BufferedLineString.
+        BufferedLineString lineString = new BufferedLineString(emptyPoints, buffer, spatialContext);
+
+        // ACT
+        // Perform the comparison against null.
+        boolean isEqual = lineString.equals(null);
+
+        // ASSERT
+        // An object instance should never be equal to null.
+        assertFalse("equals(null) must always return false.", isEqual);
+
+        // Also, verify the object was constructed with the correct state.
+        assertEquals("The buffer value should be correctly stored.", buffer, lineString.getBuf(), 0.0);
     }
 }
