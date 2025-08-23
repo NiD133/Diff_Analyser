@@ -1,46 +1,47 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
 
-public class XYLineAnnotation_ESTestTest36 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation(500, 1069.473, 0.25, 0.25);
-        xYLineAnnotation0.getStroke();
-        assertEquals(500.0, xYLineAnnotation0.getX1(), 0.01);
-        assertEquals(1069.473, xYLineAnnotation0.getY1(), 0.01);
-        assertEquals(0.25, xYLineAnnotation0.getY2(), 0.01);
-        assertEquals(0.25, xYLineAnnotation0.getX2(), 0.01);
+    private static final double DELTA = 0.001;
+
+    /**
+     * Verifies that the constructor taking only coordinates correctly initializes
+     * the line's position and sets the stroke and paint to their default values.
+     */
+    @Test
+    public void constructorWithCoordinatesShouldSetDefaultStrokeAndPaint() {
+        // Arrange: Define the coordinates and expected default properties.
+        double x1 = 500.0;
+        double y1 = 1069.473;
+        double x2 = 0.25;
+        double y2 = 0.25;
+
+        Stroke expectedDefaultStroke = new BasicStroke(1.0f);
+        Paint expectedDefaultPaint = Color.BLACK;
+
+        // Act: Create the annotation using the constructor under test.
+        XYLineAnnotation annotation = new XYLineAnnotation(x1, y1, x2, y2);
+
+        // Assert: Verify that all properties are set as expected.
+        // Check coordinates
+        assertEquals("The x1 coordinate should be correctly set.", x1, annotation.getX1(), DELTA);
+        assertEquals("The y1 coordinate should be correctly set.", y1, annotation.getY1(), DELTA);
+        assertEquals("The x2 coordinate should be correctly set.", x2, annotation.getX2(), DELTA);
+        assertEquals("The y2 coordinate should be correctly set.", y2, annotation.getY2(), DELTA);
+
+        // Check for default stroke and paint, which was missing in the original test
+        assertEquals("The stroke should default to a 1.0f width BasicStroke.", expectedDefaultStroke, annotation.getStroke());
+        assertEquals("The paint should default to black.", expectedDefaultPaint, annotation.getPaint());
     }
 }
