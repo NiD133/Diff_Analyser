@@ -1,23 +1,28 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest7 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class, focusing on the getAsString method.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add("");
-        String string0 = jsonArray0.getAsString();
-        assertEquals("", string0);
+    /**
+     * Tests that getAsString() correctly returns the string value
+     * when the JsonArray contains exactly one element which is a string.
+     */
+    @Test
+    public void getAsString_shouldReturnStringValue_whenArrayContainsSingleStringElement() {
+        // Arrange: Create a JsonArray and add a single string element.
+        JsonArray jsonArray = new JsonArray();
+        String expectedString = "";
+        jsonArray.add(expectedString);
+
+        // Act: Retrieve the string value from the array.
+        String actualString = jsonArray.getAsString();
+
+        // Assert: Verify that the retrieved string matches the element that was added.
+        assertEquals("The returned string should match the single element in the array.", expectedString, actualString);
     }
 }
