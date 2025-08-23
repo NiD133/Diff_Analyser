@@ -1,38 +1,45 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.jsoup.nodes.Node;
+import org.junit.Test;
 
-public class XmlTreeBuilder_ESTestTest7 extends XmlTreeBuilder_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        streamParser0.parseFragment("}VF\"~1WF,kf?;\"Lf2", (Element) document0, "");
-        assertEquals(">: ", document0.location());
-        Token.Comment token_Comment0 = new Token.Comment();
-        xmlTreeBuilder0.insertCommentFor(token_Comment0);
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
+/**
+ * Test suite for the XmlTreeBuilder class, focusing on node insertion logic.
+ */
+public class XmlTreeBuilderTest {
+
+    /**
+     * Verifies that insertCommentFor() correctly adds a comment node
+     * as a child of the current element in the parse tree.
+     */
+    @Test
+    public void insertCommentForAddsCommentToCurrentElement() {
+        // Arrange: Set up the builder and parse an initial tag to create a context.
+        // This leaves the <root> element as the current element on the builder's stack.
+        XmlTreeBuilder xmlBuilder = new XmlTreeBuilder();
+        Document doc = xmlBuilder.parse("<root>", "http://example.com/");
+        Element root = doc.child(0);
+
+        // Create the comment token to be inserted.
+        Token.Comment commentToken = new Token.Comment();
+        String commentText = "This is a test comment";
+        commentToken.data(commentText);
+
+        // Act: Insert the comment using the method under test.
+        xmlBuilder.insertCommentFor(commentToken);
+
+        // Assert: Verify that the comment was added as a child of the <root> element.
+        assertEquals("The root element should now have one child node.", 1, root.childNodeSize());
+
+        Node insertedNode = root.childNode(0);
+        assertTrue("The inserted node should be an instance of Comment.", insertedNode instanceof Comment);
+
+        Comment insertedComment = (Comment) insertedNode;
+        assertEquals("The comment's data should match the token's data.", commentText, insertedComment.getData());
     }
 }
