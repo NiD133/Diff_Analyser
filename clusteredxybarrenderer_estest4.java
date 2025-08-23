@@ -1,51 +1,47 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
 import org.jfree.data.statistics.SimpleHistogramBin;
 import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ClusteredXYBarRenderer_ESTestTest4 extends ClusteredXYBarRenderer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Integer integer0 = JLayeredPane.PALETTE_LAYER;
-        SimpleHistogramDataset<Integer> simpleHistogramDataset0 = new SimpleHistogramDataset<Integer>(integer0);
-        SimpleHistogramBin simpleHistogramBin0 = new SimpleHistogramBin(1, 3);
-        simpleHistogramDataset0.addBin(simpleHistogramBin0);
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        Range range0 = clusteredXYBarRenderer0.findDomainBoundsWithOffset(simpleHistogramDataset0);
-        assertEquals(1.0, range0.getCentralValue(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertNotNull(range0);
+    /**
+     * Tests that findDomainBoundsWithOffset correctly calculates the domain range
+     * for a dataset containing a single interval (bin). The expected behavior is
+     * that the resulting range is centered on the interval's start value, with a
+     * width equal to the interval's original width.
+     */
+    @Test
+    public void findDomainBoundsWithOffset_withSingleBin_shouldCenterRangeOnBinStartValue() {
+        // Arrange
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+
+        // Create a dataset with a single bin representing an interval from 1.0 to 3.0.
+        SimpleHistogramDataset dataset = new SimpleHistogramDataset("Test Series");
+        final double binStart = 1.0;
+        final double binEnd = 3.0;
+        dataset.addBin(new SimpleHistogramBin(binStart, binEnd));
+
+        // The method is expected to calculate a range centered on the bin's start value,
+        // with a width equal to the bin's original width.
+        // Original width = 3.0 - 1.0 = 2.0
+        // New center     = 1.0 (the bin's start value)
+        // New lower bound= 1.0 - (2.0 / 2) = 0.0
+        // New upper bound= 1.0 + (2.0 / 2) = 2.0
+        Range expectedRange = new Range(0.0, 2.0);
+
+        // Act
+        // Note: findDomainBoundsWithOffset() is a protected method.
+        // This test can call it directly because it resides in the same package.
+        Range actualRange = renderer.findDomainBoundsWithOffset(dataset);
+
+        // Assert
+        assertNotNull("The calculated range should not be null.", actualRange);
+        assertEquals("The calculated domain range is incorrect.", expectedRange, actualRange);
     }
 }
