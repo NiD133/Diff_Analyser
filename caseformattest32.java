@@ -1,27 +1,43 @@
 package com.google.common.base;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
 import com.google.common.testing.SerializableTester;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-public class CaseFormatTestTest32 extends TestCase {
+/**
+ * Verifies that for every combination of source and target formats, the {@link Converter} returned
+ * by {@link CaseFormat#converterTo(CaseFormat)} is serializable.
+ */
+@RunWith(Parameterized.class)
+public class CaseFormatConverterSerializationTest {
 
-    public void testConverter_serialization() {
-        for (CaseFormat outer : CaseFormat.values()) {
-            for (CaseFormat inner : CaseFormat.values()) {
-                SerializableTester.reserializeAndAssert(outer.converterTo(inner));
-            }
-        }
+  private final CaseFormat sourceFormat;
+  private final CaseFormat targetFormat;
+
+  public CaseFormatConverterSerializationTest(CaseFormat sourceFormat, CaseFormat targetFormat) {
+    this.sourceFormat = sourceFormat;
+    this.targetFormat = targetFormat;
+  }
+
+  @Parameters(name = "{0}_to_{1}")
+  public static Collection<Object[]> data() {
+    List<Object[]> testCases = new ArrayList<>();
+    for (CaseFormat source : CaseFormat.values()) {
+      for (CaseFormat target : CaseFormat.values()) {
+        testCases.add(new Object[] {source, target});
+      }
     }
+    return testCases;
+  }
+
+  @Test
+  public void converterIsSerializable() {
+    Converter<String, String> converter = sourceFormat.converterTo(targetFormat);
+    SerializableTester.reserializeAndAssert(converter);
+  }
 }
