@@ -1,29 +1,48 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class ZippingIterator_ESTestTest12 extends ZippingIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Integer integer0 = new Integer((-550));
-        linkedList0.add(integer0);
-        Iterator<Integer> iterator0 = linkedList0.iterator();
-        ZippingIterator<Object> zippingIterator0 = new ZippingIterator<Object>(iterator0, iterator0, iterator0);
-        zippingIterator0.next();
-        zippingIterator0.remove();
+/**
+ * Tests for {@link ZippingIterator}.
+ */
+public class ZippingIteratorTest {
+
+    /**
+     * Tests that the remove() method correctly removes the element from the
+     * underlying collection's iterator.
+     *
+     * This test creates a ZippingIterator with the same underlying iterator
+     * provided three times. It verifies that after calling next() and then remove(),
+     * the single element in the source list is successfully removed.
+     */
+    @Test
+    public void removeShouldDelegateToUnderlyingIterator() {
+        // Arrange: Create a list with a single element and an iterator for it.
+        List<Integer> sourceList = new LinkedList<>();
+        sourceList.add(100);
+        Iterator<Integer> sourceIterator = sourceList.iterator();
+
+        // The ZippingIterator is created with the same iterator instance multiple times.
+        ZippingIterator<Integer> zippingIterator = new ZippingIterator<>(sourceIterator, sourceIterator, sourceIterator);
+
+        // Pre-assertion: The list should not be empty, and the iterator should have a next element.
+        assertFalse("Source list should not be empty before the test", sourceList.isEmpty());
+        assertTrue("ZippingIterator should have an element to start with", zippingIterator.hasNext());
+
+        // Act: Advance the iterator and remove the element.
+        Integer value = zippingIterator.next();
+        zippingIterator.remove();
+
+        // Assert: Verify the element was removed from the source list.
+        assertEquals("The value returned by next() should be the one from the list", Integer.valueOf(100), value);
+        assertTrue("The source list should be empty after remove() is called", sourceList.isEmpty());
+        assertFalse("ZippingIterator should have no more elements", zippingIterator.hasNext());
     }
 }
