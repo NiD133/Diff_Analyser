@@ -1,23 +1,33 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GregorianChronology_ESTestTest21 extends GregorianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        Chronology chronology0 = gregorianChronology0.withZone((DateTimeZone) null);
-        assertSame(gregorianChronology0, chronology0);
+/**
+ * Contains tests for the GregorianChronology class.
+ */
+public class GregorianChronologyTest {
+
+    /**
+     * Tests that calling withZone() with a null argument returns a Chronology
+     * instance configured with the default system time zone.
+     */
+    @Test
+    public void withZone_givenNull_returnsChronologyInDefaultTimeZone() {
+        // Arrange: Create a base chronology in a non-default zone (UTC) to ensure
+        // the test is meaningful. We also retrieve the system's default time zone.
+        Chronology baseChronologyInUTC = GregorianChronology.getInstanceUTC();
+        DateTimeZone systemDefaultZone = DateTimeZone.getDefault();
+
+        // Act: Call the method under test with a null time zone.
+        Chronology resultChronology = baseChronologyInUTC.withZone(null);
+
+        // Assert: The resulting chronology's time zone should match the system's default.
+        // This correctly verifies the documented behavior that 'null' means 'default zone'.
+        assertEquals("The chronology should be in the default time zone",
+                systemDefaultZone, resultChronology.getZone());
     }
 }
