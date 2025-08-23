@@ -1,53 +1,44 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializer;
-import com.google.gson.ToNumberPolicy;
 import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.internal.Excluder;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.BufferedWriter;
-import java.io.CharArrayWriter;
-import java.io.EOFException;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.time.temporal.ChronoField;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
 
-public class TypeAdapterRuntimeTypeWrapper_ESTestTest14 extends TypeAdapterRuntimeTypeWrapper_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Gson gson0 = new Gson();
-        Class<Object> class0 = Object.class;
-        TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
-        TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
-        PipedReader pipedReader0 = new PipedReader();
-        JsonReader jsonReader0 = gson0.newJsonReader(pipedReader0);
+/**
+ * Tests for {@link TypeAdapterRuntimeTypeWrapper}.
+ */
+public class TypeAdapterRuntimeTypeWrapperTest {
+
+    /**
+     * Verifies that the read() method propagates an IOException thrown by the underlying JsonReader.
+     */
+    @Test
+    public void read_whenReaderThrowsIOException_propagatesException() {
+        // Arrange
+        Gson gson = new Gson();
+        Class<Object> objectType = Object.class;
+        TypeAdapter<Object> delegateAdapter = gson.getAdapter(objectType);
+        TypeAdapter<Object> typeAdapterWrapper = new TypeAdapterRuntimeTypeWrapper<>(gson, delegateAdapter, objectType);
+
+        // Create a reader that is guaranteed to throw an IOException on read,
+        // because it's not connected to a writer.
+        PipedReader unconnectedReader = new PipedReader();
+        JsonReader jsonReader = gson.newJsonReader(unconnectedReader);
+
+        // Act & Assert
         try {
-            typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedReader", e);
+            typeAdapterWrapper.read(jsonReader);
+            fail("Expected an IOException to be thrown because the reader is not connected.");
+        } catch (IOException expected) {
+            // Verify that the propagated exception is the one we expect from the PipedReader.
+            assertEquals("Pipe not connected", expected.getMessage());
         }
     }
 }
