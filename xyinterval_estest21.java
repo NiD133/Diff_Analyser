@@ -1,23 +1,25 @@
 package org.jfree.data.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class XYInterval_ESTestTest21 extends XYInterval_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval(0.0, 0.0, 0.0, 0.0, 0.0);
-        Object object0 = new Object();
-        boolean boolean0 = xYInterval0.equals(object0);
-        assertEquals(0.0, xYInterval0.getYHigh(), 0.01);
-        assertEquals(0.0, xYInterval0.getXLow(), 0.01);
-        assertFalse(boolean0);
-        assertEquals(0.0, xYInterval0.getYLow(), 0.01);
-        assertEquals(0.0, xYInterval0.getY(), 0.01);
-        assertEquals(0.0, xYInterval0.getXHigh(), 0.01);
+    /**
+     * Verifies that the equals() method returns false when an XYInterval object
+     * is compared with an object of an incompatible type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithIncompatibleType() {
+        // Arrange: Create an XYInterval instance and an object of a different type.
+        XYInterval interval = new XYInterval(1.0, 2.0, 1.5, 1.4, 1.6);
+        Object otherObject = new Object();
+
+        // Act & Assert: The result of the comparison should be false.
+        assertFalse("An XYInterval should not be equal to an object of a different type.",
+                interval.equals(otherObject));
     }
 }
