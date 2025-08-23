@@ -1,28 +1,34 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
 
-public class ConstructorUtils_ESTestTest8 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.reflect.ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 1);
-        Class<Integer> class0 = Integer.class;
-        // Undeclared exception!
+    /**
+     * Tests that {@link ConstructorUtils#invokeConstructor(Class, Object[], Class[])}
+     * throws an IllegalArgumentException when the number of provided arguments does not
+     * match the number of specified parameter types.
+     */
+    @Test
+    public void invokeConstructorWithMismatchedArgumentCountThrowsIllegalArgumentException() {
+        // Arrange: We will attempt to invoke the Integer(String) constructor
+        // but provide no arguments. This mismatch should cause an exception.
+        final Class<Integer> targetClass = Integer.class;
+        final Class<?>[] parameterTypes = {String.class};
+        final Object[] args = {}; // An empty array, signifying zero arguments.
+
+        // Act & Assert: The call should fail with an IllegalArgumentException.
         try {
-            ConstructorUtils.invokeConstructor(class0, (Object[]) null, (Class<?>[]) classArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
+            ConstructorUtils.invokeConstructor(targetClass, args, parameterTypes);
+            fail("Expected an IllegalArgumentException to be thrown due to argument count mismatch.");
+        } catch (final IllegalArgumentException expected) {
+            // The expected exception was thrown. The test passes.
+        } catch (final Exception e) {
+            fail("Expected IllegalArgumentException, but caught " + e.getClass().getName());
         }
     }
 }
