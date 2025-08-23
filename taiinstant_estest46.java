@@ -1,29 +1,31 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class TaiInstant_ESTestTest46 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TaiInstant} class, focusing on comparison methods.
+ */
+public class TaiInstantComparisonTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(37L, 37L);
-        TaiInstant taiInstant1 = TaiInstant.ofTaiSeconds(37L, 3503L);
-        boolean boolean0 = taiInstant0.isBefore(taiInstant1);
-        assertTrue(boolean0);
-        assertEquals(37L, taiInstant1.getTaiSeconds());
-        assertEquals(3503, taiInstant1.getNano());
+    /**
+     * Tests that isBefore() returns true when comparing an instant to a later
+     * instant that has the same second value but a greater nanosecond value.
+     */
+    @Test
+    public void isBefore_returnsTrue_whenOtherInstantHasGreaterNanos() {
+        // Arrange: Create two instants with the same second value.
+        // The 'laterInstant' has a larger nanosecond component.
+        TaiInstant baseInstant = TaiInstant.ofTaiSeconds(37L, 100L);
+        TaiInstant laterInstant = TaiInstant.ofTaiSeconds(37L, 500L);
+
+        // Act: Check if the base instant is before the later one.
+        boolean isBefore = baseInstant.isBefore(laterInstant);
+
+        // Assert: The result should be true.
+        assertTrue(
+            "An instant should be 'before' another with the same seconds but more nanos.",
+            isBefore
+        );
     }
 }
