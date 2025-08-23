@@ -1,55 +1,33 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class InternationalFixedChronology_ESTestTest35 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link InternationalFixedChronology}.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        // Undeclared exception!
-        try {
-            internationalFixedChronology0.dateEpochDay((-1145400L));
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid value for EpochDay (valid values -719528 - 364522971): -1145400
-            //
-            verifyException("java.time.temporal.ValueRange", e);
-        }
+    @Test
+    public void dateEpochDay_whenEpochDayIsBelowMinimum_throwsDateTimeException() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        // The valid range for epoch day is [-719528, 364522971].
+        // We test with a value just below the minimum boundary.
+        long minValidEpochDay = -719528L;
+        long invalidEpochDay = minValidEpochDay - 1;
+
+        // Act & Assert
+        DateTimeException thrown = assertThrows(
+            DateTimeException.class,
+            () -> chronology.dateEpochDay(invalidEpochDay)
+        );
+
+        // Verify that the exception message is informative and correct.
+        String expectedMessage = "Invalid value for EpochDay (valid values " +
+                                 minValidEpochDay + " - 364522971): " + invalidEpochDay;
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
