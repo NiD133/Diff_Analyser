@@ -1,31 +1,32 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest45 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class, focusing on its behavior as a single-element view.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Number) null);
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsBigDecimal();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
-        }
+    /**
+     * Tests that calling getAsBigDecimal() on a JsonArray containing a single JsonNull element
+     * throws an UnsupportedOperationException.
+     *
+     * This behavior occurs because getAsBigDecimal() on a JsonArray delegates the call to its
+     * single element. For a JsonNull element, this operation is not supported.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void getAsBigDecimal_whenArrayContainsSingleJsonNull_throwsUnsupportedOperationException() {
+        // Arrange: Create a JsonArray and add a null Number.
+        // According to the JsonArray documentation, adding a null value results in a
+        // JsonNull element being added to the array.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((Number) null);
+
+        // Act: Attempt to get the single element as a BigDecimal.
+        // This should throw an exception because the operation is not supported on JsonNull.
+        jsonArray.getAsBigDecimal();
+
+        // Assert: The test passes if an UnsupportedOperationException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
