@@ -1,18 +1,22 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TokenQueue_ESTestTest75 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the TokenQueue class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("f7(L)+X");
-        boolean boolean0 = tokenQueue0.matchesWhitespace();
-        assertFalse(boolean0);
+    @Test
+    public void matchesWhitespaceShouldReturnFalseWhenQueueStartsWithNonWhitespace() {
+        // Arrange: Create a queue that does not start with a whitespace character.
+        TokenQueue queue = new TokenQueue("f7(L)+X");
+
+        // Act: Check if the queue starts with whitespace.
+        boolean result = queue.matchesWhitespace();
+
+        // Assert: The result should be false.
+        assertFalse("Expected matchesWhitespace() to be false for a non-whitespace character.", result);
     }
 }
