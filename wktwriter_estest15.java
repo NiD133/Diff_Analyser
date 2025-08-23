@@ -1,39 +1,35 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.ChoiceFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Circle;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.impl.BufferedLine;
-import org.locationtech.spatial4j.shape.impl.BufferedLineString;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 
-public class WKTWriter_ESTestTest15 extends WKTWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        WKTWriter wKTWriter0 = new WKTWriter();
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 360.0, spatialContext0);
-        Point point0 = bufferedLineString0.getCenter();
-        String string0 = wKTWriter0.toString((Shape) point0);
-        assertEquals("POINT EMPTY", string0);
+/**
+ * Test suite for the {@link WKTWriter} class.
+ * This refactored test focuses on clarity and maintainability.
+ */
+public class WKTWriterTest {
+
+    /**
+     * Tests that the WKTWriter correctly formats an empty Point shape
+     * into the standard "POINT EMPTY" string representation.
+     */
+    @Test
+    public void toString_withEmptyPoint_shouldReturnPointEmpty() {
+        // Arrange
+        WKTWriter wktWriter = new WKTWriter();
+        SpatialContext spatialContext = SpatialContext.GEO;
+
+        // In Spatial4j, an empty point is created by providing NaN for coordinates.
+        Point emptyPoint = spatialContext.makePoint(Double.NaN, Double.NaN);
+        String expectedWkt = "POINT EMPTY";
+
+        // Act
+        String actualWkt = wktWriter.toString(emptyPoint);
+
+        // Assert
+        assertEquals("The WKT for an empty point should be 'POINT EMPTY'", expectedWkt, actualWkt);
     }
 }
