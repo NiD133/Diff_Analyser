@@ -1,19 +1,24 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonLocation_ESTestTest41 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class, focusing on its equality implementation.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        boolean boolean0 = jsonLocation0.equals((Object) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing a JsonLocation
+     * instance to null. This adheres to the general contract of Object.equals().
+     */
+    @Test
+    public void equals_whenComparedWithNull_shouldReturnFalse() {
+        // Arrange: Get a standard instance of JsonLocation.
+        // JsonLocation.NA is a convenient, non-null, static instance to use.
+        JsonLocation location = JsonLocation.NA;
+
+        // Act & Assert: The result of comparing any object to null should be false.
+        assertFalse("A JsonLocation instance should not be equal to null.", location.equals(null));
     }
 }
