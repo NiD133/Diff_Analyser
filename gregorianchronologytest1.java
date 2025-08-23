@@ -1,46 +1,40 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class GregorianChronologyTestTest1 extends TestCase {
+/**
+ * Tests for GregorianChronology.
+ */
+public class GregorianChronologyTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    // A fixed point in time for consistent test results: 2002-06-09
+    private static final long TEST_TIME_NOW =
+            new DateTime(2002, 6, 9, 0, 0, 0, 0, DateTimeZone.UTC).getMillis();
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    /**
+     * Sets up the test environment by fixing the current time and setting default
+     * time zone and locale. This ensures tests are repeatable.
+     */
+    @Before
+    public void setUp() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
@@ -50,20 +44,31 @@ public class GregorianChronologyTestTest1 extends TestCase {
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    /**
+     * Tears down the test environment by resetting the system properties
+     * to their original states.
+     */
+    @After
+    public void tearDown() throws Exception {
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
     //-----------------------------------------------------------------------
-    public void testFactoryUTC() {
-        assertEquals(DateTimeZone.UTC, GregorianChronology.getInstanceUTC().getZone());
-        assertSame(GregorianChronology.class, GregorianChronology.getInstanceUTC().getClass());
+
+    /**
+     * Tests that getInstanceUTC() returns a singleton instance of
+     * GregorianChronology configured for the UTC time zone.
+     */
+    @Test
+    public void getInstanceUTC_shouldReturnChronologyInUTC() {
+        // Act
+        GregorianChronology chronology = GregorianChronology.getInstanceUTC();
+
+        // Assert
+        assertEquals(DateTimeZone.UTC, chronology.getZone());
+        assertSame(GregorianChronology.class, chronology.getClass());
     }
 }
