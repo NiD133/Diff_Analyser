@@ -1,19 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtils_ESTestTest40 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Tests for the static methods in {@link RandomUtils}.
+ * This class focuses on a specific test case that was improved for clarity.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        long long0 = RandomUtils.nextLong();
-        //  // Unstable assertion: assertEquals(1627130694281105876L, long0);
+    /**
+     * Tests that the deprecated {@link RandomUtils#nextLong()} method returns a non-negative value,
+     * which is consistent with its contract of generating a random long between
+     * 0 (inclusive) and Long.MAX_VALUE (exclusive).
+     */
+    @Test
+    public void nextLong_shouldReturnNonNegativeValue() {
+        // The method under test, RandomUtils.nextLong(), is deprecated.
+        // This test verifies its fundamental contract.
+
+        // Act: Call the method to get a random long.
+        final long randomLong = RandomUtils.nextLong();
+
+        // Assert: The returned value must be non-negative.
+        assertTrue("The generated long must be non-negative, but was " + randomLong, randomLong >= 0L);
     }
 }
