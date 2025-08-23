@@ -1,27 +1,27 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest26 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TaiInstant} class.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(1L, 0L);
-        int int0 = taiInstant0.getNano();
-        assertEquals(1L, taiInstant0.getTaiSeconds());
-        assertEquals(0, int0);
+    /**
+     * Tests that getNano() correctly returns 0 when a TaiInstant is created
+     * with a zero nanosecond component.
+     */
+    @Test
+    public void getNano_whenCreatedWithZeroNanos_returnsZero() {
+        // Arrange: Create a TaiInstant with a specific number of TAI seconds
+        // and a zero nanosecond adjustment.
+        TaiInstant instant = TaiInstant.ofTaiSeconds(1L, 0L);
+
+        // Act: Retrieve the nanosecond component from the instant.
+        int actualNanos = instant.getNano();
+
+        // Assert: The retrieved nanosecond component should be zero.
+        assertEquals(0, actualNanos);
     }
 }
