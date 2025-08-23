@@ -1,40 +1,47 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonWriteContext_ESTestTest42 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonWriteContext jsonWriteContext0 = new JsonWriteContext((byte) (-16), (JsonWriteContext) null, dupDetector0);
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildArrayContext();
-        assertNotNull(jsonWriteContext1);
-        Object object0 = new Object();
-        JsonWriteContext jsonWriteContext2 = jsonWriteContext1.createChildObjectContext(object0);
-        JsonWriteContext jsonWriteContext3 = jsonWriteContext2.getParent();
-        assertFalse(jsonWriteContext0.inArray());
-        assertEquals(0, jsonWriteContext3.getEntryCount());
-        assertNotNull(jsonWriteContext3);
-        assertEquals(2, jsonWriteContext2.getNestingDepth());
-        assertTrue(jsonWriteContext3.inArray());
-        assertEquals(0, jsonWriteContext2.getEntryCount());
-        assertEquals("Object", jsonWriteContext2.typeDesc());
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on context creation and parent-child relationships.
+ * Note: The original test class name "JsonWriteContext_ESTestTest42" was generated and has been omitted for clarity.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Tests that getParent() correctly returns the direct parent context
+     * from a nested structure (root -> array -> object).
+     */
+    @Test
+    public void getParentShouldReturnCorrectParentContextForNestedObject() {
+        // Arrange: Create a nested context structure: root -> array -> object
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(dupDetector);
+        JsonWriteContext arrayContext = rootContext.createChildArrayContext();
+        JsonWriteContext objectContext = arrayContext.createChildObjectContext(new Object());
+
+        // Act: Retrieve the parent of the innermost (object) context
+        JsonWriteContext parentOfObjectContext = objectContext.getParent();
+
+        // Assert: Verify the retrieved parent and the state of the contexts
+
+        // 1. Check that the retrieved parent is the correct instance
+        assertNotNull("Parent context should not be null", parentOfObjectContext);
+        assertSame("getParent() should return the exact parent instance", arrayContext, parentOfObjectContext);
+
+        // 2. Verify properties of the parent (the array context)
+        assertTrue("Parent context should be of type array", parentOfObjectContext.inArray());
+        assertEquals("Entry count of the parent array context should be 0", 0, parentOfObjectContext.getEntryCount());
+
+        // 3. Verify properties of the child (the object context)
+        assertEquals("Nesting depth of the object context should be 2", 2, objectContext.getNestingDepth());
+        assertEquals("Entry count of the object context should be 0", 0, objectContext.getEntryCount());
+        assertEquals("The type description should be 'Object'", "Object", objectContext.typeDesc());
+
+        // 4. Verify a property of the root context for completeness
+        assertFalse("Root context should not be in an array", rootContext.inArray());
     }
 }
