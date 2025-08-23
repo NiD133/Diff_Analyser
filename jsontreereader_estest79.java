@@ -1,35 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest79 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test078() throws Throwable {
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive("-Infinity");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
+/**
+ * Test suite for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    @Test
+    public void nextDouble_onNegativeInfinity_throwsIOException() {
+        // Arrange: Create a JsonTreeReader with a JSON primitive representing negative infinity.
+        // According to the JSON standard, infinity values are not permitted.
+        JsonPrimitive negativeInfinity = new JsonPrimitive("-Infinity");
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(negativeInfinity);
+
+        // Act & Assert: Verify that calling nextDouble() throws an IOException with a specific message.
         try {
-            jsonTreeReader0.nextDouble();
-            fail("Expecting exception: IOException");
+            jsonTreeReader.nextDouble();
+            fail("Expected an IOException because JSON forbids infinity values, but no exception was thrown.");
         } catch (IOException e) {
-            //
-            // JSON forbids NaN and infinities: -Infinity
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            String expectedMessage = "JSON forbids NaN and infinities: -Infinity";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
