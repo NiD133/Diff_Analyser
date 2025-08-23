@@ -1,17 +1,25 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class OptionBuilder_ESTestTest19 extends OptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionBuilder}.
+ */
+public class OptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        OptionBuilder optionBuilder0 = OptionBuilder.withDescription(":}gwm &");
-        assertNotNull(optionBuilder0);
+    @Test
+    public void withDescriptionShouldReturnBuilderInstanceForChaining() {
+        // Arrange
+        String description = "A sample option description";
+
+        // Act
+        // Call the method under test, which should return the builder instance.
+        OptionBuilder builder = OptionBuilder.withDescription(description);
+
+        // Assert
+        // Verify that a non-null builder instance is returned to ensure
+        // the fluent API contract is met (i.e., method calls can be chained).
+        assertNotNull("Expected withDescription() to return the builder instance", builder);
     }
 }
