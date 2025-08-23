@@ -1,35 +1,48 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest9 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
-        Point point0 = bufferedLineString0.getCenter();
-        linkedList0.add(point0);
-        BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1569.552036879501, false, spatialContext0);
-        ShapeCollection<BufferedLine> shapeCollection0 = bufferedLineString1.getSegments();
-        assertEquals(1, linkedList0.size());
-        assertEquals(1, shapeCollection0.size());
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for {@link BufferedLineString}.
+ */
+public class BufferedLineStringTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * The BufferedLineString constructor has special handling for a list containing a single point.
+     * It should create a single line segment from that point to itself. This test verifies that
+     * exactly one segment is created.
+     */
+    @Test
+    public void whenConstructedWithSinglePoint_thenCreatesOneSegment() {
+        // ARRANGE
+        // A single point to construct the line string.
+        Point point = spatialContext.makePoint(0, 0);
+        List<Point> singlePointList = Collections.singletonList(point);
+        double bufferDistance = 10.0;
+
+        // ACT
+        // Create the BufferedLineString with the single point.
+        BufferedLineString lineString = new BufferedLineString(singlePointList, bufferDistance, false, spatialContext);
+        ShapeCollection<BufferedLine> segments = lineString.getSegments();
+
+        // ASSERT
+        // Verify that the resulting shape contains exactly one segment.
+        assertEquals(1, segments.size());
+
+        // Further verify that the segment is a zero-length line from the point to itself.
+        BufferedLine createdSegment = segments.get(0);
+        assertEquals("Segment start point should match the input point", point, createdSegment.getA());
+        assertEquals("Segment end point should match the input point", point, createdSegment.getB());
+        assertEquals("Segment buffer should match the input buffer", bufferDistance, createdSegment.getBuf(), 0.0);
     }
 }
