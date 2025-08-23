@@ -1,34 +1,30 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class MeterNeedle_ESTestTest33 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link MeterNeedle} class and its subclasses.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        shipNeedle0.setOutlineStroke((Stroke) null);
-        assertEquals(5, shipNeedle0.getSize());
-        assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
-        assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+    /**
+     * Verifies that the outline stroke of a needle can be set to null.
+     * A null stroke is a valid state, typically indicating that no outline
+     * should be drawn.
+     */
+    @Test
+    public void setOutlineStrokeShouldAcceptNullValue() {
+        // Arrange: Create a ShipNeedle instance, which has a default outline stroke.
+        // MeterNeedle is abstract, so we use a concrete implementation for the test.
+        ShipNeedle needle = new ShipNeedle();
+        assertNotNull("Precondition: The default outline stroke should not be null.", needle.getOutlineStroke());
+
+        // Act: Set the outline stroke to null.
+        needle.setOutlineStroke(null);
+
+        // Assert: Verify that the outline stroke has been updated to null.
+        assertNull("The outline stroke should have been updated to null.", needle.getOutlineStroke());
     }
 }
