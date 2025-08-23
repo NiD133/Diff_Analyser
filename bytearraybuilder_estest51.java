@@ -1,19 +1,29 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest51 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class, focusing on its size management.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(4);
-        byteArrayBuilder0.append(4);
-        byteArrayBuilder0.appendFourBytes(4);
-        assertEquals(5, byteArrayBuilder0.size());
+    /**
+     * Verifies that the builder's size is correctly calculated after appending
+     * a single byte and a four-byte integer.
+     */
+    @Test
+    public void shouldReportCorrectSizeAfterAppendingBytes() {
+        // Arrange: Create a ByteArrayBuilder. The initial capacity is not critical
+        // for this test's logic, so we can use any small number.
+        ByteArrayBuilder builder = new ByteArrayBuilder(4);
+
+        // Act: Append one byte and then four bytes to the builder.
+        builder.append(123); // Appends 1 byte
+        builder.appendFourBytes(456); // Appends 4 bytes
+
+        // Assert: The total size should be the sum of the appended bytes (1 + 4 = 5).
+        int expectedSize = 5;
+        assertEquals(expectedSize, builder.size());
     }
 }
