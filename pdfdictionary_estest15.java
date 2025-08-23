@@ -1,37 +1,38 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class PdfDictionary_ESTestTest15 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Test suite for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        PdfDocument.PdfInfo pdfDocument_PdfInfo0 = new PdfDocument.PdfInfo();
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        FdfWriter fdfWriter0 = new FdfWriter(pipedOutputStream0);
-        FdfWriter.Wrt fdfWriter_Wrt0 = fdfWriter0.wrt;
-        try {
-            pdfDocument_PdfInfo0.toPdf(fdfWriter_Wrt0, pipedOutputStream0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
-        }
+    /**
+     * Verifies that the toPdf() method correctly propagates an IOException
+     * when the provided OutputStream fails during a write operation.
+     * <p>
+     * This scenario is simulated by attempting to write to an unconnected
+     * PipedOutputStream, which is guaranteed to throw an IOException.
+     */
+    @Test(expected = IOException.class)
+    public void toPdf_shouldThrowIOException_whenOutputStreamFails() throws IOException {
+        // Arrange: Create a PdfDictionary instance (using PdfInfo, a subclass)
+        // and a stream that is guaranteed to fail on write.
+        PdfDictionary pdfDictionary = new PdfDocument.PdfInfo();
+        PipedOutputStream faultyOutputStream = new PipedOutputStream();
+
+        // The toPdf method requires a PdfWriter instance. We can create a dummy
+        // writer that uses our faulty stream to satisfy the method signature.
+        PdfWriter writer = new FdfWriter(faultyOutputStream).wrt;
+
+        // Act: Attempt to write the dictionary to the faulty stream.
+        // This action is expected to throw an IOException.
+        pdfDictionary.toPdf(writer, faultyOutputStream);
+
+        // Assert: The test succeeds if an IOException is thrown, as specified
+        // by the @Test(expected = IOException.class) annotation.
     }
 }
