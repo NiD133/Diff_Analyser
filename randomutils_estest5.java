@@ -1,19 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomUtils_ESTestTest5 extends RandomUtils_ESTest_scaffolding {
+/**
+ * A test suite for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        long long0 = RandomUtils.nextLong(0L, 0L);
-        assertEquals(0L, long0);
+    /**
+     * Tests that {@code RandomUtils.nextLong(start, end)} returns the start value
+     * when the start and end of the range are the same. This tests the behavior
+     * for a zero-width range, e.g., [0, 0), where the upper bound is exclusive.
+     */
+    @Test
+    public void nextLong_withIdenticalBounds_shouldReturnLowerBound() {
+        // Define the boundary for the zero-width range [0, 0).
+        final long boundary = 0L;
+
+        // When the start and end values are the same, the exclusive upper bound
+        // means the range is effectively empty. The method should return the
+        // inclusive start value.
+        final long result = RandomUtils.nextLong(boundary, boundary);
+
+        assertEquals("For a zero-width range, the result should be the boundary value.", boundary, result);
     }
 }
