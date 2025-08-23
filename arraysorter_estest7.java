@@ -1,21 +1,26 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ArraySorter_ESTestTest7 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ArraySorter} class.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        double[] doubleArray0 = new double[0];
-        double[] doubleArray1 = ArraySorter.sort(doubleArray0);
-        assertSame(doubleArray0, doubleArray1);
+    /**
+     * Tests that calling sort() on an empty double array returns the same array instance,
+     * confirming the in-place nature of the sort for this edge case.
+     */
+    @Test
+    public void sort_withEmptyDoubleArray_returnsSameInstance() {
+        // Arrange: Create an empty array.
+        final double[] emptyArray = new double[0];
+
+        // Act: Call the sort method under test.
+        final double[] resultArray = ArraySorter.sort(emptyArray);
+
+        // Assert: The returned array should be the exact same instance as the input array.
+        assertSame("The returned array should be the same instance as the input", emptyArray, resultArray);
     }
 }
