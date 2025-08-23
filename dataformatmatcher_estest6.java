@@ -1,37 +1,51 @@
 package com.fasterxml.jackson.core.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.CharConversionException;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class DataFormatMatcher_ESTestTest6 extends DataFormatMatcher_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        JsonFactory jsonFactory0 = new JsonFactory();
-        FileDescriptor fileDescriptor0 = new FileDescriptor();
-        MockFileInputStream mockFileInputStream0 = new MockFileInputStream(fileDescriptor0);
-        InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(mockFileInputStream0, byteArray0);
-        MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-        DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-        dataFormatMatcher0.getDataStream();
-        assertTrue(dataFormatMatcher0.hasMatch());
-        assertEquals(MatchStrength.WEAK_MATCH, dataFormatMatcher0.getMatchStrength());
+/**
+ * Contains tests for the {@link DataFormatMatcher} class, focusing on its state
+ * and stream handling capabilities.
+ */
+public class DataFormatMatcherTest {
+
+    /**
+     * Verifies that calling {@link DataFormatMatcher#getDataStream()} returns a valid stream
+     * and does not alter the internal state of the matcher, such as its match status
+     * and strength.
+     */
+    @Test
+    public void getDataStreamShouldNotAlterMatchState() throws IOException {
+        // Arrange: Set up the necessary objects for creating a DataFormatMatcher.
+        byte[] bufferedData = new byte[10];
+        InputStream originalInputStream = new ByteArrayInputStream(new byte[]{1, 2, 3});
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(originalInputStream, bufferedData);
+
+        JsonFactory matchedFactory = new JsonFactory();
+        MatchStrength expectedStrength = MatchStrength.WEAK_MATCH;
+
+        // Create the DataFormatMatcher instance to be tested.
+        DataFormatMatcher matcher = inputAccessor.createMatcher(matchedFactory, expectedStrength);
+
+        // Act: Call the method under test.
+        // The goal is to retrieve the data stream, which should combine buffered data
+        // with the original stream's remaining content.
+        InputStream resultStream = matcher.getDataStream();
+
+        // Assert: Verify that the matcher's state remains consistent after the call.
+        assertNotNull("getDataStream() should not return a null stream.", resultStream);
+        
+        assertTrue("Matcher must still indicate a match after stream retrieval.", matcher.hasMatch());
+        
+        assertEquals("Match strength should be preserved after stream retrieval.",
+                expectedStrength, matcher.getMatchStrength());
     }
 }
