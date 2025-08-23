@@ -1,42 +1,67 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-public class WeeksTestTest3 extends TestCase {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    // (before the late 90's they were all over the place)
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+@DisplayName("Weeks")
+class WeeksTest {
+
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    @Nested
+    @DisplayName("factory method weeksBetween(start, end)")
+    class WeeksBetweenFactory {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
+        @Test
+        @DisplayName("should calculate positive weeks when end instant is after start instant")
+        void weeksBetween_calculatesPositiveWeeks_forForwardInterval() {
+            // Arrange
+            DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+            DateTime threeWeeksLater = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
+            DateTime sixWeeksLater = new DateTime(2006, 7, 21, 12, 0, 0, 0, PARIS);
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+            // Act
+            Weeks threeWeeks = Weeks.weeksBetween(start, threeWeeksLater);
+            Weeks sixWeeks = Weeks.weeksBetween(start, sixWeeksLater);
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+            // Assert
+            assertThat(threeWeeks.getWeeks()).isEqualTo(3);
+            assertThat(sixWeeks.getWeeks()).isEqualTo(6);
+        }
 
-    //-----------------------------------------------------------------------
-    public void testFactory_weeksBetween_RInstant() {
-        DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 7, 21, 12, 0, 0, 0, PARIS);
-        assertEquals(3, Weeks.weeksBetween(start, end1).getWeeks());
-        assertEquals(0, Weeks.weeksBetween(start, start).getWeeks());
-        assertEquals(0, Weeks.weeksBetween(end1, end1).getWeeks());
-        assertEquals(-3, Weeks.weeksBetween(end1, start).getWeeks());
-        assertEquals(6, Weeks.weeksBetween(start, end2).getWeeks());
+        @Test
+        @DisplayName("should calculate zero weeks when start and end instants are identical")
+        void weeksBetween_calculatesZeroWeeks_forSameInstant() {
+            // Arrange
+            DateTime instant = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+
+            // Act
+            Weeks result = Weeks.weeksBetween(instant, instant);
+
+            // Assert
+            assertThat(result.getWeeks()).isEqualTo(0);
+            // We can also assert that it returns the singleton instance for ZERO
+            assertThat(result).isSameAs(Weeks.ZERO);
+        }
+
+        @Test
+        @DisplayName("should calculate negative weeks when end instant is before start instant")
+        void weeksBetween_calculatesNegativeWeeks_forBackwardInterval() {
+            // Arrange
+            DateTime start = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
+            DateTime end = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+
+            // Act
+            Weeks result = Weeks.weeksBetween(start, end);
+
+            // Assert
+            assertThat(result.getWeeks()).isEqualTo(-3);
+        }
     }
 }
