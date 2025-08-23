@@ -1,32 +1,32 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest18 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that the {@link Validate#fail(String)} method correctly throws
+     * an {@link IllegalArgumentException} with the provided message.
+     */
+    @Test
+    public void failThrowsIllegalArgumentExceptionWithMessage() {
+        // Arrange: Define the message that we expect the exception to contain.
+        String expectedMessage = "This is a test failure message.";
+
         try {
-            Validate.fail("org.jsoup.helper.ValidationException");
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Call the method that is expected to throw an exception.
+            Validate.fail(expectedMessage);
+
+            // Assert: If this line is reached, the test fails because no exception was thrown.
+            fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // org.jsoup.helper.ValidationException
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: The correct exception was thrown. Now, verify its message.
+            assertEquals("The exception message should match the one provided.", expectedMessage, e.getMessage());
         }
     }
 }
