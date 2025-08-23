@@ -1,22 +1,34 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.testing.EqualsTester;
-import com.google.gson.common.MoreAsserts;
-import java.math.BigInteger;
+
 import org.junit.Test;
 
-public class JsonArrayTestTest9 {
+/**
+ * Tests for {@link JsonArray} focusing on adding elements.
+ */
+public class JsonArrayTest {
 
-    @Test
-    public void testStringPrimitiveAddition() {
-        JsonArray jsonArray = new JsonArray();
-        jsonArray.add("Hello");
-        jsonArray.add("Goodbye");
-        jsonArray.add("Thank you");
-        jsonArray.add((String) null);
-        jsonArray.add("Yes");
-        assertThat(jsonArray.toString()).isEqualTo("[\"Hello\",\"Goodbye\",\"Thank you\",null,\"Yes\"]");
-    }
+  @Test
+  public void addString_withNullValue_addsJsonNull() {
+    // Arrange
+    JsonArray actualArray = new JsonArray();
+
+    // Act
+    actualArray.add("Hello");
+    actualArray.add("Goodbye");
+    actualArray.add("Thank you");
+    actualArray.add((String) null); // This should be converted to JsonNull
+    actualArray.add("Yes");
+
+    // Assert
+    JsonArray expectedArray = new JsonArray();
+    expectedArray.add("Hello");
+    expectedArray.add("Goodbye");
+    expectedArray.add("Thank you");
+    expectedArray.add(JsonNull.INSTANCE);
+    expectedArray.add("Yes");
+
+    assertThat(actualArray).isEqualTo(expectedArray);
+  }
 }
