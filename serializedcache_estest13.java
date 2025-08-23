@@ -1,34 +1,29 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest13 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for the {@link SerializedCache} decorator.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        SerializedCache serializedCache0 = new SerializedCache((Cache) null);
-        // Undeclared exception!
-        try {
-            serializedCache0.removeObject((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
-        }
+    /**
+     * Verifies that removeObject() throws a NullPointerException if the underlying
+     * delegate cache is null.
+     *
+     * A SerializedCache must be constructed with a valid, non-null delegate. This
+     * test ensures that invoking methods on an improperly configured instance fails fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void removeObjectShouldThrowNullPointerExceptionWhenDelegateIsNull() {
+        // Arrange: Create a SerializedCache with a null delegate.
+        SerializedCache serializedCache = new SerializedCache(null);
+
+        // Act: Attempt to remove an object. This should fail because the call
+        // will be forwarded to the null delegate.
+        serializedCache.removeObject("any-key");
+
+        // Assert: The test expects a NullPointerException, as declared in the @Test annotation.
     }
 }
