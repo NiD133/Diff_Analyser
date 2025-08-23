@@ -1,26 +1,36 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
+import static org.junit.Assert.assertEquals;
+
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest5 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Test suite for the BlockingCache decorator.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("cy0]f56gGY%Vb");
-        ScheduledCache scheduledCache0 = new ScheduledCache(perpetualCache0);
-        LruCache lruCache0 = new LruCache(scheduledCache0);
-        LoggingCache loggingCache0 = new LoggingCache(lruCache0);
-        BlockingCache blockingCache0 = new BlockingCache(loggingCache0);
-        blockingCache0.setTimeout((-2805L));
-        long long0 = blockingCache0.getTimeout();
-        assertEquals((-2805L), long0);
+    /**
+     * Verifies that the timeout value can be set and retrieved correctly.
+     */
+    @Test
+    public void shouldSetAndGetTimeout() {
+        // Arrange
+        // A simple delegate cache is sufficient for testing the timeout functionality.
+        // The complex chain of decorators from the original test is not necessary here.
+        Cache delegate = new PerpetualCache("test-delegate-cache");
+        BlockingCache blockingCache = new BlockingCache(delegate);
+        
+        // A negative timeout is a valid, if unusual, value to test.
+        final long expectedTimeout = -2805L;
+
+        // Act
+        blockingCache.setTimeout(expectedTimeout);
+        long actualTimeout = blockingCache.getTimeout();
+
+        // Assert
+        assertEquals("The retrieved timeout should match the value that was set.",
+                expectedTimeout, actualTimeout);
     }
 }
