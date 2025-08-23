@@ -1,38 +1,35 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest12 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Tests for the {@link MeterNeedle} class and its subclasses.
+ * This focuses on the highlight paint property.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        PlumNeedle plumNeedle0 = new PlumNeedle();
-        DefaultTreeCellRenderer defaultTreeCellRenderer0 = new DefaultTreeCellRenderer();
-        Color color0 = defaultTreeCellRenderer0.getBackgroundNonSelectionColor();
-        plumNeedle0.setHighlightPaint(color0);
-        Paint paint0 = plumNeedle0.getHighlightPaint();
-        assertEquals(5, plumNeedle0.getSize());
-        assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
-        assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
-        assertNotNull(paint0);
+    /**
+     * Verifies that the highlight paint can be set and retrieved correctly.
+     * A call to setHighlightPaint should store the paint, and a subsequent
+     * call to getHighlightPaint should return the same paint object.
+     */
+    @Test
+    public void testSetAndGetHighlightPaint() {
+        // Arrange: Create a needle instance and the paint to be set.
+        // PlumNeedle is a concrete implementation of the abstract MeterNeedle.
+        PlumNeedle needle = new PlumNeedle();
+        Paint expectedPaint = Color.RED;
+
+        // Act: Set the highlight paint on the needle.
+        needle.setHighlightPaint(expectedPaint);
+        Paint actualPaint = needle.getHighlightPaint();
+
+        // Assert: The retrieved paint should be the same as the one set.
+        assertEquals("The highlight paint returned by the getter should match the paint set by the setter.",
+                expectedPaint, actualPaint);
     }
 }
