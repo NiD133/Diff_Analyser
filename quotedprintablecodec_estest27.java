@@ -1,27 +1,33 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest27 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Contains improved tests for the {@link QuotedPrintableCodec} class, focusing on error handling.
+ */
+public class QuotedPrintableCodecImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec((Charset) null);
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.encode((Object) " la4'");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that attempting to encode a String using a QuotedPrintableCodec
+     * initialized with a null charset results in a NullPointerException.
+     *
+     * <p>The encoding process for a String requires a valid charset to convert the
+     * string into bytes. Providing a null charset creates an invalid state for the
+     * codec, and the operation is expected to fail when the charset is accessed
+     * internally.</p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeStringWithNullCharsetShouldThrowNullPointerException() {
+        // Arrange: Create a codec instance with a null charset, which is an invalid
+        // configuration for encoding strings.
+        QuotedPrintableCodec codec = new QuotedPrintableCodec((Charset) null);
+        Object stringToEncode = "This is a test string.";
+
+        // Act: Attempt to encode the string object.
+        // The assertion is handled by the 'expected' attribute of the @Test annotation,
+        // which verifies that a NullPointerException is thrown.
+        codec.encode(stringToEncode);
     }
 }
