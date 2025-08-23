@@ -1,44 +1,42 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest35 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
+/**
+ * Test suite for {@link W3CDom}.
+ * This class contains an improved version of a test case that was likely auto-generated,
+ * focusing on clarity and modern testing practices.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that the {@link W3CDom#convert(org.jsoup.nodes.Element, org.w3c.dom.Document)} method
+     * throws a DOMException when attempting to add a root element to a W3C document
+     * that already contains one.
+     */
     @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parseBodyFragment("", "");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup((Element) document0);
-        // Undeclared exception!
-        try {
-            w3CDom0.convert((Element) document0, document1);
-            fail("Expecting exception: DOMException");
-        } catch (DOMException e) {
-        }
+    public void convertThrowsExceptionWhenAddingToDocumentThatAlreadyHasRootElement() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+        // Create a basic Jsoup document, which includes <html> and <body> tags.
+        Document jsoupDoc = Parser.parseBodyFragment("", "");
+
+        // Convert the Jsoup document to a W3C document.
+        // The resulting w3cDoc now has a root element (<html>).
+        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+
+        // Act & Assert
+        // Attempting to convert the same Jsoup document again into the already-populated
+        // W3C document should fail, as a document cannot have more than one root element.
+        assertThrows(
+            "Should throw DOMException when adding a second root element",
+            DOMException.class,
+            () -> w3cDom.convert(jsoupDoc, w3cDoc)
+        );
     }
 }
