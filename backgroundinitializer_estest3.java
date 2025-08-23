@@ -1,33 +1,41 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class BackgroundInitializer_ESTestTest3 extends BackgroundInitializer_ESTest_scaffolding {
+/**
+ * Test suite for {@link BackgroundInitializer}.
+ */
+public class BackgroundInitializerTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        BackgroundInitializer<Delayed> backgroundInitializer0 = new BackgroundInitializer<Delayed>();
-        boolean boolean0 = backgroundInitializer0.start();
-        boolean boolean1 = backgroundInitializer0.isInitialized();
-        assertFalse(boolean1 == boolean0);
-        assertFalse(boolean1);
+    /**
+     * Tests that an initializer is not in the "initialized" state immediately
+     * after being started, as the background task needs time to complete.
+     */
+    @Test
+    public void isInitializedShouldReturnFalseImmediatelyAfterStart() {
+        // Arrange: Create a basic BackgroundInitializer.
+        // We provide a minimal implementation of the abstract initialize() method.
+        // The actual result is not important for this test.
+        final BackgroundInitializer<Object> initializer = new BackgroundInitializer<Object>() {
+            @Override
+            protected Object initialize() {
+                // This background task is not expected to complete before the check.
+                return new Object();
+            }
+        };
+
+        // Act: Start the initializer and immediately check its status.
+        final boolean startSucceeded = initializer.start();
+        final boolean isInitialized = initializer.isInitialized();
+
+        // Assert: Verify the state right after starting.
+        // The start() method should return true on the first call.
+        assertTrue("start() should return true on the first successful invocation.", startSucceeded);
+
+        // Immediately after starting, the background task will not have completed yet,
+        // so the initializer should not be considered initialized.
+        assertFalse("isInitialized() should be false right after start(), before the task completes.", isInitialized);
     }
 }
