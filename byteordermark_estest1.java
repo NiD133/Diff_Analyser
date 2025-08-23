@@ -1,20 +1,36 @@
 package org.apache.commons.io;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteOrderMark_ESTestTest1 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Tests for {@link ByteOrderMark}.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16BE;
-        int[] intArray0 = new int[8];
-        intArray0[0] = (int) '\uFEFF';
-        boolean boolean0 = byteOrderMark0.matches(intArray0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the matches() method correctly returns false for an input
+     * that does not start with the expected BOM bytes.
+     *
+     * <p>This test specifically checks that the UTF-16BE BOM (0xFE, 0xFF) does not
+     * match an input array starting with the single integer value of the Unicode
+     * BOM character (0xFEFF). This ensures the method compares individual byte
+     * values rather than a combined integer.</p>
+     */
+    @Test
+    public void testMatchesReturnsFalseForMismatchedPrefix() {
+        // Arrange
+        // The UTF-16BE BOM is defined by the sequence of two integers: 0xFE, 0xFF.
+        final ByteOrderMark utf16beBom = ByteOrderMark.UTF_16BE;
+
+        // Create an input array that starts with the single Unicode BOM character (0xFEFF).
+        // This is different from the first integer (0xFE) of the UTF-16BE BOM.
+        final int[] nonMatchingBytes = {(int) ByteOrderMark.UTF_BOM, 0x11, 0x22};
+
+        // Act
+        final boolean isMatch = utf16beBom.matches(nonMatchingBytes);
+
+        // Assert
+        assertFalse("Expected BOM not to match an incorrect byte prefix", isMatch);
     }
 }
