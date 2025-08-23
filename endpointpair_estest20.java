@@ -1,25 +1,23 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertNotEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest20 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        Integer integer0 = new Integer(123);
-        NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
-        StandardNetwork<Object, Object> standardNetwork0 = new StandardNetwork<Object, Object>(networkBuilder0);
-        EndpointPair<Object> endpointPair0 = EndpointPair.of((Network<?, ?>) standardNetwork0, (Object) locale_Category0, (Object) integer0);
-        EndpointPair<Integer> endpointPair1 = EndpointPair.ordered(integer0, integer0);
-        boolean boolean0 = endpointPair0.equals(endpointPair1);
-        assertFalse(boolean0);
+    @Test
+    public void equals_orderedPairsWithDifferentNodes_shouldReturnFalse() {
+        // Arrange: Create two distinct ordered endpoint pairs.
+        // The equals() method for ordered pairs requires both the source and target nodes
+        // to be equal in the same order.
+        EndpointPair<Integer> pairA = EndpointPair.ordered(1, 2);
+        EndpointPair<Integer> pairB = EndpointPair.ordered(3, 4);
+
+        // Act & Assert: Verify that the two distinct pairs are not equal.
+        assertNotEquals(pairA, pairB);
     }
 }
