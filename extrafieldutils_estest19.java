@@ -1,27 +1,29 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest19 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[2];
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-        }
+    /**
+     * Tests that {@link ExtraFieldUtils#mergeCentralDirectoryData(ZipExtraField[])}
+     * throws a NullPointerException if the input array contains null elements.
+     * The method is expected to iterate over the array, and will fail when it
+     * attempts to access a method on a null object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mergeCentralDirectoryDataShouldThrowNpeWhenArrayContainsNull() {
+        // Arrange: Create an array where elements are initialized to null by default.
+        // A single null element is sufficient to trigger the exception.
+        final ZipExtraField[] fieldsWithNull = new ZipExtraField[1];
+
+        // Act: Attempt to merge the central directory data from the array.
+        // This call is expected to throw a NullPointerException.
+        ExtraFieldUtils.mergeCentralDirectoryData(fieldsWithNull);
+
+        // Assert: The test passes if a NullPointerException is thrown, as
+        // specified by the 'expected' attribute of the @Test annotation.
     }
 }
