@@ -1,103 +1,91 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collection;
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
 import org.joda.time.YearMonthDay;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-public class ISOChronologyTestTest13 extends TestCase {
+/**
+ * Tests year additions in ISOChronology, especially around the historical
+ * Gregorian cutover period to ensure the proleptic calendar behaves correctly.
+ */
+@RunWith(Parameterized.class)
+public class ISOChronologyYearAdditionTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final Chronology UTC_CHRONOLOGY = ISOChronology.getInstanceUTC();
+    private static final DurationFieldType YEARS_FIELD = DurationFieldType.years();
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    private final String startDateTimeStr;
+    private final String endDateTimeStr;
+    private final int yearsToAdd;
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public ISOChronologyYearAdditionTest(String startDateTimeStr, String endDateTimeStr, int yearsToAdd) {
+        this.startDateTimeStr = startDateTimeStr;
+        this.endDateTimeStr = endDateTimeStr;
+        this.yearsToAdd = yearsToAdd;
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
+    @Parameters(name = "Test {index}: {0} + {2} year(s) = {1}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            // Test cases around 1582, the year of the historical Gregorian calendar adoption.
+            // ISOChronology is proleptic, so it should handle these additions linearly
+            // without any "cutover" gap.
+
+            // --- Adding one year ---
+            {"1582-01-01", "1583-01-01", 1},
+            {"1582-02-15", "1583-02-15", 1},
+            {"1582-02-28", "1583-02-28", 1}, // End of month in a non-leap year
+            {"1582-03-01", "1583-03-01", 1},
+            {"1582-09-30", "1583-09-30", 1},
+            {"1582-10-01", "1583-10-01", 1},
+            {"1582-10-04", "1583-10-04", 1}, // Date just before the historical cutover
+            {"1582-10-15", "1583-10-15", 1}, // Date just after the historical cutover
+            {"1582-10-16", "1583-10-16", 1},
+
+            // --- Adding four years to cross a leap year (1584) ---
+            {"1580-01-01", "1584-01-01", 4},
+            {"1580-02-29", "1584-02-29", 4}, // Leap day to leap day
+            {"1580-10-01", "1584-10-01", 4},
+            {"1580-10-10", "1584-10-10", 4},
+            {"1580-10-15", "1584-10-15", 4},
+            {"1580-12-31", "1584-12-31", 4},
+        });
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
+    @Test
+    public void testYearAdditionIsCorrect() {
+        DateTime dtStart = new DateTime(startDateTimeStr, UTC_CHRONOLOGY);
+        DateTime dtEnd = new DateTime(endDateTimeStr, UTC_CHRONOLOGY);
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
+        // 1. Test forward addition
+        assertEquals("Forward addition of years failed.",
+            dtEnd, dtStart.withFieldAdded(YEARS_FIELD, yearsToAdd));
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
+        // 2. Test backward addition (reversibility)
+        assertEquals("Backward addition of years failed.",
+            dtStart, dtEnd.withFieldAdded(YEARS_FIELD, -yearsToAdd));
 
-    public void testCutoverAddYears() {
-        testAdd("1582-01-01", DurationFieldType.years(), 1, "1583-01-01");
-        testAdd("1582-02-15", DurationFieldType.years(), 1, "1583-02-15");
-        testAdd("1582-02-28", DurationFieldType.years(), 1, "1583-02-28");
-        testAdd("1582-03-01", DurationFieldType.years(), 1, "1583-03-01");
-        testAdd("1582-09-30", DurationFieldType.years(), 1, "1583-09-30");
-        testAdd("1582-10-01", DurationFieldType.years(), 1, "1583-10-01");
-        testAdd("1582-10-04", DurationFieldType.years(), 1, "1583-10-04");
-        testAdd("1582-10-15", DurationFieldType.years(), 1, "1583-10-15");
-        testAdd("1582-10-16", DurationFieldType.years(), 1, "1583-10-16");
-        testAdd("1580-01-01", DurationFieldType.years(), 4, "1584-01-01");
-        testAdd("1580-02-29", DurationFieldType.years(), 4, "1584-02-29");
-        testAdd("1580-10-01", DurationFieldType.years(), 4, "1584-10-01");
-        testAdd("1580-10-10", DurationFieldType.years(), 4, "1584-10-10");
-        testAdd("1580-10-15", DurationFieldType.years(), 4, "1584-10-15");
-        testAdd("1580-12-31", DurationFieldType.years(), 4, "1584-12-31");
+        // 3. Test difference calculation
+        DurationField yearDurationField = YEARS_FIELD.getField(UTC_CHRONOLOGY);
+        int differenceInYears = yearDurationField.getDifference(dtEnd.getMillis(), dtStart.getMillis());
+        assertEquals("Calculating the difference in years failed.", yearsToAdd, differenceInYears);
+
+        // 4. Test addition on a date-only partial (YearMonthDay)
+        YearMonthDay ymdStart = new YearMonthDay(startDateTimeStr, UTC_CHRONOLOGY);
+        YearMonthDay ymdEnd = new YearMonthDay(endDateTimeStr, UTC_CHRONOLOGY);
+        assertEquals("Forward addition for YearMonthDay failed.",
+            ymdEnd, ymdStart.withFieldAdded(YEARS_FIELD, yearsToAdd));
+        assertEquals("Backward addition for YearMonthDay failed.",
+            ymdStart, ymdEnd.withFieldAdded(YEARS_FIELD, -yearsToAdd));
     }
 }
