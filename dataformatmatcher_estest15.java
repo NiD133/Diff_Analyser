@@ -1,33 +1,48 @@
 package com.fasterxml.jackson.core.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.CharConversionException;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class DataFormatMatcher_ESTestTest15 extends DataFormatMatcher_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        byte[] byteArray0 = new byte[41];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        MatchStrength matchStrength0 = MatchStrength.INCONCLUSIVE;
-        DataFormatMatcher dataFormatMatcher0 = new DataFormatMatcher(byteArrayInputStream0, byteArray0, 0, 0, (JsonFactory) null, matchStrength0);
-        String string0 = dataFormatMatcher0.getMatchedFormatName();
-        assertNull(string0);
+/**
+ * This test class contains tests for the {@link DataFormatMatcher} class.
+ * The original test was automatically generated and has been improved for clarity.
+ */
+public class DataFormatMatcher_ESTestTest15 { // Note: Class name kept from original for context.
+
+    /**
+     * Verifies that getMatchedFormatName() returns null when the DataFormatMatcher
+     * represents a state where no data format was matched.
+     *
+     * This is simulated by creating a DataFormatMatcher with a null JsonFactory.
+     */
+    @Test
+    public void getMatchedFormatName_shouldReturnNull_whenNoMatchIsFound() {
+        // Arrange: Set up a scenario representing an inconclusive format match.
+        byte[] inputData = new byte[16]; // The content and size are arbitrary for this test.
+        InputStream inputStream = new ByteArrayInputStream(inputData);
+        MatchStrength strength = MatchStrength.INCONCLUSIVE;
+
+        // A null JsonFactory signifies that no format was identified.
+        JsonFactory noMatchingFactory = null;
+
+        DataFormatMatcher matcher = new DataFormatMatcher(
+                inputStream,
+                inputData,
+                0, // bufferedStart
+                0, // bufferedLength
+                noMatchingFactory,
+                strength
+        );
+
+        // Act: Call the method under test.
+        String matchedFormatName = matcher.getMatchedFormatName();
+
+        // Assert: Verify that the result is null as expected.
+        assertNull("The matched format name should be null when no JsonFactory is provided.", matchedFormatName);
     }
 }
