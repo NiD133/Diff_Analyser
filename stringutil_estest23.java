@@ -1,35 +1,36 @@
 package org.jsoup.internal;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class StringUtil_ESTestTest23 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the URL resolution logic in {@link StringUtil}.
+ */
+class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        try {
-            StringUtil.resolve((URL) null, "B1s2U[+");
-            fail("Expecting exception: MalformedURLException");
-        } catch (MalformedURLException e) {
-            //
-            // no protocol: B1s2U[+
-            //
-            verifyException("java.net.URL", e);
-        }
+    /**
+     * Verifies that resolving a relative URL string with a null base URL
+     * correctly throws a MalformedURLException. A URL cannot be constructed
+     * from a relative path without a base to resolve against.
+     */
+    @Test
+    void resolveWithNullBaseUrlAndRelativeUrlThrowsException() {
+        // Arrange: Define the inputs for the test case.
+        final URL baseUrl = null;
+        final String relativeUrl = "B1s2U[+";
+        final String expectedErrorMessage = "no protocol: " + relativeUrl;
+
+        // Act & Assert: Execute the method and verify the expected exception is thrown.
+        MalformedURLException thrownException = assertThrows(
+            MalformedURLException.class,
+            () -> StringUtil.resolve(baseUrl, relativeUrl),
+            "A MalformedURLException should be thrown when the base URL is null and the relative URL is not absolute."
+        );
+
+        // Assert: Verify the exception message is as expected for more precise testing.
+        assertEquals(expectedErrorMessage, thrownException.getMessage());
     }
 }
