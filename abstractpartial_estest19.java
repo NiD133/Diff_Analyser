@@ -1,54 +1,28 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest19 extends AbstractPartial_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link AbstractPartial} class, focusing on index-based access.
+ */
+public class AbstractPartialTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        // Undeclared exception!
-        try {
-            yearMonth0.getFieldType(1040);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 1040
-            //
-            verifyException("org.joda.time.YearMonth", e);
-        }
+    /**
+     * Tests that calling getFieldType(int) with an index that is out of bounds
+     * throws an ArrayIndexOutOfBoundsException.
+     *
+     * A YearMonth is used as a concrete implementation of AbstractPartial. It has two
+     * fields (year and month), so valid indices are 0 and 1.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void getFieldType_withInvalidIndex_shouldThrowArrayIndexOutOfBoundsException() {
+        // Arrange: Create a YearMonth instance. It has fields at index 0 (year) and 1 (month).
+        YearMonth yearMonth = new YearMonth();
+        int invalidIndex = 2; // Any index other than 0 or 1 is invalid.
+
+        // Act: Attempt to access a field type at an index that does not exist.
+        // The @Test(expected=...) annotation handles the assertion that an exception is thrown.
+        yearMonth.getFieldType(invalidIndex);
     }
 }
