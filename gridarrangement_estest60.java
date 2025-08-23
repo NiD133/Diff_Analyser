@@ -2,78 +2,52 @@ package org.jfree.chart.block;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest60 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Tests for the {@link GridArrangement} class, focusing on its handling of
+ * various layout constraints.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(15, 15);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        BlockContainer blockContainer1 = new BlockContainer();
-        assertEquals(0.0, blockContainer1.getContentXOffset(), 0.01);
-        assertTrue(blockContainer1.isEmpty());
-        assertEquals(0.0, blockContainer1.getHeight(), 0.01);
-        assertNull(blockContainer1.getID());
-        assertEquals(0.0, blockContainer1.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getWidth(), 0.01);
-        assertNotNull(blockContainer1);
-        assertTrue(blockContainer1.equals((Object) blockContainer0));
-        blockContainer0.add((Block) blockContainer1);
-        assertNotSame(blockContainer0, blockContainer1);
-        assertNotSame(blockContainer1, blockContainer0);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer1.getContentXOffset(), 0.01);
-        assertTrue(blockContainer1.isEmpty());
-        assertEquals(0.0, blockContainer1.getHeight(), 0.01);
-        assertNull(blockContainer1.getID());
-        assertEquals(0.0, blockContainer1.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getWidth(), 0.01);
-        assertFalse(blockContainer0.equals((Object) blockContainer1));
-        assertFalse(blockContainer1.equals((Object) blockContainer0));
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        // Undeclared exception!
+    /**
+     * Verifies that the arrange() method throws a RuntimeException when given a
+     * fixed-width constraint that does not match the container's natural width.
+     *
+     * This scenario is handled by the internal `arrangeFN` method, which has a
+     * code path that is explicitly not implemented for resizing blocks to fit
+     * a fixed width. This test confirms that the unimplemented path is guarded
+     * by an appropriate exception.
+     */
+    @Test
+    public void arrangeWithMismatchedFixedWidthConstraintThrowsException() {
+        // Arrange: Set up a grid arrangement and a container with a single block
+        // of a known size. This gives the container a predictable "natural" size.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer container = new BlockContainer(arrangement);
+        
+        // The natural width of the container will be 20.0 due to this block.
+        container.add(new EmptyBlock(20.0, 20.0));
+
+        // Create a constraint with a fixed width (10.0) that differs from the
+        // container's natural width (20.0). The height constraint is NONE.
+        // This specific combination triggers the unimplemented logic.
+        RectangleConstraint constraint = new RectangleConstraint(
+            10.0, null, LengthConstraintType.FIXED,
+            0.0, null, LengthConstraintType.NONE);
+        
+        // The Graphics2D object is not used in this specific code path.
+        Graphics2D g2 = null;
+
+        // Act & Assert: We expect a RuntimeException because the logic to handle
+        // this resizing case is not implemented.
         try {
-            gridArrangement0.arrangeFN(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
+            arrangement.arrange(container, g2, constraint);
+            fail("A RuntimeException was expected but not thrown.");
         } catch (RuntimeException e) {
-            //
-            // Not implemented.
-            //
-            verifyException("org.jfree.chart.block.BorderArrangement", e);
+            assertEquals("The exception message should indicate an unimplemented feature.",
+                         "Not implemented.", e.getMessage());
         }
     }
 }
