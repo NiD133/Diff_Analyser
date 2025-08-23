@@ -1,54 +1,33 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
+import static org.junit.Assert.assertThrows;
+
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedSortedMap_ESTestTest26 extends TransformedSortedMap_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link TransformedSortedMap}.
+ * This specific test focuses on the behavior of the firstKey() method.
+ */
+public class TransformedSortedMap_ESTestTest26 {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        TreeMap<Object, Object> treeMap0 = new TreeMap<Object, Object>();
-        Transformer<Object, Object> transformer0 = MapTransformer.mapTransformer((Map<? super Object, ?>) treeMap0);
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        TreeMap<Object, Integer> treeMap1 = new TreeMap<Object, Integer>(comparator0);
-        Integer integer0 = new Integer(61);
-        ConstantTransformer<Integer, Integer> constantTransformer0 = new ConstantTransformer<Integer, Integer>(integer0);
-        TransformedSortedMap<Object, Integer> transformedSortedMap0 = TransformedSortedMap.transformedSortedMap((SortedMap<Object, Integer>) treeMap1, (Transformer<? super Object, ?>) transformer0, (Transformer<? super Integer, ? extends Integer>) constantTransformer0);
-        // Undeclared exception!
-        try {
-            transformedSortedMap0.firstKey();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
-        }
+    /**
+     * Tests that calling firstKey() on an empty TransformedSortedMap
+     * throws a NoSuchElementException, as per the SortedMap contract.
+     */
+    @Test
+    public void firstKeyOnEmptyMapShouldThrowNoSuchElementException() {
+        // Arrange: Create a TransformedSortedMap that decorates an empty TreeMap.
+        // The key and value transformers are not relevant for this test, so they are null.
+        final SortedMap<Object, Integer> emptyMap = new TreeMap<>();
+        final SortedMap<Object, Integer> transformedMap =
+                TransformedSortedMap.transformedSortedMap(emptyMap, null, null);
+
+        // Act & Assert: Verify that calling firstKey() throws the expected exception.
+        assertThrows(NoSuchElementException.class, () -> {
+            transformedMap.firstKey();
+        });
     }
 }
