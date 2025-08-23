@@ -2,27 +2,36 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest11 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test focuses on the internal behavior of the LinkedTreeMap class.
+ */
+public class LinkedTreeMapInternalTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<Object, Map.Entry<Object, Integer>> linkedTreeMap0 = new LinkedTreeMap<Object, Map.Entry<Object, Integer>>(comparator0, true);
-        LinkedTreeMap.Node<Object, Map.Entry<Object, Integer>> linkedTreeMap_Node0 = new LinkedTreeMap.Node<Object, Map.Entry<Object, Integer>>(true);
-        linkedTreeMap0.removeInternal(linkedTreeMap_Node0, true);
-        linkedTreeMap0.keySet();
-        assertEquals((-1), linkedTreeMap0.size());
+    /**
+     * Tests that calling the internal method `removeInternal` with a node
+     * that is not part of the map's structure incorrectly decrements the map's size.
+     *
+     * <p>This scenario is not a standard use case, as `removeInternal` is a private
+     * helper method. The test reveals a lack of validation within this method,
+     * which can lead to a corrupted map state (e.g., a negative size) if misused.
+     */
+    @Test
+    public void removeInternal_withDetachedNode_corruptsMapSize() {
+        // Arrange: Create an empty map and a standalone node that is not part of the map.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        assertEquals("An empty map should have a size of 0", 0, map.size());
+
+        // This creates a new node that is not linked to the map's root or any other element.
+        // It is effectively a "detached" node.
+        LinkedTreeMap.Node<String, Integer> detachedNode = new LinkedTreeMap.Node<>(true);
+
+        // Act: Call the internal remove method with the detached node.
+        // This is an improper use of the internal API, as the method assumes
+        // the node is part of the map.
+        map.removeInternal(detachedNode, true);
+
+        // Assert: The size is incorrectly decremented without validation, resulting in a negative value.
+        assertEquals("Size should become -1 after removing a detached node", -1, map.size());
     }
 }
