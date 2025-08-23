@@ -1,25 +1,37 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest5 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ProxyReader} class, focusing on the skip() method.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        long long0 = taggedReader0.skip(75);
-        assertEquals(17L, long0);
+    /**
+     * Tests that calling skip() with a number larger than the remaining characters
+     * in the stream skips only up to the end of the stream and returns the
+     * number of characters actually skipped.
+     */
+    @Test
+    public void skipShouldReturnActualCharactersSkippedWhenAttemptingToSkipPastEndOfStream() throws IOException {
+        // Arrange
+        final String inputData = "1234567890"; // A simple string with a clear length of 10.
+        final long inputLength = inputData.length();
+        final long charactersToSkip = inputLength + 5; // A number explicitly larger than the input.
+
+        // The class under test, ProxyReader, is abstract.
+        // We use a concrete subclass, TaggedReader, for instantiation.
+        final ProxyReader proxyReader = new TaggedReader(new StringReader(inputData));
+
+        // Act
+        final long actualSkipped = proxyReader.skip(charactersToSkip);
+
+        // Assert
+        assertEquals("The number of skipped characters should equal the total length of the input string.",
+                inputLength, actualSkipped);
     }
 }
