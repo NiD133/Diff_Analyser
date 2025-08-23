@@ -1,25 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest46 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for the {@link ProxyReader} class, using {@link CloseShieldReader} as a
+ * concrete implementation for testing the proxying behavior.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        StringReader stringReader0 = new StringReader("$^pT");
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
-        int int0 = closeShieldReader0.read();
-        assertEquals(36, int0);
+    /**
+     * Tests that the read() method correctly delegates to the underlying reader
+     * and returns the integer value of the first character.
+     */
+    @Test
+    public void readShouldReturnFirstCharacterAsInt() throws IOException {
+        // Arrange
+        final String inputString = "$^pT";
+        final Reader underlyingReader = new StringReader(inputString);
+        // Use CloseShieldReader as a concrete subclass of the abstract ProxyReader
+        final Reader proxyReader = CloseShieldReader.wrap(underlyingReader);
+
+        // Act
+        final int firstCharRead = proxyReader.read();
+
+        // Assert
+        assertEquals("The first character should be read correctly.", (int) '$', firstCharRead);
     }
 }
