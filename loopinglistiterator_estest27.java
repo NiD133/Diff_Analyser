@@ -1,27 +1,31 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest27 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LoopingListIterator}.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        linkedList0.add((Integer) null);
-        LoopingListIterator<Integer> loopingListIterator0 = new LoopingListIterator<Integer>(linkedList0);
-        boolean boolean0 = loopingListIterator0.hasPrevious();
-        assertTrue(boolean0);
+    /**
+     * Tests that hasPrevious() returns true for a new iterator on a non-empty list.
+     * A standard ListIterator would return false, but a LoopingListIterator should
+     * be able to "loop around" to the end of the list.
+     */
+    @Test
+    public void testHasPreviousReturnsTrueForNonEmptyListAtStart() {
+        // Arrange: Create a list with a single element and a looping iterator for it.
+        final List<String> list = Collections.singletonList("A");
+        final LoopingListIterator<String> iterator = new LoopingListIterator<>(list);
+
+        // Act & Assert: Verify that hasPrevious() is true from the start.
+        assertTrue(
+            "A new iterator for a non-empty list should report having a previous element",
+            iterator.hasPrevious()
+        );
     }
 }
