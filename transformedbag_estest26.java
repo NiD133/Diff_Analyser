@@ -1,64 +1,47 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InstantiateFactory;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedBag_ESTestTest26 extends TransformedBag_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Transformer<Object, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        TransformedSortedBag<Integer> transformedSortedBag0 = new TransformedSortedBag<Integer>(treeBag0, transformer0);
-        Integer integer0 = new Integer(3787);
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link TransformedBag} class, focusing on its
+ * interaction with transformers and underlying bag implementations.
+ */
+public class TransformedBagTest {
+
+    /**
+     * Tests that adding an element to a TransformedBag throws a NullPointerException
+     * if the transformer converts the element to null and the underlying bag
+     * (in this case, a TreeBag) does not permit null elements.
+     */
+    @Test
+    public void addShouldThrowNPEWhenTransformerReturnsNullForUnsupportedBag() {
+        // Arrange
+        // 1. Create a transformer that always returns null, simulating a transformation
+        //    that results in a value unsupported by the decorated bag.
+        final Transformer<Object, Integer> nullTransformer = ConstantTransformer.nullTransformer();
+
+        // 2. Use a TreeBag as the underlying collection. TreeBag does not allow nulls.
+        final TreeBag<Integer> underlyingBag = new TreeBag<>();
+
+        // 3. Decorate the TreeBag with the transforming behavior.
+        final TransformedSortedBag<Integer> transformedBag =
+                new TransformedSortedBag<>(underlyingBag, nullTransformer);
+
+        final Integer elementToAdd = 123; // An arbitrary element to be transformed.
+        final int numberOfCopies = 5;
+
+        // Act & Assert
+        // The add operation should transform 'elementToAdd' to null. The underlying
+        // TreeBag will then reject this null value, causing a NullPointerException.
         try {
-            transformedSortedBag0.add(integer0, 3787);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
+            transformedBag.add(elementToAdd, numberOfCopies);
+            fail("Expected a NullPointerException because the underlying TreeBag cannot store null elements.");
+        } catch (final NullPointerException e) {
+            // This exception is expected and confirms the correct behavior.
         }
     }
 }
