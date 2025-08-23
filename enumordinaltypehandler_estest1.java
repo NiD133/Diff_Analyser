@@ -1,34 +1,53 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+import org.junit.jupiter.api.Test;
 import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class EnumOrdinalTypeHandler_ESTestTest1 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
-        doReturn((-1824)).when(resultSet0).getInt(anyInt());
-        // Undeclared exception!
-        try {
-            enumOrdinalTypeHandler0.getNullableResult(resultSet0, 0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Cannot convert -1824 to JdbcType by ordinal value.
-            //
-            verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
-        }
+/**
+ * Test suite for {@link EnumOrdinalTypeHandler}.
+ */
+class EnumOrdinalTypeHandlerTest {
+
+    /**
+     * This test verifies that getNullableResult throws an IllegalArgumentException
+     * when the database returns an integer that does not correspond to a valid
+     * enum ordinal (e.g., a negative number or an out-of-bounds index).
+     */
+    @Test
+    void getNullableResultShouldThrowExceptionWhenResultSetReturnsInvalidOrdinal() throws SQLException {
+        // Arrange
+        // 1. Create the handler for a specific enum type, JdbcType.
+        EnumOrdinalTypeHandler<JdbcType> typeHandler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+
+        // 2. Mock a ResultSet to simulate a database query result.
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        // 3. Configure the mock to return an invalid ordinal value.
+        //    Enum ordinals are 0-based array indices, so any negative number is invalid.
+        final int invalidOrdinal = -1824;
+        when(mockResultSet.getInt(anyInt())).thenReturn(invalidOrdinal);
+
+        // 4. The handler first checks if the value was SQL NULL. We must mock this
+        //    to return false to proceed to the ordinal conversion logic.
+        when(mockResultSet.wasNull()).thenReturn(false);
+
+
+        // Act & Assert
+        // 5. Execute the method and assert that it throws the expected exception.
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            // The column index (e.g., 1) is arbitrary because getInt() is mocked with anyInt().
+            typeHandler.getNullableResult(mockResultSet, 1);
+        });
+
+        // 6. Verify that the exception message is clear and informative.
+        String expectedMessage = "Cannot convert " + invalidOrdinal + " to " + JdbcType.class.getSimpleName() + " by ordinal value.";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
