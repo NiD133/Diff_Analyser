@@ -1,36 +1,29 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest134 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test133() throws Throwable {
-        Document document0 = Parser.parse("nly http & htps prtocols supported", "nly http & htps prtocols supported");
-        Elements elements0 = document0.getAllElements();
-        String string0 = elements0.val();
-        assertEquals("", string0);
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    @Test
+    public void valShouldReturnEmptyStringWhenFirstElementIsNotAFormElement() {
+        // Arrange
+        // Parsing simple text creates a document with <html>, <head>, and <body> tags.
+        // The val() method on an Elements collection operates on the first element.
+        Document doc = Parser.parse("A simple text document", "");
+        Elements elements = doc.getAllElements(); // First element will be <html>
+
+        // Act
+        // Since <html> is not a form element, calling val() should return an empty string.
+        String value = elements.val();
+
+        // Assert
+        assertEquals("val() should be empty for non-form elements", "", value);
     }
 }
