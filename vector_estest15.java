@@ -1,19 +1,30 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Vector_ESTestTest15 extends Vector_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
-        Matrix matrix0 = new Matrix();
-        Vector vector1 = vector0.cross(matrix0);
-        assertTrue(vector1.equals((Object) vector0));
+    /**
+     * Tests that transforming a zero vector by an identity matrix
+     * results in the same zero vector.
+     *
+     * The Vector#cross(Matrix) method performs a vector-matrix transformation.
+     * A default-constructed Matrix is an identity matrix.
+     */
+    @Test
+    public void crossWithIdentityMatrix_withZeroVector_returnsZeroVector() {
+        // Arrange: Create a zero vector and an identity matrix.
+        Vector zeroVector = new Vector(0.0f, 0.0f, 0.0f);
+        Matrix identityMatrix = new Matrix(); // Default constructor creates an identity matrix
+
+        // Act: Transform the zero vector by the identity matrix.
+        Vector transformedVector = zeroVector.cross(identityMatrix);
+
+        // Assert: The result of transforming a zero vector should still be a zero vector.
+        assertEquals(zeroVector, transformedVector);
     }
 }
