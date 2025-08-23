@@ -1,20 +1,35 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CopticChronology_ESTestTest3 extends CopticChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance();
-        long long0 = copticChronology0.getApproxMillisAtEpochDividedByTwo();
-        assertEquals(26607895200000L, long0);
+/**
+ * Tests for {@link CopticChronology}.
+ */
+public class CopticChronologyTest {
+
+    /**
+     * This constant is a pre-calculated value used for performance optimization
+     * within the CopticChronology implementation. It represents half of the
+     * approximate number of milliseconds between the Coptic calendar's
+     * hypothetical year 0 and the standard Unix epoch (1970-01-01T00:00:00Z).
+     *
+     * This test ensures that this internal constant remains unchanged,
+     * as it's crucial for correct date calculations.
+     */
+    private static final long EXPECTED_APPROX_MILLIS_AT_EPOCH_DIVIDED_BY_TWO = 26607895200000L;
+
+    @Test
+    public void getApproxMillisAtEpochDividedByTwo_returnsCorrectConstantValue() {
+        // Arrange: Get a standard, timezone-independent instance of the chronology.
+        CopticChronology copticChronology = CopticChronology.getInstanceUTC();
+
+        // Act: Call the method under test.
+        long actualValue = copticChronology.getApproxMillisAtEpochDividedByTwo();
+
+        // Assert: Verify that the returned value matches the expected, pre-calculated constant.
+        assertEquals(EXPECTED_APPROX_MILLIS_AT_EPOCH_DIVIDED_BY_TWO, actualValue);
     }
 }
