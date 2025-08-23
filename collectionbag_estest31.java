@@ -1,49 +1,39 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.LinkedList;
+
+/**
+ * This class contains an improved version of an auto-generated test for {@link CollectionBag}.
+ * The original class name and inheritance from a test scaffolding class are preserved for context,
+ * but the test logic has been rewritten for human readability.
+ */
 public class CollectionBag_ESTestTest31 extends CollectionBag_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        TreeBag<LinkedList<Object>> treeBag0 = new TreeBag<LinkedList<Object>>();
-        CollectionBag<LinkedList<Object>> collectionBag0 = new CollectionBag<LinkedList<Object>>(treeBag0);
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        // Undeclared exception!
-        try {
-            collectionBag0.add(linkedList0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that a {@link ClassCastException} from a decorated bag is correctly propagated
+     * by the {@link CollectionBag}.
+     * <p>
+     * This test sets up a scenario where a {@link CollectionBag} wraps a {@link TreeBag}.
+     * A {@code TreeBag} requires its elements to be {@link Comparable} to maintain sort order.
+     * The test verifies that attempting to add a non-comparable element (a {@link LinkedList})
+     * results in the expected {@code ClassCastException} from the underlying {@code TreeBag}.
+     */
+    @Test(expected = ClassCastException.class)
+    public void addShouldPropagateClassCastExceptionFromUnderlyingSortedBag() {
+        // Arrange: Create a TreeBag, which requires comparable elements, and decorate it.
+        // We use LinkedList as an example of a type that is not Comparable.
+        final Bag<LinkedList<Object>> underlyingSortedBag = new TreeBag<>();
+        final Bag<LinkedList<Object>> collectionBag = new CollectionBag<>(underlyingSortedBag);
+        final LinkedList<Object> nonComparableElement = new LinkedList<>();
+
+        // Act: Attempt to add the non-comparable element. The CollectionBag delegates
+        // this call to the underlying TreeBag, which will throw the exception.
+        collectionBag.add(nonComparableElement);
+
+        // Assert: The test is expected to throw a ClassCastException, which is
+        // verified by the @Test(expected) annotation.
     }
 }
