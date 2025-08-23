@@ -1,17 +1,27 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest24 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        double double0 = IEEE754rUtils.max((-3055.536570341673), (double) (-1.0F));
-        assertEquals((-1.0), double0, 0.01);
+    /**
+     * Tests that max(double, double) returns the arithmetically greater of two negative values.
+     */
+    @Test
+    public void testMaxWithTwoNegativeDoubles() {
+        // Arrange
+        final double smallerNegative = -3055.5365;
+        final double largerNegative = -1.0; // Closer to zero, hence arithmetically greater
+        final double expectedMax = -1.0;
+
+        // Act
+        final double actualMax = IEEE754rUtils.max(smallerNegative, largerNegative);
+
+        // Assert
+        assertEquals(expectedMax, actualMax, 0.0);
     }
 }
