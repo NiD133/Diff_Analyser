@@ -1,53 +1,32 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest22 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Tests for {@link Symmetry010Chronology}.
+ * This focuses on validating method contracts and handling of invalid inputs.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        ThaiBuddhistEra thaiBuddhistEra0 = ThaiBuddhistEra.BEFORE_BE;
-        // Undeclared exception!
-        try {
-            symmetry010Chronology0.dateYearDay((Era) thaiBuddhistEra0, 107016, 107016);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // Invalid era: BEFORE_BE
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry010Chronology", e);
-        }
+    /**
+     * Tests that dateYearDay() throws a ClassCastException when an era
+     * other than IsoEra is provided. The Symmetry010Chronology is documented
+     * to only support IsoEra.
+     */
+    @Test(expected = ClassCastException.class)
+    public void dateYearDay_withNonIsoEra_throwsClassCastException() {
+        // Arrange: Get the chronology instance and an era from a different calendar system.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        Era invalidEra = ThaiBuddhistEra.BEFORE_BE;
+        int yearOfEra = 2023;
+        int dayOfYear = 100;
+
+        // Act: Attempt to create a date with the unsupported era.
+        // This call is expected to fail with a ClassCastException.
+        chronology.dateYearDay(invalidEra, yearOfEra, dayOfYear);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
