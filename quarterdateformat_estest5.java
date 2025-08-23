@@ -1,39 +1,28 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
 import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class QuarterDateFormat_ESTestTest5 extends QuarterDateFormat_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the {@link QuarterDateFormat} class.
+ */
+public class QuarterDateFormatTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat();
-        quarterDateFormat0.setNumberFormat((NumberFormat) null);
-        QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat();
-        // Undeclared exception!
-        try {
-            quarterDateFormat0.equals(quarterDateFormat1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.text.DateFormat", e);
-        }
+    /**
+     * Verifies that calling equals() on an instance with a null NumberFormat
+     * throws a NullPointerException. This behavior is inherited from the
+     * superclass, java.text.DateFormat, which does not perform a null check
+     * on its internal numberFormat field during comparison.
+     */
+    @Test(expected = NullPointerException.class)
+    public void equals_whenNumberFormatIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create two formatters, and set the NumberFormat of one to null.
+        QuarterDateFormat formatterWithNullNumberFormat = new QuarterDateFormat();
+        formatterWithNullNumberFormat.setNumberFormat(null); // This is allowed by the parent class API.
+
+        QuarterDateFormat otherFormatter = new QuarterDateFormat();
+
+        // Act & Assert: Comparing the two should trigger an NPE from the superclass's equals method.
+        formatterWithNullNumberFormat.equals(otherFormatter);
     }
 }
