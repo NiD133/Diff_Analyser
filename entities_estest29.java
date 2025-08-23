@@ -1,35 +1,31 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Entities_ESTestTest29 extends Entities_ESTest_scaffolding {
+/**
+ * This test suite contains tests for the {@link Entities} class.
+ * This specific test case focuses on the behavior of the escape method
+ * when handling invalid arguments.
+ */
+public class Entities_ESTestTest29 { // Note: Class name kept from original for consistency.
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            Entities.escape((QuietAppendable) null, "></", document_OutputSettings0, 108);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that the {@link Entities#escape(QuietAppendable, String, Document.OutputSettings, int)}
+     * method throws a NullPointerException when the destination 'Appendable' is null.
+     * This ensures the method correctly handles invalid input and fails fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void escapeWithNullAppendableThrowsNullPointerException() {
+        // Arrange: Prepare the arguments for the escape method.
+        // The key argument for this test is the null QuietAppendable.
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        String inputToEscape = "some text"; // The content of the string is not critical for this test.
+        int arbitraryOptions = 108; // An arbitrary value for options, not relevant to the null check.
+
+        // Act & Assert: Call the method with a null appendable.
+        // The @Test(expected) annotation handles the assertion, failing the test
+        // if a NullPointerException is not thrown.
+        Entities.escape((QuietAppendable) null, inputToEscape, outputSettings, arbitraryOptions);
     }
 }
