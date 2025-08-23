@@ -1,106 +1,163 @@
 package com.google.common.math;
 
 import static com.google.common.math.StatsTesting.ALLOWED_ERROR;
-import static com.google.common.math.StatsTesting.ALL_MANY_VALUES;
-import static com.google.common.math.StatsTesting.EMPTY_STATS_ITERABLE;
 import static com.google.common.math.StatsTesting.MANY_VALUES;
 import static com.google.common.math.StatsTesting.MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.MANY_VALUES_STATS_ITERABLE;
 import static com.google.common.math.StatsTesting.MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
 import static com.google.common.math.StatsTesting.ONE_VALUE;
-import static com.google.common.math.StatsTesting.ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_STATS;
 import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE;
-import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES_STATS;
 import static com.google.common.math.StatsTesting.TWO_VALUES;
-import static com.google.common.math.StatsTesting.TWO_VALUES_STATS;
 import static com.google.common.math.StatsTesting.TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
-import static com.google.common.math.StatsTesting.assertDiagonalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertHorizontalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertLinearTransformationNaN;
-import static com.google.common.math.StatsTesting.assertStatsApproxEqual;
-import static com.google.common.math.StatsTesting.assertVerticalLinearTransformation;
 import static com.google.common.math.StatsTesting.createFilledPairedStatsAccumulator;
 import static com.google.common.math.StatsTesting.createPartitionedFilledPairedStatsAccumulator;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertThrows;
-import com.google.common.math.StatsTesting.ManyValues;
+
+import com.google.common.base.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-public class PairedStatsAccumulatorTestTest6 extends TestCase {
+/**
+ * Tests for {@link PairedStatsAccumulator#sampleCovariance()}.
+ *
+ * <p>This test is parameterized to run all calculation scenarios against two functionally
+ * equivalent accumulators: one built with direct {@code add} calls, and one built by partitioning
+ * the data and using {@code addAll}. This verifies that both data input methods produce the same
+ * statistical results.
+ */
+@RunWith(Parameterized.class)
+public class PairedStatsAccumulatorSampleCovarianceTest {
 
-    private PairedStatsAccumulator emptyAccumulator;
+  // A description of the test case, used for test runner output.
+  private final String caseDescription;
 
-    private PairedStatsAccumulator emptyAccumulatorByAddAllEmptyPairedStats;
+  // A supplier to create the PairedStatsAccumulator under test.
+  // Using a supplier defers object creation until the test method runs.
+  private final Supplier<PairedStatsAccumulator> accumulatorSupplier;
 
-    private PairedStatsAccumulator oneValueAccumulator;
+  // The expected result of the sampleCovariance() calculation.
+  private final double expectedSampleCovariance;
 
-    private PairedStatsAccumulator oneValueAccumulatorByAddAllEmptyPairedStats;
+  public PairedStatsAccumulatorSampleCovarianceTest(
+      String caseDescription,
+      Supplier<PairedStatsAccumulator> accumulatorSupplier,
+      double expectedSampleCovariance) {
+    this.caseDescription = caseDescription;
+    this.accumulatorSupplier = accumulatorSupplier;
+    this.expectedSampleCovariance = expectedSampleCovariance;
+  }
 
-    private PairedStatsAccumulator twoValuesAccumulator;
+  @Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(
+        new Object[][] {
+          {
+            "two values",
+            (Supplier<PairedStatsAccumulator>)
+                () -> createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES),
+            TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS
+          },
+          {
+            "two values, via addAll",
+            (Supplier<PairedStatsAccumulator>)
+                () -> createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1),
+            TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS
+          },
+          {
+            "many values",
+            (Supplier<PairedStatsAccumulator>)
+                () -> createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES),
+            MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1)
+          },
+          {
+            "many values, via addAll",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2),
+            MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1)
+          },
+          {
+            "horizontal data (y is constant)",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createFilledPairedStatsAccumulator(
+                        MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE)),
+            0.0
+          },
+          {
+            "horizontal data, via addAll",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createPartitionedFilledPairedStatsAccumulator(
+                        MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2),
+            0.0
+          },
+          {
+            "vertical data (x is constant)",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createFilledPairedStatsAccumulator(
+                        Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES),
+            0.0
+          },
+          {
+            "vertical data, via addAll",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createPartitionedFilledPairedStatsAccumulator(
+                        Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE),
+                        OTHER_MANY_VALUES,
+                        2),
+            0.0
+          },
+          {
+            "constant data (x and y are constant)",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createFilledPairedStatsAccumulator(
+                        Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE),
+                        Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE)),
+            0.0
+          },
+          {
+            "constant data, via addAll",
+            (Supplier<PairedStatsAccumulator>)
+                () ->
+                    createPartitionedFilledPairedStatsAccumulator(
+                        Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE),
+                        Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE),
+                        2),
+            0.0
+          }
+        });
+  }
 
-    private PairedStatsAccumulator twoValuesAccumulatorByAddAllPartitionedPairedStats;
+  @Test
+  public void sampleCovariance_withSufficientData_isCorrect() {
+    PairedStatsAccumulator accumulator = accumulatorSupplier.get();
+    assertThat(accumulator.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(expectedSampleCovariance);
+  }
 
-    private PairedStatsAccumulator manyValuesAccumulator;
+  @Test
+  public void sampleCovariance_withNoValues_throwsIllegalStateException() {
+    PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+    assertThrows(IllegalStateException.class, accumulator::sampleCovariance);
+  }
 
-    private PairedStatsAccumulator manyValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator horizontalValuesAccumulator;
-
-    private PairedStatsAccumulator horizontalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator verticalValuesAccumulator;
-
-    private PairedStatsAccumulator verticalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator constantValuesAccumulator;
-
-    private PairedStatsAccumulator constantValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        emptyAccumulator = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        oneValueAccumulator = new PairedStatsAccumulator();
-        oneValueAccumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        oneValueAccumulatorByAddAllEmptyPairedStats.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        twoValuesAccumulator = createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
-        twoValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
-        manyValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
-        manyValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
-        horizontalValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
-        verticalValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES);
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES, 2);
-        constantValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        constantValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
-    }
-
-    public void testSampleCovariance() {
-        assertThrows(IllegalStateException.class, () -> emptyAccumulator.sampleCovariance());
-        assertThrows(IllegalStateException.class, () -> emptyAccumulatorByAddAllEmptyPairedStats.sampleCovariance());
-        assertThrows(IllegalStateException.class, () -> oneValueAccumulator.sampleCovariance());
-        assertThrows(IllegalStateException.class, () -> oneValueAccumulatorByAddAllEmptyPairedStats.sampleCovariance());
-        assertThat(twoValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS);
-        assertThat(twoValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance()).isWithin(ALLOWED_ERROR).of(TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS);
-        assertThat(manyValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1));
-        assertThat(manyValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance()).isWithin(ALLOWED_ERROR).of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1));
-        assertThat(horizontalValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
-        assertThat(horizontalValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
-        assertThat(verticalValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
-        assertThat(verticalValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
-        assertThat(constantValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
-        assertThat(constantValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
-    }
+  @Test
+  public void sampleCovariance_withOneValue_throwsIllegalStateException() {
+    PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+    accumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
+    assertThrows(IllegalStateException.class, accumulator::sampleCovariance);
+  }
 }
