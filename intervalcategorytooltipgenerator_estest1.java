@@ -1,34 +1,27 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IntervalCategoryToolTipGenerator_ESTestTest1 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link IntervalCategoryToolTipGenerator} class.
+ */
+public class IntervalCategoryToolTipGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
-        // Undeclared exception!
-        try {
-            intervalCategoryToolTipGenerator0.createItemArray((CategoryDataset) null, 70, 70);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.labels.IntervalCategoryToolTipGenerator", e);
-        }
+    /**
+     * Verifies that the createItemArray method throws a NullPointerException
+     * when the provided dataset is null. This is the expected behavior to prevent
+     * further processing with invalid data.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createItemArray_withNullDataset_shouldThrowNullPointerException() {
+        // Arrange: Create an instance of the generator.
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+        CategoryDataset nullDataset = null;
+        int anyRow = 0;
+        int anyColumn = 0;
+
+        // Act & Assert: Call the method with a null dataset, which is expected to throw.
+        generator.createItemArray(nullDataset, anyRow, anyColumn);
     }
 }
