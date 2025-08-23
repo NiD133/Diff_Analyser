@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest65 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        Weeks weeks0 = Weeks.THREE;
-        int int0 = weeks0.getWeeks();
-        assertEquals(3, int0);
+    /**
+     * Tests that the getWeeks() method correctly returns the integer value
+     * for the predefined constant Weeks.THREE.
+     */
+    @Test
+    public void getWeeks_returnsCorrectValueForConstantThree() {
+        // Arrange
+        Weeks threeWeeks = Weeks.THREE;
+        int expectedWeeks = 3;
+
+        // Act
+        int actualWeeks = threeWeeks.getWeeks();
+
+        // Assert
+        assertEquals(expectedWeeks, actualWeeks);
     }
 }
