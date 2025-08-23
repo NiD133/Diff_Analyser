@@ -1,42 +1,31 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ByteUtils_ESTestTest19 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class, focusing on exception handling.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        // Undeclared exception!
-        try {
-            ByteUtils.toLittleEndian((ByteUtils.ByteConsumer) null, (-1659L), (int) (byte) 63);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Verifies that {@link ByteUtils#toLittleEndian(ByteUtils.ByteConsumer, long, int)}
+     * throws a {@link NullPointerException} when the provided consumer is null.
+     * This ensures the method is null-safe with respect to its consumer argument.
+     *
+     * @throws IOException although not expected in this test, it's declared by the
+     *                     method under test and thus required by the compiler.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toLittleEndianWithNullConsumerShouldThrowNullPointerException() throws IOException {
+        // Arrange: The arguments for value and length are arbitrary as the method
+        // should fail before they are used.
+        final long anyValue = 42L;
+        final int anyValidLength = 4;
+
+        // Act & Assert: Call the method with a null consumer.
+        // The @Test(expected=...) annotation handles the assertion that a
+        // NullPointerException is thrown.
+        ByteUtils.toLittleEndian(null, anyValue, anyValidLength);
     }
 }
