@@ -1,22 +1,39 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest15 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class, focusing on its constructors and accessors.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        JsonLocation jsonLocation0 = new JsonLocation((Object) null, (-219L), 314, 314);
-        int int0 = jsonLocation0.getLineNr();
-        assertEquals(314, int0);
-        assertEquals(314, jsonLocation0.getColumnNr());
-        assertEquals((-219L), jsonLocation0.getCharOffset());
-        assertEquals((-1L), jsonLocation0.getByteOffset());
+    /**
+     * Tests that the four-argument constructor correctly initializes the location's properties,
+     * including setting the default byte offset.
+     *
+     * This test covers a deprecated constructor to ensure backward compatibility is maintained.
+     */
+    @Test
+    public void constructorWithObjectSourceShouldCorrectlySetLocationFields() {
+        // Arrange
+        final Object sourceRef = null; // The source reference can be null.
+        final long expectedCharOffset = -219L;
+        final int expectedLineNumber = 314;
+        final int expectedColumnNumber = 314;
+        // This specific deprecated constructor defaults the byte offset to -1.
+        final long expectedByteOffset = -1L;
+
+        // Act
+        // We are testing the deprecated constructor:
+        // JsonLocation(Object srcRef, long totalChars, int lineNr, int columnNr)
+        @SuppressWarnings("deprecation")
+        JsonLocation location = new JsonLocation(sourceRef, expectedCharOffset, expectedLineNumber, expectedColumnNumber);
+
+        // Assert
+        assertEquals("Line number should match the constructor argument.", expectedLineNumber, location.getLineNr());
+        assertEquals("Column number should match the constructor argument.", expectedColumnNumber, location.getColumnNr());
+        assertEquals("Character offset should match the constructor argument.", expectedCharOffset, location.getCharOffset());
+        assertEquals("Byte offset should default to -1 for this constructor.", expectedByteOffset, location.getByteOffset());
     }
 }
