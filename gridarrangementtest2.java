@@ -1,0 +1,31 @@
+package org.jfree.chart.block;
+
+import org.jfree.chart.TestUtils;
+import org.jfree.data.Range;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class GridArrangementTestTest2 {
+
+    private static final double EPSILON = 0.000000001;
+
+    private BlockContainer createTestContainer1() {
+        Block b1 = new EmptyBlock(10, 11);
+        Block b2 = new EmptyBlock(20, 22);
+        Block b3 = new EmptyBlock(30, 33);
+        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
+        result.add(b1);
+        result.add(b2);
+        result.add(b3);
+        return result;
+    }
+
+    /**
+     * Immutable - cloning is not necessary.
+     */
+    @Test
+    public void testCloning() {
+        GridArrangement f1 = new GridArrangement(1, 2);
+        assertFalse(f1 instanceof Cloneable);
+    }
+}
