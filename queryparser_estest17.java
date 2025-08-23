@@ -1,17 +1,29 @@
 package org.jsoup.select;
 
+import org.jsoup.select.Evaluator.ContainsText;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest17 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the Jsoup {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":contains(%s)");
-        assertNotNull(evaluator0);
+    /**
+     * Verifies that the parser can handle a :contains pseudo-selector
+     * whose argument contains special characters, like a format specifier ("%s").
+     * This ensures the parser is robust and doesn't misinterpret such inputs.
+     */
+    @Test
+    public void parseHandlesContainsWithFormatSpecifierArgument() {
+        // Arrange: A CSS query with a format specifier in the :contains() argument.
+        String query = ":contains(%s)";
+
+        // Act: Parse the query into an Evaluator.
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert: The parser should successfully create a non-null ContainsText evaluator.
+        assertNotNull("The parsed evaluator should not be null.", evaluator);
+        assertTrue("The evaluator should be an instance of ContainsText.", evaluator instanceof ContainsText);
     }
 }
