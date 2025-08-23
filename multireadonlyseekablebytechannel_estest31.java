@@ -1,43 +1,42 @@
 package org.apache.commons.compress.utils;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest31 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Contains tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        File[] fileArray0 = new File[2];
-        MockFile mockFile0 = new MockFile("");
-        fileArray0[0] = (File) mockFile0;
-        fileArray0[1] = (File) mockFile0;
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = (MultiReadOnlySeekableByteChannel) MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        multiReadOnlySeekableByteChannel0.close();
-        try {
-            multiReadOnlySeekableByteChannel0.position((-1456L), (-1456L));
-            fail("Expecting exception: ClosedChannelException");
-        } catch (ClosedChannelException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-        }
+    // Rule to create temporary files and folders, ensuring cleanup after the test.
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    /**
+     * Verifies that attempting to set the position on a closed channel
+     * throws a ClosedChannelException.
+     */
+    @Test(expected = ClosedChannelException.class)
+    public void shouldThrowExceptionWhenPositioningAClosedChannel() throws IOException {
+        // Arrange: Create a multi-file channel from two temporary files.
+        File file1 = temporaryFolder.newFile();
+        File file2 = temporaryFolder.newFile();
+        File[] files = {file1, file2};
+
+        // The method under test, position(long, long), is specific to the implementation class,
+        // so a cast is necessary.
+        final MultiReadOnlySeekableByteChannel channel =
+            (MultiReadOnlySeekableByteChannel) MultiReadOnlySeekableByteChannel.forFiles(files);
+
+        // Close the channel to set up the test condition.
+        channel.close();
+
+        // Act & Assert: Attempting to set the position should throw the expected exception.
+        channel.position(0L, 0L);
     }
 }
