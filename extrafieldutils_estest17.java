@@ -1,26 +1,22 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest17 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.parse((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-        }
+    /**
+     * Verifies that calling the parse method with a null byte array
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void parseWithNullDataShouldThrowNullPointerException() throws ZipException {
+        // The method signature for parse(byte[]) declares "throws ZipException".
+        // While a NullPointerException is expected for a null input, the test
+        // method's signature must be compatible with the method under test.
+        ExtraFieldUtils.parse(null);
     }
 }
