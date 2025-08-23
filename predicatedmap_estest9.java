@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.functors.AnyPredicate;
 import org.apache.commons.collections4.functors.ComparatorPredicate;
 import org.apache.commons.collections4.functors.ConstantTransformer;
