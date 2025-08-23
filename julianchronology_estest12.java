@@ -1,56 +1,35 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JulianChronology_ESTestTest12 extends JulianChronology_ESTest_scaffolding {
+/**
+ * This test class evaluates the behavior of the JulianChronology class.
+ * Note: The original class name 'JulianChronology_ESTestTest12' was preserved,
+ * but a more descriptive name like 'JulianChronologyTest' would be preferable in a real project.
+ */
+public class JulianChronology_ESTestTest12 {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        JulianEra julianEra0 = JulianEra.AD;
-        JulianDate julianDate0 = julianChronology0.date((Era) julianEra0, (-2282), 9, 2);
-        assertEquals(JulianEra.BC, julianDate0.getEra());
+    /**
+     * Tests that creating a date with the AD era but a negative year-of-era
+     * correctly resolves to a date in the BC era.
+     *
+     * <p>The Julian calendar system calculates the proleptic year from the era and year-of-era.
+     * A negative year-of-era for AD results in a negative proleptic year, which
+     * corresponds to the BC era. This test verifies that this edge case is handled correctly.
+     */
+    @Test
+    public void date_withAdEraAndNegativeYearOfEra_resolvesToBcDate() {
+        // Arrange
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        int negativeYearOfEra = -2282;
+        int month = 9;
+        int day = 2;
+
+        // Act: Create a date using the AD era with a negative year-of-era.
+        JulianDate resultingDate = julianChronology.date(JulianEra.AD, negativeYearOfEra, month, day);
+
+        // Assert: The chronology should correctly interpret this as a BC date.
+        assertEquals("The era should be resolved to BC", JulianEra.BC, resultingDate.getEra());
     }
 }
