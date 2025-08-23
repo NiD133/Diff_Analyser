@@ -1,31 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest16 extends LineIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link LineIterator}.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        // Undeclared exception!
-        try {
-            lineIterator0.remove();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // remove not supported
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
-        }
+    /**
+     * Tests that calling the remove() method, which is an optional operation
+     * for an Iterator, throws an UnsupportedOperationException. This is the
+     * expected behavior for a read-only iterator.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void removeShouldThrowUnsupportedOperationException() {
+        // Arrange: Create a LineIterator. The reader's content is irrelevant for this test.
+        final StringReader reader = new StringReader("");
+        final LineIterator iterator = new LineIterator(reader);
+
+        // Act: Attempt to call the unsupported remove() method.
+        // Assert: The @Test(expected=...) annotation asserts that an
+        // UnsupportedOperationException is thrown.
+        iterator.remove();
     }
 }
