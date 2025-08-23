@@ -1,19 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtils_ESTestTest47 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the static methods of {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        int int0 = RandomUtils.nextInt();
-        //  // Unstable assertion: assertEquals(72930858, int0);
+    /**
+     * Tests that {@link RandomUtils#nextInt()} returns a non-negative integer.
+     * According to its Javadoc, this method should generate a random integer
+     * between 0 (inclusive) and Integer.MAX_VALUE (exclusive). This test
+     * verifies the lower bound of this contract.
+     */
+    @Test
+    public void nextInt_shouldReturnNonNegativeInteger() {
+        // Act: Call the method under test.
+        // This method is deprecated, but we still test its basic contract.
+        @SuppressWarnings("deprecation")
+        int randomNumber = RandomUtils.nextInt();
+
+        // Assert: Verify the result is within the expected range.
+        assertTrue("The generated random integer must be non-negative.", randomNumber >= 0);
     }
 }
