@@ -1,27 +1,28 @@
 package com.google.gson.internal;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.MoreAsserts;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 import org.junit.Test;
 
-public class LinkedTreeMapTestTest10 {
+/**
+ * Tests for {@link LinkedTreeMap} focusing on its handling of null keys.
+ */
+// Renamed from LinkedTreeMapTestTest10 for clarity and to follow conventions.
+public class LinkedTreeMapTest {
 
     @Test
-    public void testContainsNullKeyIsAlwaysFalse() {
+    public void containsKey_withNullKey_returnsFalse() {
+        // Arrange
         LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+
+        // Assert on an empty map
+        // According to its contract, LinkedTreeMap does not permit null keys.
         assertThat(map.containsKey(null)).isFalse();
-        map.put("a", "android");
+
+        // Act: Add an element to make the map non-empty.
+        map.put("a", "value");
+
+        // Assert on a non-empty map
+        // The behavior must be consistent, regardless of the map's contents.
         assertThat(map.containsKey(null)).isFalse();
     }
 }
