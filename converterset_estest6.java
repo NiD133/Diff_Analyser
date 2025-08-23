@@ -2,24 +2,41 @@ package org.joda.time.convert;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest6 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ConverterSet} class.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Converter[] converterArray0 = new Converter[7];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        ConverterSet converterSet1 = converterSet0.remove(1, converterArray0);
-        assertFalse(converterSet1.equals((Object) converterSet0));
+    /**
+     * Tests that removing a converter by its index returns a new, modified set.
+     */
+    @Test
+    public void removeByIndex_shouldReturnNewSetWithoutSpecifiedConverter() {
+        // Arrange: Create a ConverterSet with a few known converters.
+        Converter converter1 = LongConverter.INSTANCE;
+        Converter converterToRemove = StringConverter.INSTANCE;
+        Converter converter3 = CalendarConverter.INSTANCE;
+
+        Converter[] initialConverters = {converter1, converterToRemove, converter3};
+        ConverterSet originalSet = new ConverterSet(initialConverters);
+
+        // The 'remove' method can optionally return the removed converter in this array.
+        Converter[] removedContainer = new Converter[1];
+        int indexToRemove = 1;
+
+        // Act: Remove the converter at the specified index.
+        ConverterSet newSet = originalSet.remove(indexToRemove, removedContainer);
+
+        // Assert: Verify the new set is a distinct, smaller instance and the correct
+        // converter was removed.
+        assertNotSame("The remove operation should return a new instance.", originalSet, newSet);
+        assertNotEquals("The new set should not be equal to the original.", originalSet, newSet);
+
+        assertEquals("The new set should have one less converter.",
+                     initialConverters.length - 1, newSet.size());
+
+        assertSame("The correct converter should be reported as removed.",
+                   converterToRemove, removedContainer[0]);
     }
 }
