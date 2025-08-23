@@ -1,36 +1,23 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class WeeksTestTest8 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void getWeeks_shouldReturnTheValueTheInstanceWasCreatedWith() {
+        // Arrange
+        final int expectedWeeks = 20;
+        Weeks weeks = Weeks.weeks(expectedWeeks);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act
+        int actualWeeks = weeks.getWeeks();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testGetMethods() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals(20, test.getWeeks());
+        // Assert
+        assertEquals(expectedWeeks, actualWeeks);
     }
 }
