@@ -1,39 +1,50 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest13 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test012() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        jsonObject0.addProperty("z", "z");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        jsonObject0.add("", (JsonElement) null);
-        // Undeclared exception!
+/**
+ * Contains tests for {@link JsonTreeReader}, focusing on its behavior when the
+ * underlying JSON structure is modified during iteration.
+ */
+public class JsonTreeReaderImprovedTest {
+
+    /**
+     * Verifies that modifying a JsonObject while a JsonTreeReader is iterating over it
+     * correctly throws a ConcurrentModificationException.
+     * <p>
+     * This test ensures the reader fails fast, which is the expected behavior for
+     * iterators when their underlying collection is modified unexpectedly.
+     */
+    @Test
+    public void promoteNameToValue_whenObjectIsModifiedDuringIteration_throwsConcurrentModificationException() {
+        // Arrange: Create a JsonObject and a reader that has started iterating over it.
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("initialProperty", "value");
+        JsonTreeReader reader = new JsonTreeReader(jsonObject);
+
         try {
-            jsonTreeReader0.promoteNameToValue();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.LinkedTreeMap$LinkedTreeMapIterator", e);
+            // This call prepares the reader and its internal iterator to read the object's members.
+            reader.beginObject();
+
+            // Act: Modify the underlying JsonObject after the iterator has been created.
+            // This action invalidates the reader's internal state.
+            jsonObject.add("anotherProperty", (JsonElement) null);
+
+            // Assert: The next operation that uses the iterator should fail.
+            reader.promoteNameToValue();
+            fail("Expected a ConcurrentModificationException to be thrown, but it was not.");
+        } catch (ConcurrentModificationException expected) {
+            // Success: This is the expected behavior.
+        } catch (IOException e) {
+            // The method signature includes IOException, but it's not expected in this test.
+            fail("Test threw an unexpected IOException: " + e.getMessage());
         }
     }
 }
