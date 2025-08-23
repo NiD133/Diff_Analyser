@@ -1,61 +1,46 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
 import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for the IndexedCollection class.
+ * This class retains the original test's scaffolding for compatibility.
+ */
 public class IndexedCollection_ESTestTest52 extends IndexedCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        IndexedCollection<Object, Object> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-        indexedCollection0.add(linkedList0);
-        LinkedList<Object> linkedList1 = new LinkedList<Object>();
-        Predicate<Object> predicate0 = EqualPredicate.equalPredicate((Object) linkedList1);
-        boolean boolean0 = indexedCollection0.removeIf(predicate0);
-        assertEquals(1, linkedList0.size());
-        assertFalse(boolean0);
+    /**
+     * Tests that `removeIf()` does not modify the collection and returns false
+     * when the predicate does not match any elements.
+     */
+    @Test
+    public void testRemoveIfShouldNotModifyCollectionWhenPredicateIsFalse() {
+        // Arrange
+        Collection<String> underlyingCollection = new LinkedList<>();
+        Transformer<String, Object> keyTransformer = ConstantTransformer.nullTransformer();
+        IndexedCollection<Object, String> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(underlyingCollection, keyTransformer);
+        indexedCollection.add("Apple");
+
+        // A predicate that will not match the element "Apple"
+        Predicate<String> noMatchPredicate = EqualPredicate.equalPredicate("Banana");
+
+        // Act
+        boolean wasModified = indexedCollection.removeIf(noMatchPredicate);
+
+        // Assert
+        assertFalse("removeIf should return false as no elements were removed", wasModified);
+        assertEquals("Collection size should not change", 1, indexedCollection.size());
+        assertTrue("Collection should still contain the original element", indexedCollection.contains("Apple"));
     }
 }
