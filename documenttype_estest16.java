@@ -1,23 +1,31 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentType_ESTestTest16 extends DocumentType_ESTest_scaffolding {
+/**
+ * Tests for the {@link DocumentType} class.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DocumentType documentType0 = new DocumentType("QGRn=|xO8k", "QGRn=|xO8k", "QGRn=|xO8k");
-        String string0 = documentType0.name();
-        assertEquals("QGRn=|xO8k", string0);
-        assertEquals("#doctype", documentType0.nodeName());
+    /**
+     * Verifies that the name() method returns the name that was provided
+     * in the constructor.
+     */
+    @Test
+    public void nameReturnsNameProvidedInConstructor() {
+        // Arrange: Create a DocumentType with a known, simple name.
+        // The publicId and systemId are not relevant to this test, so they are empty.
+        String expectedName = "html";
+        DocumentType docType = new DocumentType(expectedName, "", "");
+
+        // Act: Retrieve the name using the name() method.
+        String actualName = docType.name();
+
+        // Assert: Check that the retrieved name matches the one set in the constructor.
+        assertEquals(expectedName, actualName);
+
+        // Also, assert that the node name is correctly set to the constant for doctypes.
+        assertEquals("#doctype", docType.nodeName());
     }
 }
