@@ -1,26 +1,29 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest13 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        Strictness strictness0 = Strictness.LENIENT;
-        jsonTreeWriter0.setStrictness(strictness0);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value((-336L));
-        assertTrue(jsonWriter0.isLenient());
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    /**
+     * Verifies that the strictness setting on a JsonTreeWriter is not affected
+     * by subsequent write operations.
+     */
+    @Test
+    public void strictnessSettingShouldPersistAfterWritingValue() {
+        // Arrange: Create a writer and set its strictness to lenient.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.setStrictness(Strictness.LENIENT);
+
+        // Act: Perform a write operation.
+        writer.value(-336L);
+
+        // Assert: The writer should still be in lenient mode.
+        assertTrue("The writer's strictness should remain lenient after a value is written.", writer.isLenient());
     }
 }
