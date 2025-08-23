@@ -1,28 +1,19 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest52 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        boolean boolean0 = StringUtil.isAsciiLetter('!');
-        assertFalse(boolean0);
+    @Test
+    public void isAsciiLetterShouldReturnFalseForNonLetterCharacter() {
+        // The '!' character is a symbol, not an ASCII letter in the a-z or A-Z range.
+        assertFalse(
+            "isAsciiLetter() should return false for a non-letter character.",
+            StringUtil.isAsciiLetter('!')
+        );
     }
 }
