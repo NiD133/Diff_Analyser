@@ -1,31 +1,41 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
+
 import org.junit.jupiter.api.Test;
 
-public class ByteOrderMarkTestTest2 {
+/**
+ * Tests for exceptional cases in the {@link ByteOrderMark} constructor.
+ */
+class ByteOrderMarkConstructorExceptionTest {
 
-    private static final ByteOrderMark TEST_BOM_1 = new ByteOrderMark("test1", 1);
-
-    private static final ByteOrderMark TEST_BOM_2 = new ByteOrderMark("test2", 1, 2);
-
-    private static final ByteOrderMark TEST_BOM_3 = new ByteOrderMark("test3", 1, 2, 3);
-
-    /**
-     * Tests Exceptions
-     */
     @Test
-    void testConstructorExceptions() {
-        assertThrows(NullPointerException.class, () -> new ByteOrderMark(null, 1, 2, 3));
-        assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("", 1, 2, 3));
-        assertThrows(NullPointerException.class, () -> new ByteOrderMark("a", (int[]) null));
-        assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("b"));
+    void constructorShouldThrowNullPointerExceptionWhenCharsetNameIsNull() {
+        // The constructor should reject a null charset name.
+        final NullPointerException e = assertThrows(NullPointerException.class, () -> new ByteOrderMark(null, 1, 2, 3));
+        assertEquals("charsetName", e.getMessage());
+    }
+
+    @Test
+    void constructorShouldThrowIllegalArgumentExceptionWhenCharsetNameIsEmpty() {
+        // The constructor should reject an empty charset name.
+        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("", 1, 2, 3));
+        assertEquals("No charsetName specified", e.getMessage());
+    }
+
+    @Test
+    void constructorShouldThrowNullPointerExceptionWhenBytesAreNull() {
+        // The constructor should reject a null byte array.
+        final NullPointerException e = assertThrows(NullPointerException.class, () -> new ByteOrderMark("test-charset", (int[]) null));
+        assertEquals("bytes", e.getMessage());
+    }
+
+    @Test
+    void constructorShouldThrowIllegalArgumentExceptionWhenBytesAreEmpty() {
+        // The constructor uses a varargs parameter for bytes, so calling it with no
+        // byte arguments results in an empty array, which should be rejected.
+        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("test-charset"));
+        assertEquals("No bytes specified", e.getMessage());
     }
 }
