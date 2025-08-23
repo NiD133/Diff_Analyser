@@ -1,18 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest15 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Years years0 = Years.THREE;
-        Years years1 = years0.minus(0);
-        assertEquals(3, years1.getYears());
+    @Test
+    public void minus_whenSubtractingZero_shouldNotChangeValue() {
+        // Arrange: Define the initial Years object.
+        final Years threeYears = Years.THREE;
+
+        // Act: Call the method under test with a value that should not cause a change.
+        final Years result = threeYears.minus(0);
+
+        // Assert: The resulting object should be equal to the original.
+        assertEquals("Subtracting zero should result in an equal Years object.", threeYears, result);
     }
 }
