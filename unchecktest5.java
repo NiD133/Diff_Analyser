@@ -1,72 +1,37 @@
 package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest5 {
+/**
+ * Tests the successful execution paths of the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
-    }
+    private static final byte[] TEST_DATA = {'a', 'b'};
 
     /**
-     * Tests {@link Uncheck#apply(IOFunction, Object)}.
+     * Tests that {@link Uncheck#apply(IOFunction, Object)} executes a given IO-bound function,
+     * returns its result, and that the function's side effects (state changes) are correctly applied.
      */
     @Test
-    void testApply1() {
-        final ByteArrayInputStream stream = newInputStream();
-        assertEquals(1, Uncheck.apply(n -> stream.skip(n), 1).intValue());
-        assertEquals('b', Uncheck.get(stream::read).intValue());
+    void applyShouldExecuteFunctionAndReturnResult() {
+        // Arrange: Create an input stream with two bytes: 'a' and 'b'.
+        final ByteArrayInputStream stream = new ByteArrayInputStream(TEST_DATA);
+
+        // Act: Skip the first byte ('a') using Uncheck.apply.
+        // This wraps the call to stream.skip(), which can throw an IOException.
+        final Long skippedCount = Uncheck.apply(stream::skip, 1L);
+
+        // Assert: Verify that one byte was skipped.
+        assertEquals(1L, skippedCount, "The number of skipped bytes should be 1.");
+
+        // Act: Read the next byte ('b') using Uncheck.get to verify the stream's state.
+        final Integer nextByte = Uncheck.get(stream::read);
+
+        // Assert: Verify that the correct byte was read after the skip operation.
+        assertEquals('b', nextByte.intValue(), "The byte read after skipping should be 'b'.");
     }
 }
