@@ -1,46 +1,53 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.IOException;
+import java.io.PipedOutputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+// Note: The original test class name 'UTF8Writer_ESTestTest37' and scaffolding are kept for context.
+// In a real-world scenario, this test would be part of a consolidated 'UTF8WriterTest' class.
 public class UTF8Writer_ESTestTest37 extends UTF8Writer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.UNKNOWN_CONTENT;
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
+    /**
+     * Verifies that calling write() with a Unicode code point larger than the
+     * maximum allowed value (U+10FFFF) results in an IOException.
+     */
+    @Test
+    public void write_withInvalidCodePoint_shouldThrowIOException() {
+        // Arrange
+        // Set up the necessary context and a dummy output stream for the writer.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.UNKNOWN_CONTENT,
+                false
+        );
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, new PipedOutputStream());
+
+        // The largest valid Unicode code point is 0x10FFFF.
+        // We use a value just beyond this limit to test the boundary condition.
+        int invalidCodePoint = 0x10FFFF + 1; // This is 0x110000
+
+        // Act & Assert
         try {
-            uTF8Writer0.write(20000000);
-            fail("Expecting exception: IOException");
+            utf8Writer.write(invalidCodePoint);
+            fail("Expected an IOException because the code point exceeds the valid Unicode range.");
         } catch (IOException e) {
-            //
-            // Illegal character point (0x1312d00) to output; max is 0x10FFFF as per RFC 4627
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            String expectedMessage = String.format(
+                "Illegal character point (0x%X) to output; max is 0x10FFFF as per RFC 4627",
+                invalidCodePoint
+            );
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
