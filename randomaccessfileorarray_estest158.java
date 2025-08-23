@@ -1,39 +1,32 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import org.junit.Test;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains refactored tests for the RandomAccessFileOrArray class.
+ * The original test was auto-generated and has been improved for clarity and maintainability.
+ */
 public class RandomAccessFileOrArray_ESTestTest158 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test157() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readDouble();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that readDouble() throws a NullPointerException when the
+     * RandomAccessFileOrArray is constructed with a null RandomAccessSource.
+     * This is the expected behavior, as any read operation will attempt to
+     * delegate to the underlying source, which is null in this case.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readDouble_whenSourceIsNull_shouldThrowNullPointerException() throws IOException {
+        // Arrange: Create an instance of RandomAccessFileOrArray with a null source.
+        // The cast to RandomAccessSource is necessary to resolve constructor ambiguity.
+        RandomAccessFileOrArray randomAccessFileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act: Attempt to read a double from the null source.
+        // This action is expected to throw a NullPointerException.
+        randomAccessFileOrArray.readDouble();
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // as specified by the @Test(expected = ...) annotation.
     }
 }
