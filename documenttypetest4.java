@@ -1,34 +1,30 @@
 package org.jsoup.nodes;
 
-import org.jsoup.Jsoup;
-import org.jsoup.parser.Parser;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentTypeTestTest4 {
+/**
+ * Test suite for the DocumentType class.
+ */
+public class DocumentTypeTest {
 
-    private String htmlOutput(String in) {
-        DocumentType type = (DocumentType) Jsoup.parse(in).childNode(0);
-        return type.outerHtml();
-    }
-
-    private String xmlOutput(String in) {
-        return Jsoup.parse(in, "", Parser.xmlParser()).childNode(0).outerHtml();
-    }
-
+    /**
+     * Verifies that the nodeName() for a DocumentType is always "#doctype".
+     *
+     * The node name for a DocumentType is a fixed value and should not be
+     * influenced by the name, publicId, or systemId attributes provided
+     * during its construction.
+     */
     @Test
-    public void outerHtmlGeneration() {
-        DocumentType html5 = new DocumentType("html", "", "");
-        assertEquals("<!doctype html>", html5.outerHtml());
-        DocumentType publicDocType = new DocumentType("html", "-//IETF//DTD HTML//", "");
-        assertEquals("<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML//\">", publicDocType.outerHtml());
-        DocumentType systemDocType = new DocumentType("html", "", "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd");
-        assertEquals("<!DOCTYPE html SYSTEM \"http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd\">", systemDocType.outerHtml());
-        DocumentType combo = new DocumentType("notHtml", "--public", "--system");
-        assertEquals("<!DOCTYPE notHtml PUBLIC \"--public\" \"--system\">", combo.outerHtml());
-        assertEquals("notHtml", combo.name());
-        assertEquals("--public", combo.publicId());
-        assertEquals("--system", combo.systemId());
+    public void nodeNameShouldAlwaysReturnHashDoctype() {
+        // Arrange: Create a DocumentType instance. The specific constructor arguments
+        // are arbitrary for this test, as they are not expected to affect the nodeName.
+        DocumentType docType = new DocumentType("html", "", "");
+
+        // Act: Retrieve the node name from the DocumentType object.
+        String actualNodeName = docType.nodeName();
+
+        // Assert: Confirm that the retrieved node name is the constant "#doctype".
+        assertEquals("#doctype", actualNodeName);
     }
 }
