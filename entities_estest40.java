@@ -1,28 +1,31 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest40 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities} class.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        String string0 = Entities.getByName("nbsp");
-        assertEquals("\u00A0", string0);
-        assertNotNull(string0);
+    /**
+     * Verifies that getByName() correctly translates the "nbsp" named entity
+     * to its corresponding non-breaking space character.
+     */
+    @Test
+    public void getByNameShouldReturnNonBreakingSpaceForNbspEntity() {
+        // Arrange
+        String entityName = "nbsp";
+        String expectedCharacter = "\u00A0"; // The non-breaking space character
+
+        // Act
+        String actualCharacter = Entities.getByName(entityName);
+
+        // Assert
+        assertEquals(
+            "The named entity 'nbsp' should be converted to a non-breaking space character.",
+            expectedCharacter,
+            actualCharacter
+        );
     }
 }
