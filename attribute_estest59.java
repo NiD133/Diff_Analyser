@@ -1,29 +1,29 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest59 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.html;
-        String string0 = Attribute.getValidKey("", document_OutputSettings_Syntax0);
-        assertNull(string0);
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that getValidKey() returns null for an empty input key,
+     * as an empty string is not a valid attribute key.
+     */
+    @Test
+    public void getValidKeyShouldReturnNullForEmptyKey() {
+        // Arrange
+        String emptyKey = "";
+        Syntax syntax = Syntax.html;
+
+        // Act
+        String result = Attribute.getValidKey(emptyKey, syntax);
+
+        // Assert
+        assertNull("getValidKey should return null for an empty key string.", result);
     }
 }
