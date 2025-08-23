@@ -1,60 +1,27 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
+
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ObjectGraphIterator_ESTestTest35 extends ObjectGraphIterator_ESTest_scaffolding {
+/**
+ * This test suite focuses on the behavior of the ObjectGraphIterator,
+ * particularly its handling of empty or exhausted iterators.
+ */
+public class ObjectGraphIterator_ESTestTest35 {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        ObjectGraphIterator<Object> objectGraphIterator0 = new ObjectGraphIterator<Object>((Iterator<?>) null);
-        // Undeclared exception!
-        try {
-            objectGraphIterator0.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // No more elements in the iteration
-            //
-            verifyException("org.apache.commons.collections4.iterators.ObjectGraphIterator", e);
-        }
+    /**
+     * Verifies that calling next() on an iterator that was initialized
+     * with a null root (making it effectively empty) throws a NoSuchElementException.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void nextShouldThrowExceptionWhenIteratorIsEmpty() {
+        // Arrange: Create an iterator that is empty from the start by providing a null root iterator.
+        final ObjectGraphIterator<Object> emptyIterator = new ObjectGraphIterator<>((Iterator<?>) null);
+
+        // Act & Assert: Calling next() on the empty iterator is expected to throw
+        // a NoSuchElementException, which is verified by the @Test annotation.
+        emptyIterator.next();
     }
 }
