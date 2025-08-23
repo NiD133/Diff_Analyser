@@ -1,24 +1,34 @@
 package org.apache.commons.codec.language.bm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest2 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Tests for the {@link PhoneticEngine} class, focusing on its configuration and property accessors.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        NameType nameType0 = NameType.GENERIC;
-        RuleType ruleType0 = RuleType.EXACT;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false, 1);
-        int int0 = phoneticEngine0.getMaxPhonemes();
-        assertFalse(phoneticEngine0.isConcat());
-        assertEquals(1, int0);
+    /**
+     * Tests that the constructor correctly initializes the 'maxPhonemes' and 'concat' properties,
+     * and that the corresponding getter methods return the expected values.
+     */
+    @Test
+    public void constructorShouldCorrectlySetMaxPhonemesAndConcatProperties() {
+        // Arrange
+        final NameType nameType = NameType.GENERIC;
+        final RuleType ruleType = RuleType.EXACT;
+        final boolean shouldConcat = false;
+        final int expectedMaxPhonemes = 1;
+
+        // Act
+        final PhoneticEngine phoneticEngine = new PhoneticEngine(nameType, ruleType, shouldConcat, expectedMaxPhonemes);
+
+        // Assert
+        assertEquals("The max phonemes should be the value provided to the constructor.",
+                     expectedMaxPhonemes, phoneticEngine.getMaxPhonemes());
+        assertFalse("The concat flag should be the value provided to the constructor.",
+                    phoneticEngine.isConcat());
     }
 }
