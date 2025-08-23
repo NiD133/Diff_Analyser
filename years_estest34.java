@@ -1,26 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Years_ESTestTest34 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Years years0 = Years.ONE;
-        // Undeclared exception!
+    @Test
+    public void dividedBy_byZero_throwsArithmeticException() {
+        // Arrange
+        Years oneYear = Years.ONE;
+
+        // Act & Assert
         try {
-            years0.dividedBy(0);
-            fail("Expecting exception: ArithmeticException");
+            oneYear.dividedBy(0);
+            fail("Expected an ArithmeticException to be thrown for division by zero.");
         } catch (ArithmeticException e) {
-            //
-            // / by zero
-            //
-            verifyException("org.joda.time.Years", e);
+            // Verify that the exception message is correct, which is standard for integer division by zero.
+            assertEquals("/ by zero", e.getMessage());
         }
     }
 }
