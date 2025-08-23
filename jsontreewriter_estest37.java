@@ -1,33 +1,30 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest37 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.value("");
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that attempting to write a value inside a JSON object
+     * without first specifying a name results in an IllegalStateException.
+     * According to the JSON specification, object members must be key-value pairs.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void writingValueInsideObjectWithoutNameShouldThrowException() throws IOException {
+        // Arrange: Create a writer and start an object context.
+        JsonWriter jsonWriter = new JsonTreeWriter();
+        jsonWriter.beginObject();
+
+        // Act: Attempt to write a value directly, without a preceding call to name().
+        // This action is invalid and should trigger the exception.
+        jsonWriter.value("some value");
+
+        // Assert: The test passes if an IllegalStateException is thrown,
+        // which is handled by the @Test(expected = ...) annotation.
     }
 }
