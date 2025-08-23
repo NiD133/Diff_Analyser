@@ -1,28 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class SerializedString_ESTestTest30 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link SerializedString#equals(Object)} method.
+ */
+public class SerializedStringEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("8+19.:23Vy=-x");
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(0);
-        boolean boolean0 = serializedString0.equals(byteBuffer0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when a SerializedString
+     * is compared with an object of a completely different type. This is a
+     * standard contract for the equals() method.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange: Create a SerializedString instance and an object of another type.
+        SerializedString serializedString = new SerializedString("some value");
+        Object differentTypeObject = ByteBuffer.allocate(0);
+
+        // Act: Call the equals method with the different type object.
+        boolean result = serializedString.equals(differentTypeObject);
+
+        // Assert: The result should be false.
+        assertFalse("SerializedString should not be equal to an object of a different type.", result);
     }
 }
