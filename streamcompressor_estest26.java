@@ -1,47 +1,38 @@
 package org.apache.commons.compress.archivers.zip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
 import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StreamCompressor_ESTestTest26 extends StreamCompressor_ESTest_scaffolding {
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Enumeration<MockFileInputStream> enumeration0 = (Enumeration<MockFileInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        StreamCompressor streamCompressor0 = StreamCompressor.create(8, (ScatterGatherBackingStore) null);
-        // Undeclared exception!
-        try {
-            streamCompressor0.deflate(sequenceInputStream0, 8);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.StreamCompressor$ScatterGatherBackingStoreCompressor", e);
-        }
+/**
+ * Test suite for {@link StreamCompressor}.
+ * This class contains the improved version of the original test.
+ */
+public class StreamCompressor_ESTestTest26 { // Retaining original class name for context
+
+    /**
+     * Verifies that calling deflate() on a StreamCompressor created with a null
+     * ScatterGatherBackingStore throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void deflateWithNullBackingStoreThrowsNullPointerException() throws IOException {
+        // Arrange: Create a StreamCompressor with a null backing store.
+        // The factory method is expected to create an instance, but any subsequent
+        // operation on it should fail.
+        StreamCompressor compressor = StreamCompressor.create(
+            ZipEntry.DEFLATED, (ScatterGatherBackingStore) null);
+
+        InputStream emptyInput = new ByteArrayInputStream(new byte[0]);
+
+        // Act: Attempt to deflate an empty stream. This should trigger the use of the
+        // null backing store, causing a NullPointerException.
+        compressor.deflate(emptyInput, ZipEntry.DEFLATED);
+
+        // Assert: The @Test(expected = NullPointerException.class) annotation handles the
+        // verification that the expected exception was thrown.
     }
 }
