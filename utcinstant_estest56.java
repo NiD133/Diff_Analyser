@@ -1,24 +1,26 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest56 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        int int0 = utcInstant0.compareTo(utcInstant0);
-        assertEquals(0, int0);
+    /**
+     * Tests that compareTo() returns 0 when an instant is compared to itself.
+     * This verifies the reflexivity property of the Comparable contract (x.compareTo(x) == 0).
+     */
+    @Test
+    public void compareTo_shouldReturnZero_whenComparedToItself() {
+        // Arrange
+        UtcInstant anInstant = UtcInstant.ofModifiedJulianDay(0L, 0L);
+
+        // Act
+        int comparisonResult = anInstant.compareTo(anInstant);
+
+        // Assert
+        assertEquals("An instant compared to itself should result in 0.", 0, comparisonResult);
     }
 }
