@@ -1,24 +1,33 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.apache.commons.codec.DecoderException;
+import org.junit.Test;
 
-public class QuotedPrintableCodec_ESTestTest20 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.decode("", charset0);
-        assertEquals("", string0);
+    /**
+     * Tests that decoding an empty string correctly results in an empty string.
+     * This is an important edge case to ensure the codec handles empty input gracefully.
+     */
+    @Test
+    public void testDecodeEmptyStringReturnsEmptyString() throws DecoderException {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final String input = "";
+        final String expected = "";
+        // Using the system's default charset, as in the original test.
+        final Charset charset = Charset.defaultCharset();
+
+        // Act
+        final String result = codec.decode(input, charset);
+
+        // Assert
+        assertEquals("Decoding an empty string should result in an empty string.", expected, result);
     }
 }
