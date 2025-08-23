@@ -1,43 +1,34 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest61 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test060() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements} class.
+ * This class contains tests for methods that modify the list of elements.
+ */
+public class ElementsModificationTest {
+
+    /**
+     * Verifies that the {@link Elements#set(int, Element)} method throws an
+     * {@link IllegalArgumentException} when a null element is provided. The method
+     * must not allow null elements in the collection.
+     */
+    @Test
+    public void setShouldThrowExceptionWhenElementIsNull() {
+        // Arrange: Create an Elements collection with one item to ensure index 0 is valid.
+        Elements elements = new Elements(new Element("p"));
+
         try {
-            elements0.set((-1), (Element) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Attempt to replace an element with null.
+            elements.set(0, null);
+            fail("Expected an IllegalArgumentException to be thrown for a null element.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify that the correct exception was thrown with the expected message.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
