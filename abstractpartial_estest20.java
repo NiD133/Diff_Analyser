@@ -1,54 +1,26 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest20 extends AbstractPartial_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link AbstractPartial} class.
+ */
+public class AbstractPartialTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        // Undeclared exception!
-        try {
-            yearMonth0.getField((-817));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Invalid index: -817
-            //
-            verifyException("org.joda.time.YearMonth", e);
-        }
+    /**
+     * Verifies that calling getField() with a negative index throws an IndexOutOfBoundsException.
+     * This behavior is defined in the contract of AbstractPartial and is tested here using
+     * YearMonth as a concrete implementation.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getField_withNegativeIndex_shouldThrowIndexOutOfBoundsException() {
+        // Arrange: Create a concrete instance of a partial to test the abstract behavior.
+        YearMonth partial = YearMonth.now();
+        int invalidIndex = -1;
+
+        // Act: Attempt to access a field with an invalid, negative index.
+        // This call is expected to throw the exception verified by the @Test annotation.
+        partial.getField(invalidIndex);
     }
 }
