@@ -1,20 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest5 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        List<Locale> list0 = LocaleUtils.localeLookupList((Locale) null, (Locale) null);
-        assertTrue(list0.isEmpty());
+    /**
+     * Tests that localeLookupList() returns an empty list when the primary locale is null,
+     * as specified by the method's contract.
+     */
+    @Test
+    public void localeLookupList_shouldReturnEmptyList_whenLocaleIsNull() {
+        // Arrange: Define null inputs for both the primary and default locales.
+        final Locale nullLocale = null;
+        final Locale nullDefaultLocale = null;
+
+        // Act: Call the method under test.
+        final List<Locale> localeList = LocaleUtils.localeLookupList(nullLocale, nullDefaultLocale);
+
+        // Assert: Verify that the returned list is empty.
+        assertTrue("The list should be empty when the primary locale is null.", localeList.isEmpty());
     }
 }
