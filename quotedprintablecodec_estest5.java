@@ -1,23 +1,28 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import java.nio.charset.StandardCharsets;
 
-public class QuotedPrintableCodec_ESTestTest5 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.getDefaultCharset();
-        assertEquals("UTF-8", string0);
+    /**
+     * Tests that a QuotedPrintableCodec instance created with the default
+     * constructor uses UTF-8 as its default charset.
+     */
+    @Test
+    public void testDefaultConstructorUsesUTF8Charset() {
+        // Arrange
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        String expectedCharset = StandardCharsets.UTF_8.name();
+
+        // Act
+        String actualCharset = codec.getDefaultCharset();
+
+        // Assert
+        assertEquals("The default charset should be UTF-8.", expectedCharset, actualCharset);
     }
 }
