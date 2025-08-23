@@ -1,70 +1,53 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
 import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest16 extends IndexedCollection_ESTest_scaffolding {
+import java.util.LinkedList;
+import java.util.Collection;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        IndexedCollection<Object, Object> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-        indexedCollection0.add(transformer0);
-        Transformer<Object, Integer> transformer1 = ConstantTransformer.nullTransformer();
-        IndexedCollection<Integer, Object> indexedCollection1 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) indexedCollection0, transformer1);
-        Transformer<Object, Boolean> transformer2 = ConstantTransformer.nullTransformer();
-        Predicate<Object> predicate0 = TransformerPredicate.transformerPredicate((Transformer<? super Object, Boolean>) transformer2);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class contains an improved version of a test for IndexedCollection.
+ * The original test was auto-generated and lacked clarity.
+ */
+public class IndexedCollection_ESTestTest16 { // Retaining original class name for context
+
+    /**
+     * Tests that IndexedCollection.removeIf() throws a RuntimeException when
+     * the provided Predicate is a TransformerPredicate whose transformer
+     * incorrectly returns null instead of a Boolean.
+     */
+    @Test
+    public void removeIfShouldThrowExceptionWhenPredicateTransformerReturnsNull() {
+        // Arrange
+        // 1. Create a transformer that is incorrectly configured to always return null.
+        //    TransformerPredicate requires its transformer to return a non-null Boolean.
+        final Transformer<Object, Boolean> nullReturningTransformer = ConstantTransformer.nullTransformer();
+        final Predicate<Object> faultyPredicate = TransformerPredicate.transformerPredicate(nullReturningTransformer);
+
+        // 2. Create a simple IndexedCollection with one element to ensure the predicate is executed.
+        final Collection<Object> baseCollection = new LinkedList<>();
+        baseCollection.add("test element");
+
+        // The key transformer is not relevant to this test's logic.
+        final Transformer<Object, Object> keyTransformer = input -> input;
+        final IndexedCollection<Object, Object> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(baseCollection, keyTransformer);
+
+        // Act & Assert
         try {
-            indexedCollection1.removeIf(predicate0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Transformer must return an instanceof Boolean, it was a null object
-            //
-            verifyException("org.apache.commons.collections4.functors.TransformerPredicate", e);
+            indexedCollection.removeIf(faultyPredicate);
+            fail("Expected a RuntimeException because the predicate's transformer returned null.");
+        } catch (final RuntimeException e) {
+            // 3. Verify that the correct exception is thrown from TransformerPredicate.
+            final String expectedMessage = "Transformer must return an instanceof Boolean, it was a null object";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
