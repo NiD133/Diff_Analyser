@@ -1,18 +1,27 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest7 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(1);
-        byteArrayBuilder0.appendTwoBytes((-1155));
-        assertEquals(2, byteArrayBuilder0.size());
+    /**
+     * Verifies that calling {@link ByteArrayBuilder#appendTwoBytes(int)}
+     * correctly appends two bytes, increasing the builder's size by 2.
+     */
+    @Test
+    public void appendTwoBytesShouldIncreaseSizeByTwo() {
+        // Arrange: Create an empty ByteArrayBuilder.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        assertEquals("A new builder should have an initial size of 0.", 0, builder.size());
+
+        // Act: Append a two-byte value. The specific integer is not critical for this test.
+        builder.appendTwoBytes(5000);
+
+        // Assert: The size should now be exactly 2.
+        assertEquals("The size should be 2 after appending two bytes.", 2, builder.size());
     }
 }
