@@ -1,34 +1,28 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
 import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest8 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} utility class.
+ * This test focuses on the behavior of the fail() method.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Object[] objectArray0 = new Object[1];
-        objectArray0[0] = (Object) "jzb<%EEu_";
-        // Undeclared exception!
-        try {
-            Validate.fail("jzb<%EEu_", objectArray0);
-            fail("Expecting exception: IllegalFormatConversionException");
-        } catch (IllegalFormatConversionException e) {
-            //
-            // e != java.lang.String
-            //
-            verifyException("java.util.Formatter$FormatSpecifier", e);
-        }
+    /**
+     * Verifies that Validate.fail() throws an IllegalFormatConversionException
+     * when a format string specifier does not match the type of its argument.
+     */
+    @Test(expected = IllegalFormatConversionException.class)
+    public void failShouldThrowExceptionForMismatchedFormatSpecifier() {
+        // Arrange: The format specifier "%E" expects a floating-point number (e.g., float, double).
+        String formatString = "Scientific notation value: %E";
+        Object[] args = { "this is a string, not a number" };
+
+        // Act: Call fail() with a string argument for a numeric format specifier.
+        Validate.fail(formatString, args);
+
+        // Assert: The test expects an IllegalFormatConversionException, which is
+        // handled by the @Test(expected=...) annotation.
     }
 }
