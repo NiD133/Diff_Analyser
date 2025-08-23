@@ -1,30 +1,32 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest25 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode abstract class.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("org.jsoup.nodes.LeafNode");
-        cDataNode0.value = (Object) cDataNode0;
-        // Undeclared exception!
-        try {
-            cDataNode0.removeAttr("org.jsoup.nodes.LeafNode");
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // org.jsoup.nodes.CDataNode cannot be cast to java.lang.String
-            //
-            verifyException("org.jsoup.nodes.LeafNode", e);
-        }
+    /**
+     * Verifies that attribute manipulation methods fail with a ClassCastException
+     * when the internal 'value' field of a LeafNode is in an inconsistent or corrupted state.
+     * <p>
+     * This is a white-box test that manually sets the 'value' to an invalid type (i.e., not a String
+     * or an Attributes map) to ensure the code fails predictably rather than silently producing
+     * incorrect behavior.
+     */
+    @Test(expected = ClassCastException.class)
+    public void removeAttrThrowsClassCastExceptionWhenCoreValueIsCorrupted() {
+        // Arrange: Create a LeafNode instance (using a concrete subclass).
+        CDataNode cdataNode = new CDataNode("Initial content");
+
+        // Arrange: Manually corrupt the internal state by assigning an invalid object type to the 'value' field.
+        // The LeafNode's internal logic expects 'value' to be a String.
+        cdataNode.value = cdataNode; // Set value to the node itself, which is not a String.
+
+        // Act & Assert: Attempting to remove an attribute should now fail by throwing a
+        // ClassCastException when it tries to access the 'value' as a String.
+        // The @Test(expected) annotation handles the assertion.
+        cdataNode.removeAttr("anyKey");
     }
 }
