@@ -1,31 +1,37 @@
 package org.apache.commons.io.function;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Uncheck_ESTestTest6 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for {@link Uncheck}.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn(1139L).when(iOLongSupplier0).getAsLong();
-        long long0 = Uncheck.getAsLong(iOLongSupplier0, (Supplier<String>) null);
-        assertEquals(1139L, long0);
+    /**
+     * Tests that {@link Uncheck#getAsLong(IOLongSupplier, Supplier)} correctly returns the value
+     * from the underlying supplier when it executes without throwing an IOException.
+     */
+    @Test
+    public void testGetAsLongReturnsValueFromSupplier() throws IOException {
+        // Arrange
+        final long expectedValue = 1139L;
+        final IOLongSupplier mockIoLongSupplier = mock(IOLongSupplier.class);
+        doReturn(expectedValue).when(mockIoLongSupplier).getAsLong();
+
+        // The message supplier is null for this test case, as we are testing the
+        // scenario where no exception is thrown.
+        final Supplier<String> nullMessageSupplier = null;
+
+        // Act
+        final long actualValue = Uncheck.getAsLong(mockIoLongSupplier, nullMessageSupplier);
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
