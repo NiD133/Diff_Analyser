@@ -1,26 +1,33 @@
 package org.jsoup.select;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Test suite for the {@link Elements#empty()} method.
+ */
 public class ElementsTestTest22 {
 
     @Test
-    public void empty() {
-        Document doc = Jsoup.parse("<div><p>Hello <b>there</b></p> <p>now!</p></div>");
+    void emptyRemovesAllChildNodesFromSelectedElements() {
+        // Arrange: Set up the initial HTML document.
+        String initialHtml = "<div><p>Hello <b>there</b></p> <p>now!</p></div>";
+        Document doc = Jsoup.parse(initialHtml);
+        
+        // Disable pretty-printing to ensure the output HTML is a single line,
+        // making the string comparison in the assertion predictable.
         doc.outputSettings().prettyPrint(false);
+
+        // Act: Select all <p> elements and call the empty() method on them.
         doc.select("p").empty();
-        assertEquals("<div><p></p> <p></p></div>", doc.body().html());
+
+        // Assert: Verify that all children of the <p> elements have been removed.
+        String expectedHtml = "<div><p></p> <p></p></div>";
+        String actualHtml = doc.body().html();
+        
+        assertEquals(expectedHtml, actualHtml, "The empty() method should remove all child nodes from the selected elements.");
     }
 }
