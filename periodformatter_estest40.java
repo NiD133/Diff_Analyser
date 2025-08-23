@@ -1,37 +1,33 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
 import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 
+/**
+ * Unit tests for {@link PeriodFormatter}.
+ */
 public class PeriodFormatter_ESTestTest40 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        Locale locale0 = Locale.JAPANESE;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0, locale0, (PeriodType) null);
-        PeriodFormatter periodFormatter1 = periodFormatter0.withLocale((Locale) null);
-        assertNotSame(periodFormatter1, periodFormatter0);
+    /**
+     * Tests that withLocale() returns a new formatter instance, confirming the class's immutability.
+     */
+    @Test
+    public void withLocale_shouldReturnNewFormatterInstance() {
+        // Arrange: Create a formatter with a specific locale.
+        PeriodFormatterBuilder.Literal emptyLiteral = PeriodFormatterBuilder.Literal.EMPTY;
+        Locale initialLocale = Locale.JAPANESE;
+        PeriodFormatter initialFormatter = new PeriodFormatter(emptyLiteral, emptyLiteral, initialLocale, null);
+
+        // Act: Create a new formatter by changing the locale.
+        PeriodFormatter updatedFormatter = initialFormatter.withLocale(null);
+
+        // Assert: The new formatter should be a different instance, and its locale should be updated,
+        // while the original formatter remains unchanged.
+        assertNotSame("A new formatter instance should be returned.", initialFormatter, updatedFormatter);
+        assertNull("The new formatter's locale should be updated to null.", updatedFormatter.getLocale());
+        assertEquals("The original formatter's locale should remain unchanged.", initialLocale, initialFormatter.getLocale());
     }
 }
