@@ -1,47 +1,36 @@
 package com.itextpdf.text.xml.xmp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.xmp.XMPException;
 import com.itextpdf.xmp.XMPMeta;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest39 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PdfAction pdfAction0 = PdfAction.gotoRemotePage("zhcsaI", "", true, false);
-        XmpWriter xmpWriter0 = new XmpWriter(pipedOutputStream0, pdfAction0);
-        xmpWriter0.setAbout("|+)1]{?0s");
+/**
+ * Contains unit tests for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Tests that the setAbout method correctly updates the 'rdf:about' attribute
+     * in the underlying XMP metadata object.
+     */
+    @Test
+    public void setAbout_shouldUpdateRdfAboutAttributeInXmpMetadata() throws IOException, XMPException {
+        // Arrange: Create an XmpWriter and define the expected 'about' attribute.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XmpWriter xmpWriter = new XmpWriter(outputStream);
+        String expectedAboutAttribute = "uuid:a2d81f83-4841-428a-8b13-39b1252a3c1f";
+
+        // Act: Call the method under test.
+        xmpWriter.setAbout(expectedAboutAttribute);
+
+        // Assert: Verify that the XMP metadata object was updated correctly.
+        XMPMeta actualXmpMeta = xmpWriter.getXmpMeta();
+        assertEquals("The 'rdf:about' attribute should be set to the provided value.",
+                expectedAboutAttribute, actualXmpMeta.getObjectName());
     }
 }
