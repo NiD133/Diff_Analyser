@@ -1,28 +1,27 @@
 package org.jfree.chart.labels;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest6 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SymbolicXYItemLabelGenerator} class.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        Object object0 = new Object();
-        boolean boolean0 = symbolicXYItemLabelGenerator0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing an instance
+     * to an object of a different, incompatible type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange: Create an instance of the class under test and an object of a different type.
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+        Object otherObject = new Object();
+
+        // Act: Call the equals method with the other object.
+        boolean isEqual = generator.equals(otherObject);
+
+        // Assert: The result should be false, as the types are incompatible.
+        assertFalse(isEqual);
     }
 }
