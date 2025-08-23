@@ -1,55 +1,51 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest25 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = Symmetry010Chronology.INSTANCE;
-        Clock clock0 = MockClock.systemUTC();
-        Duration duration0 = Duration.ofDays(365250000L);
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
+/**
+ * This test class contains an improved version of the original generated test case.
+ * The original class name is kept for context, but scaffolding and EvoRunner dependencies are removed.
+ */
+public class Symmetry010Chronology_ESTestTest25 {
+
+    /**
+     * Verifies that dateNow() throws a DateTimeException when the provided Clock
+     * represents a date beyond the maximum supported by the Symmetry010Chronology.
+     */
+    @Test
+    public void dateNow_whenClockIsBeyondMaximumDate_throwsDateTimeException() {
+        // Arrange: Set up the test scenario.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+
+        // Determine the maximum supported epoch day from the chronology's defined range.
+        // This avoids using magic numbers and makes the test robust against future changes.
+        long maxSupportedEpochDay = chronology.range(ChronoField.EPOCH_DAY).getMaximum();
+
+        // Create a clock fixed to an instant that is exactly one day beyond the maximum supported date.
+        // There are 86400 seconds in a standard day.
+        Instant outOfBoundsInstant = Instant.ofEpochSecond((maxSupportedEpochDay + 1) * 86400L);
+        Clock clockBeyondMaxDate = Clock.fixed(outOfBoundsInstant, ZoneOffset.UTC);
+
+        // Act & Assert: Perform the action and verify the outcome.
         try {
-            symmetry010Chronology0.dateNow(clock1);
-            fail("Expecting exception: DateTimeException");
+            chronology.dateNow(clockBeyondMaxDate);
+            fail("Expected a DateTimeException to be thrown for a date outside the supported range.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for EpochDay (valid values -365961480 - 364523156): 365266118
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception is thrown for the correct reason.
+            // The message should indicate that the EpochDay value is invalid.
+            assertTrue(
+                    "Exception message should indicate an invalid EpochDay value.",
+                    e.getMessage().contains("Invalid value for EpochDay")
+            );
         }
     }
 }
