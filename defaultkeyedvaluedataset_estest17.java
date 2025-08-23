@@ -1,35 +1,36 @@
 package org.jfree.data.general;
 
+import org.jfree.data.KeyedValue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class DefaultKeyedValueDataset_ESTestTest17 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        DefaultKeyedValueDataset defaultKeyedValueDataset1 = new DefaultKeyedValueDataset(defaultKeyedValueDataset0);
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        // Undeclared exception!
-        try {
-            defaultKeyedValueDataset1.updateValue(integer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'key' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that calling updateValue() on a dataset that was initialized
+     * with a null key throws an IllegalArgumentException.
+     */
+    @Test
+    public void updateValue_whenKeyIsNull_throwsIllegalArgumentException() {
+        // Arrange: Create a dataset whose underlying KeyedValue has a null key.
+        // This is achieved by passing an empty dataset to the constructor,
+        // as an empty dataset's getKey() method returns null.
+        KeyedValue sourceDataWithNullKey = new DefaultKeyedValueDataset();
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset(sourceDataWithNullKey);
+        Number newValue = 100;
+
+        // Act & Assert: Expect an IllegalArgumentException when updating the value.
+        // The internal implementation of updateValue retrieves the existing key
+        // to set the new value, and a null key is not permitted.
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            dataset.updateValue(newValue);
+        });
+
+        // Verify that the exception message is as expected.
+        assertEquals("Null 'key' argument.", exception.getMessage());
     }
 }
