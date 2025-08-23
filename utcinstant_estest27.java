@@ -1,26 +1,36 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest27 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Instant instant0 = MockInstant.ofEpochSecond(0L);
-        UtcInstant utcInstant0 = UtcInstant.of(instant0);
-        long long0 = utcInstant0.getModifiedJulianDay();
-        assertEquals(0L, utcInstant0.getNanoOfDay());
-        assertEquals(40587L, long0);
+    /**
+     * Tests that getModifiedJulianDay() returns the correct value for the Java epoch.
+     * The Java epoch (1970-01-01T00:00:00Z) corresponds to Modified Julian Day 40587.
+     */
+    @Test
+    public void getModifiedJulianDay_forJavaEpoch_isCorrect() {
+        // Arrange
+        // The Java epoch is 1970-01-01T00:00:00Z.
+        Instant javaEpoch = Instant.EPOCH;
+        UtcInstant utcInstant = UtcInstant.of(javaEpoch);
+
+        // The Modified Julian Day epoch starts on 1858-11-17.
+        // The number of days between 1858-11-17 and 1970-01-01 is 40587.
+        long expectedModifiedJulianDay = 40587L;
+
+        // Act
+        long actualModifiedJulianDay = utcInstant.getModifiedJulianDay();
+
+        // Assert
+        assertEquals("Modified Julian Day should match the expected value for the Java epoch",
+                expectedModifiedJulianDay, actualModifiedJulianDay);
+        assertEquals("Nano of day should be zero at the start of the epoch",
+                0L, utcInstant.getNanoOfDay());
     }
 }
