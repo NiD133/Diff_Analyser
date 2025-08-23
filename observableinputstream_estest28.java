@@ -1,50 +1,30 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest28 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream} focusing on exception propagation.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        byte[] byteArray0 = new byte[10];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, (-1732), 1);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(byteArrayInputStream0);
-        // Undeclared exception!
-        try {
-            observableInputStream0.consume();
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.ByteArrayInputStream", e);
-        }
+    /**
+     * Tests that an exception from the underlying stream is propagated
+     * when {@link ObservableInputStream#consume()} is called.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void consumeShouldPropagateExceptionFromUnderlyingStream() throws IOException {
+        // Arrange: Create an underlying stream that is guaranteed to throw an
+        // ArrayIndexOutOfBoundsException upon reading due to an invalid negative offset.
+        final byte[] dummyData = new byte[10];
+        final InputStream failingStream = new ByteArrayInputStream(dummyData, -1, 1);
+        final ObservableInputStream observableStream = new ObservableInputStream(failingStream);
+
+        // Act: Calling consume() will trigger a read on the failing underlying stream.
+        // The test asserts that the expected exception is thrown and propagated.
+        observableStream.consume();
     }
 }
