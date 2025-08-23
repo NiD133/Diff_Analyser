@@ -1,31 +1,32 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class DefaultPieDataset_ESTestTest44 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Contains tests for the clone() method of the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDataset_ESTestTest44 {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        DefaultKeyedValuesDataset<Integer> defaultKeyedValuesDataset0 = new DefaultKeyedValuesDataset<Integer>();
-        DefaultPieDataset defaultPieDataset0 = (DefaultPieDataset) defaultKeyedValuesDataset0.clone();
-        assertTrue(defaultPieDataset0.getNotify());
+    /**
+     * Verifies that a cloned DefaultPieDataset has dataset change notifications
+     * enabled by default.
+     * <p>
+     * The 'notify' flag, inherited from AbstractDataset, controls whether change
+     * events are fired. This test ensures that cloning preserves the default
+     * state (enabled) for this flag.
+     * </p>
+     */
+    @Test
+    public void clone_returnsNewInstanceWithNotificationsEnabled() throws CloneNotSupportedException {
+        // Arrange: Create an original DefaultPieDataset instance.
+        DefaultPieDataset<String> originalDataset = new DefaultPieDataset<>();
+
+        // Act: Create a clone of the original dataset.
+        DefaultPieDataset<String> clonedDataset = (DefaultPieDataset<String>) originalDataset.clone();
+
+        // Assert: The cloned dataset should have the 'notify' flag enabled by default.
+        assertTrue("A cloned dataset should have notifications enabled by default.",
+                clonedDataset.getNotify());
     }
 }
