@@ -1,39 +1,30 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest24 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MultiReadOnlySeekableByteChannel} class.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Path[] pathArray0 = new Path[8];
-        // Undeclared exception!
-        try {
-            MultiReadOnlySeekableByteChannel.forPaths(pathArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.file.Files", e);
-        }
+    /**
+     * Tests that {@link MultiReadOnlySeekableByteChannel#forPaths(Path...)} throws a
+     * NullPointerException if the input array contains a null element. The underlying
+     * {@code java.nio.file.Files.newByteChannel} is expected to throw this exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void forPathsThrowsNullPointerExceptionWhenArrayContainsNull() throws IOException {
+        // Arrange: Create an array of Path objects with a null element.
+        // A single-element array containing null is sufficient to demonstrate the behavior.
+        final Path[] pathsWithNull = { null };
+
+        // Act: This call is expected to throw a NullPointerException.
+        MultiReadOnlySeekableByteChannel.forPaths(pathsWithNull);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // as specified by the 'expected' attribute of the @Test annotation.
     }
 }
