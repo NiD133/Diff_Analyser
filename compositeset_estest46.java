@@ -1,63 +1,33 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest46 extends CompositeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        CompositeSet<LinkedHashSet<Object>> compositeSet0 = new CompositeSet<LinkedHashSet<Object>>();
-        assertNotNull(compositeSet0);
-        LinkedHashSet<Object> linkedHashSet0 = new LinkedHashSet<Object>();
-        assertNotNull(linkedHashSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        boolean boolean0 = compositeSet0.removeAll(linkedHashSet0);
-        assertFalse(compositeSet0.contains(linkedHashSet0));
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        assertFalse(boolean0);
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ */
+public class CompositeSetTest {
+
+    /**
+     * Tests that calling removeAll() with an empty collection on an empty CompositeSet
+     * does not modify the set and correctly returns false.
+     */
+    @Test
+    public void removeAllFromEmptySetWithEmptyCollectionShouldReturnFalse() {
+        // Arrange: Create an empty CompositeSet and an empty collection to remove.
+        final CompositeSet<String> emptySet = new CompositeSet<>();
+        final Set<String> emptyCollectionToRemove = Collections.emptySet();
+
+        // Act: Attempt to remove the elements of the empty collection from the empty set.
+        final boolean wasModified = emptySet.removeAll(emptyCollectionToRemove);
+
+        // Assert: Verify that the set was not modified and remains empty.
+        assertFalse("removeAll should return false as the set was not modified", wasModified);
+        assertTrue("The composite set should remain empty after the operation", emptySet.isEmpty());
     }
 }
