@@ -1,22 +1,27 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest23 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ThresholdingOutputStream}.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream((-2596));
-        thresholdingOutputStream0.resetByteCount();
-        assertEquals(0L, thresholdingOutputStream0.getByteCount());
-        assertEquals(0, thresholdingOutputStream0.getThreshold());
+    /**
+     * Tests that the constructor correctly handles a negative threshold
+     * by treating it as zero, as specified in the class documentation.
+     */
+    @Test
+    public void shouldTreatNegativeThresholdAsZeroOnConstruction() {
+        // Arrange: Define a negative threshold value.
+        final int negativeThreshold = -100;
+
+        // Act: Create the stream with the negative threshold.
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(negativeThreshold);
+
+        // Assert: Verify that the threshold was set to 0 and the initial byte count is correct.
+        assertEquals("A negative threshold should be treated as 0.", 0, stream.getThreshold());
+        assertEquals("The initial byte count should be 0.", 0L, stream.getByteCount());
     }
 }
