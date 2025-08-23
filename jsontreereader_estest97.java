@@ -1,28 +1,29 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest97 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test096() throws Throwable {
-        JsonNull jsonNull0 = JsonNull.INSTANCE;
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonNull0);
-        String string0 = jsonTreeReader0.toString();
-        assertEquals("JsonTreeReader at path $", string0);
+    /**
+     * Verifies that the toString() method correctly reports the reader's position
+     * at the root of the JSON structure.
+     */
+    @Test
+    public void toString_whenAtRoot_returnsPathAsString() {
+        // Arrange
+        JsonNull rootElement = JsonNull.INSTANCE;
+        JsonTreeReader reader = new JsonTreeReader(rootElement);
+        String expectedString = "JsonTreeReader at path $";
+
+        // Act
+        String actualString = reader.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
