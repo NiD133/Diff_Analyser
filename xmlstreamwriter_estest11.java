@@ -1,37 +1,35 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
 import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmlStreamWriter_ESTestTest11 extends XmlStreamWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        XmlStreamWriter xmlStreamWriter0 = null;
+/**
+ * Tests for the {@link XmlStreamWriter} constructor.
+ */
+public class XmlStreamWriterTest {
+
+    /**
+     * Tests that the constructor throws an {@link IllegalCharsetNameException}
+     * when provided with a string that is not a valid character set name.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForInvalidCharsetName() {
+        // Arrange: Define an invalid charset name.
+        // According to the Charset documentation, names cannot contain special characters like '<', '?', or '!'.
+        final String invalidCharsetName = "<?!wml";
+
+        // Act & Assert: Attempt to create the writer and verify the exception.
         try {
-            xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null, "<?!wml");
-            fail("Expecting exception: IllegalCharsetNameException");
-        } catch (IllegalCharsetNameException e) {
-            //
-            // <?!wml
-            //
-            verifyException("java.nio.charset.Charset", e);
+            new XmlStreamWriter((OutputStream) null, invalidCharsetName);
+            fail("Expected an IllegalCharsetNameException to be thrown for invalid charset name.");
+        } catch (final IllegalCharsetNameException e) {
+            // The exception message should be the invalid name itself.
+            assertEquals(invalidCharsetName, e.getMessage());
         }
     }
 }
