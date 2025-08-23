@@ -1,27 +1,39 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class BaseTypeHandler_ESTestTest3 extends BaseTypeHandler_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ObjectTypeHandler objectTypeHandler0 = new ObjectTypeHandler();
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(callableStatement0).getObject(anyInt());
-        Object object0 = objectTypeHandler0.getNullableResult(callableStatement0, 1779);
-        assertNull(object0);
+/**
+ * Test class for BaseTypeHandler.
+ * This class tests the generic behavior of BaseTypeHandler using a concrete implementation.
+ */
+public class BaseTypeHandlerTest {
+
+    /**
+     * Verifies that getNullableResult returns null when the underlying CallableStatement
+     * returns a null object, correctly handling database NULL values.
+     */
+    @Test
+    public void getNullableResultShouldReturnNullWhenCallableStatementReturnsNull() throws SQLException {
+        // Arrange
+        // Use ObjectTypeHandler as a concrete implementation to test the abstract BaseTypeHandler
+        ObjectTypeHandler handler = new ObjectTypeHandler();
+        CallableStatement mockStatement = mock(CallableStatement.class);
+        int anyColumnIndex = 1;
+
+        // Configure the mock to return null, simulating a NULL value from a stored procedure
+        when(mockStatement.getObject(anyInt())).thenReturn(null);
+
+        // Act
+        Object result = handler.getNullableResult(mockStatement, anyColumnIndex);
+
+        // Assert
+        assertNull("The result should be null when the database value is null.", result);
     }
 }
