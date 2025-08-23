@@ -1,23 +1,31 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JsonSetter_ESTestTest12 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        JsonSetter jsonSetter0 = mock(JsonSetter.class, CALLS_REAL_METHODS);
-        doReturn((Nulls) null).when(jsonSetter0).contentNulls();
-        doReturn((Nulls) null).when(jsonSetter0).nulls();
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.from(jsonSetter0);
-        Nulls nulls0 = Nulls.DEFAULT;
-        JsonSetter.Value jsonSetter_Value1 = jsonSetter_Value0.withContentNulls(nulls0);
-        assertSame(jsonSetter_Value1, jsonSetter_Value0);
+    /**
+     * Tests that the wither-method {@code withContentNulls()} returns the same
+     * instance if the new value is identical to the current value.
+     * This is a common optimization for immutable objects.
+     */
+    @Test
+    public void withContentNulls_whenValueIsUnchanged_shouldReturnSameInstance() {
+        // Arrange
+        // JsonSetter.Value.empty() creates an instance with default values,
+        // where contentNulls is Nulls.DEFAULT.
+        JsonSetter.Value initialValue = JsonSetter.Value.empty();
+
+        // Act
+        // Attempt to set contentNulls to the same value it already has.
+        JsonSetter.Value result = initialValue.withContentNulls(Nulls.DEFAULT);
+
+        // Assert
+        // The method should return the same instance, not a new one.
+        assertSame("Expected the same instance when the value is unchanged", initialValue, result);
     }
 }
