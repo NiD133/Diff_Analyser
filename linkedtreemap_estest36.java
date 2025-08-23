@@ -1,27 +1,30 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
+
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest36 extends LinkedTreeMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        boolean boolean0 = linkedTreeMap_EntrySet0.contains(linkedTreeMap0);
-        assertFalse(boolean0);
-        assertEquals(0, linkedTreeMap_EntrySet0.size());
+public class LinkedTreeMapEntrySetTest {
+
+    @Test
+    public void entrySetContains_shouldReturnFalse_forIncompatibleObjectType() {
+        // Arrange
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        Set<Map.Entry<String, Integer>> entrySet = map.entrySet();
+
+        // Act
+        // The Set.contains() contract specifies that if the object's type is
+        // incompatible with the set's element type, the method should return false
+        // rather than throwing a ClassCastException. We test this by passing the
+        // map itself to its entrySet's contains() method.
+        boolean result = entrySet.contains(map);
+
+        // Assert
+        assertFalse("contains() should return false when called with an incompatible object type.", result);
+        assertEquals("The size of the entry set of an empty map should be 0.", 0, entrySet.size());
     }
 }
