@@ -1,26 +1,49 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest17 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Test suite for the {@link UtcInstant} class.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Duration duration0 = Duration.ofNanos((-1606L));
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-571L), 0L);
-        UtcInstant utcInstant1 = utcInstant0.plus(duration0);
-        assertEquals((-572L), utcInstant1.getModifiedJulianDay());
-        assertEquals(86399999998394L, utcInstant1.getNanoOfDay());
+    // A standard day has 86,400 seconds, and each second has 1,000,000,000 nanoseconds.
+    private static final long NANOS_IN_STANDARD_DAY = 86_400L * 1_000_000_000L;
+
+    /**
+     * Tests that adding a small negative duration to an instant at the start of a day
+     * correctly rolls back the time to the end of the previous day.
+     */
+    @Test
+    public void plus_withNegativeDuration_shouldRollBackAcrossDayBoundary() {
+        // Arrange: Create an instant at the exact start of a day (midnight).
+        long initialModifiedJulianDay = -571L;
+        UtcInstant startOfDay = UtcInstant.ofModifiedJulianDay(initialModifiedJulianDay, 0L);
+
+        // Arrange: Define a small duration to subtract, causing a day boundary to be crossed.
+        long nanosToSubtract = 1606L;
+        Duration smallNegativeDuration = Duration.ofNanos(-nanosToSubtract);
+
+        // Act: Add the negative duration to the instant.
+        UtcInstant result = startOfDay.plus(smallNegativeDuration);
+
+        // Assert: The resulting instant should be on the previous day.
+        long expectedModifiedJulianDay = initialModifiedJulianDay - 1;
+        assertEquals(
+            "The Modified Julian Day should roll back by one",
+            expectedModifiedJulianDay,
+            result.getModifiedJulianDay()
+        );
+
+        // Assert: The nano-of-day should correspond to the time just before midnight on the previous day.
+        // This assumes the previous day is a standard 86400-second day.
+        long expectedNanoOfDay = NANOS_IN_STANDARD_DAY - nanosToSubtract;
+        assertEquals(
+            "The nano-of-day should be at the end of the previous day",
+            expectedNanoOfDay,
+            result.getNanoOfDay()
+        );
     }
 }
