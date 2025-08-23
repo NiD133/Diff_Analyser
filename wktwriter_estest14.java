@@ -1,41 +1,42 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.ChoiceFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Circle;
-import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.impl.BufferedLine;
-import org.locationtech.spatial4j.shape.impl.BufferedLineString;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 
-public class WKTWriter_ESTestTest14 extends WKTWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        WKTWriter wKTWriter0 = new WKTWriter();
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 3671, true, spatialContext0);
-        Point point0 = bufferedLineString0.getCenter();
-        BufferedLine bufferedLine0 = new BufferedLine(point0, point0, 1887, spatialContext0);
-        Rectangle rectangle0 = bufferedLine0.getBoundingBox();
-        String string0 = wKTWriter0.toString((Shape) rectangle0);
-        assertEquals("ENVELOPE (\uFFFD, \uFFFD, \uFFFD, \uFFFD)", string0);
+/**
+ * Test suite for {@link WKTWriter}.
+ * This refactored test focuses on a specific edge case from an auto-generated test.
+ */
+public class WKTWriterTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+    private final WKTWriter wktWriter = new WKTWriter();
+
+    /**
+     * Tests that writing a shape with NaN (Not-a-Number) coordinates
+     * results in a WKT string where each NaN value is represented by the
+     * Unicode replacement character (U+FFFD). This is an important test
+     * for handling malformed or uninitialized geometric data gracefully.
+     */
+    @Test
+    public void toString_withNaNCoordinates_shouldProduceReplacementCharacters() {
+        // Arrange: Create a rectangle where all coordinate values are NaN.
+        // This is a more direct way to create the test condition than the
+        // original, which used a complex series of shape constructions.
+        Rectangle rectangleWithNaN = spatialContext.getShapeFactory().rect(
+                Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+
+        // Act: Convert the NaN-based rectangle to its WKT string representation.
+        String actualWkt = wktWriter.toString((Shape) rectangleWithNaN);
+
+        // Assert: The resulting string should use the Unicode replacement character '�'
+        // for each of the NaN coordinate values in the ENVELOPE format.
+        // The WKT format for a rectangle is ENVELOPE(minX, maxX, minY, maxY).
+        String expectedWkt = "ENVELOPE (\uFFFD, \uFFFD, \uFFFD, \uFFFD)";
+        assertEquals("WKT for a NaN rectangle should use replacement characters", expectedWkt, actualWkt);
     }
 }
