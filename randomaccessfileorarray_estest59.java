@@ -1,33 +1,36 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest59 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test058() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.getByteSource();
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
+
+    /**
+     * Verifies that calling getByteSource() is a non-mutating operation
+     * that does not advance the internal file pointer.
+     */
+    @Test
+    public void getByteSource_shouldNotAdvanceFilePointer() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance from a sample byte array.
+        byte[] sourceData = new byte[16];
+        RandomAccessFileOrArray randomAccessFile = new RandomAccessFileOrArray(sourceData);
+        
+        // Sanity check to ensure the file pointer starts at 0.
+        assertEquals("Pre-condition failed: File pointer should be at the beginning.", 0L, randomAccessFile.getFilePointer());
+
+        // Act: Call the method under test to get the underlying data source.
+        RandomAccessSource resultSource = randomAccessFile.getByteSource();
+
+        // Assert: The file pointer should remain unchanged, and the returned source should be valid.
+        assertNotNull("The byte source should not be null.", resultSource);
+        assertEquals("Calling getByteSource should not change the file pointer.", 0L, randomAccessFile.getFilePointer());
     }
 }
