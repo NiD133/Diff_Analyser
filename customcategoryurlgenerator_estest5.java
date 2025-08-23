@@ -1,26 +1,33 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest5 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        ArrayList<String> arrayList0 = new ArrayList<String>();
-        customCategoryURLGenerator0.addURLSeries(arrayList0);
-        String string0 = customCategoryURLGenerator0.getURL(0, 2440);
-        assertNull(string0);
+    /**
+     * Verifies that getURL() returns null when the item index is out of bounds
+     * for a given series.
+     */
+    @Test
+    public void getURL_withOutOfBoundsItemIndex_shouldReturnNull() {
+        // Arrange: Create a generator and add a series with an empty list of URLs.
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        List<String> emptyUrlList = new ArrayList<>();
+        generator.addURLSeries(emptyUrlList);
+
+        // Act: Attempt to retrieve a URL for an item index that does not exist.
+        // The series index (0) is valid, but the item index (1) is out of bounds
+        // for the empty list.
+        String retrievedUrl = generator.getURL(0, 1);
+
+        // Assert: The returned URL should be null.
+        assertNull("Expected a null URL for an out-of-bounds item index", retrievedUrl);
     }
 }
