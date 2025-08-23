@@ -1,23 +1,29 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest25 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        char[] charArray0 = new char[0];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        int int0 = charSequenceReader0.read();
-        assertEquals((-1), int0);
+    /**
+     * Verifies that calling read() on a reader with an empty CharSequence
+     * immediately returns -1, the standard indicator for the end of a stream.
+     */
+    @Test
+    public void read_onEmptySequence_returnsEndOfStream() throws IOException {
+        // Arrange: Create a reader for an empty CharSequence.
+        // An empty string is a simple and clear way to represent this.
+        CharSequenceReader reader = new CharSequenceReader("");
+
+        // Act: Attempt to read a single character from the reader.
+        int characterRead = reader.read();
+
+        // Assert: The result should be -1, signifying the end of the stream.
+        assertEquals(-1, characterRead);
     }
 }
