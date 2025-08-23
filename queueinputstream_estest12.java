@@ -1,32 +1,25 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueueInputStream_ESTestTest12 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Unit tests for {@link QueueInputStream}.
+ */
+public class QueueInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        QueueInputStream queueInputStream0 = new QueueInputStream();
-        // Undeclared exception!
-        try {
-            queueInputStream0.read((byte[]) null, 16, 16);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.QueueInputStream", e);
-        }
+    /**
+     * Tests that {@link QueueInputStream#read(byte[], int, int)} throws a
+     * {@link NullPointerException} when the provided buffer is null, as per the method's contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readWithNullBufferShouldThrowNullPointerException() {
+        // Arrange: Create an instance of the stream under test.
+        final QueueInputStream inputStream = new QueueInputStream();
+
+        // Act & Assert: Call the method with a null buffer.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        // The offset and length values are irrelevant for this test as the null check on the
+        // buffer is performed first.
+        inputStream.read(null, 0, 10);
     }
 }
