@@ -1,19 +1,45 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Soundex_ESTestTest11 extends Soundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link org.apache.commons.codec.language.Soundex} class.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Soundex soundex0 = new Soundex();
-        String string0 = soundex0.US_ENGLISH.soundex("[&L!ug<F4wFviM+`RV{");
-        assertEquals("L215", string0);
-        assertEquals(4, soundex0.getMaxLength());
+    /**
+     * Tests that the soundex algorithm correctly processes a string containing non-alphabetic characters
+     * by ignoring them and encoding only the letters.
+     */
+    @Test
+    public void soundexIgnoresNonAlphabeticCharacters() {
+        // Arrange
+        final Soundex soundex = new Soundex(); // Uses the default US English mapping
+        final String inputWithNonLetters = "[&L!ug<F4wFviM+`RV{";
+        final String expectedCode = "L215";
+
+        // Act
+        final String actualCode = soundex.soundex(inputWithNonLetters);
+
+        // Assert
+        assertEquals("The Soundex code should be generated correctly from a string containing non-letters.",
+                     expectedCode, actualCode);
+    }
+
+    /**
+     * Tests that a default Soundex instance is configured with a max length of 4,
+     * as per the standard Soundex algorithm definition.
+     */
+    @Test
+    public void defaultInstanceHasMaxLengthOfFour() {
+        // Arrange
+        final Soundex soundex = new Soundex();
+
+        // Act
+        final int maxLength = soundex.getMaxLength();
+
+        // Assert
+        assertEquals("The default max length for a Soundex code should be 4.", 4, maxLength);
     }
 }
