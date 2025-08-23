@@ -1,21 +1,34 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest30 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Unit tests for {@link EndpointPair}.
+ *
+ * <p>Note: The original test class name and structure (e.g., EndpointPair_ESTestTest30)
+ * suggested it was auto-generated. This version uses standard, human-readable conventions.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Integer integer0 = new Integer((-1));
-        EndpointPair<Integer> endpointPair0 = EndpointPair.unordered(integer0, integer0);
-        UnmodifiableIterator<Integer> unmodifiableIterator0 = endpointPair0.iterator();
-        assertNotNull(unmodifiableIterator0);
+    /**
+     * Tests that the iterator for an unordered self-loop pair returns the node twice.
+     * A self-loop is an edge that connects a node to itself.
+     */
+    @Test
+    public void iterator_onUnorderedSelfLoop_returnsNodeTwice() {
+        // Arrange: Create an unordered EndpointPair representing a self-loop (node -> node).
+        Integer node = -1;
+        EndpointPair<Integer> selfLoopPair = EndpointPair.unordered(node, node);
+
+        // Act: Consume the iterator to get the sequence of nodes.
+        List<Integer> iteratedNodes = ImmutableList.copyOf(selfLoopPair.iterator());
+
+        // Assert: The iterator should yield the node twice.
+        List<Integer> expectedNodes = ImmutableList.of(node, node);
+        assertEquals(expectedNodes, iteratedNodes);
     }
 }
