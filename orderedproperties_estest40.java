@@ -1,53 +1,35 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class OrderedProperties_ESTestTest40 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests for the {@link OrderedProperties} class.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Object object0 = orderedProperties0.put(orderedProperties0, orderedProperties0);
-        assertNull(object0);
-        String string0 = orderedProperties0.toString();
-        assertEquals("{(this Map)=(this Map)}", string0);
+    /**
+     * Tests that the toString() method correctly handles a self-referential map
+     * to prevent infinite recursion, as per the Map.toString() contract.
+     */
+    @Test
+    public void toStringShouldHandleSelfReferenceWithoutInfiniteRecursion() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+
+        // Act: Add the map to itself as both a key and a value.
+        final Object previousValue = properties.put(properties, properties);
+
+        // Assert: The first 'put' for a new key should return null.
+        assertNull("Putting a new key-value pair should return null", previousValue);
+
+        // Act: Get the string representation of the self-referential map.
+        final String toStringResult = properties.toString();
+
+        // Assert: The output should use "(this Map)" to denote the self-reference,
+        // preventing an infinite loop and a StackOverflowError.
+        assertEquals("The toString() output for a self-referential map is incorrect",
+                     "{(this Map)=(this Map)}", toStringResult);
     }
 }
