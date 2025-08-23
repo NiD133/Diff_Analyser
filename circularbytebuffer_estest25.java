@@ -1,27 +1,34 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class CircularByteBuffer_ESTestTest25 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Test suite for the CircularByteBuffer class.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        byte[] byteArray0 = new byte[22];
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer(2);
-        // Undeclared exception!
+    /**
+     * Tests that calling read() on an empty buffer throws an IllegalStateException
+     * when attempting to read more bytes than are available.
+     */
+    @Test
+    public void readShouldThrowIllegalStateExceptionWhenBufferIsEmpty() {
+        // Arrange: Create an empty buffer and a destination for the read operation.
+        final byte[] destinationBuffer = new byte[10];
+        final CircularByteBuffer circularByteBuffer = new CircularByteBuffer(8); // Buffer with capacity, but currently empty.
+        final int bytesToRead = 2;
+        final int destinationOffset = 2;
+
+        // Act & Assert: Attempting to read from the empty buffer should throw an exception.
         try {
-            circularByteBuffer0.read(byteArray0, 2, 2);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Currently, there are only 0in the buffer, not 2
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            circularByteBuffer.read(destinationBuffer, destinationOffset, bytesToRead);
+            fail("Expected an IllegalStateException to be thrown because the buffer is empty.");
+        } catch (final IllegalStateException e) {
+            // Verify that the exception message correctly identifies the issue.
+            final String expectedMessage = "Currently, there are only 0 in the buffer, not 2";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
