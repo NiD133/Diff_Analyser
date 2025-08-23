@@ -1,32 +1,33 @@
 package org.apache.commons.collections4.bag;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TreeBag_ESTestTest14 extends TreeBag_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(comparator0).toString();
-        TreeBag<Object> treeBag0 = new TreeBag<Object>(comparator0);
-        Comparator<? super Object> comparator1 = treeBag0.comparator();
-        assertNotNull(comparator1);
+/**
+ * Contains tests for the {@link TreeBag#comparator()} method.
+ */
+public class TreeBagComparatorTest {
+
+    /**
+     * Tests that the comparator() method returns the same comparator instance
+     * that was provided in the constructor.
+     */
+    @Test
+    public void shouldReturnTheComparatorUsedInConstructor() {
+        // Arrange: Create a mock comparator to be used by the TreeBag.
+        @SuppressWarnings("unchecked") // Safe for mock creation of a generic type
+        final Comparator<Object> expectedComparator = mock(Comparator.class);
+        final TreeBag<Object> bag = new TreeBag<>(expectedComparator);
+
+        // Act: Retrieve the comparator from the bag.
+        final Comparator<? super Object> actualComparator = bag.comparator();
+
+        // Assert: The retrieved comparator should be the exact same instance
+        // as the one passed to the constructor.
+        assertSame("The returned comparator should be the same instance as the one provided at construction.",
+                expectedComparator, actualComparator);
     }
 }
