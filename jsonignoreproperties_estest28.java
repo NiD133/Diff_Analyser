@@ -2,29 +2,41 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest28 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class, focusing on its
+ * immutability and "wither" methods.
+ */
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
-        Set<String> set0 = jsonIgnoreProperties_Value0.findIgnoredForSerialization();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withAllowGetters();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_Value1.withIgnored(set0);
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value2.getMerge());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertFalse(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value0));
-        assertFalse(jsonIgnoreProperties_Value2.getAllowSetters());
+    /**
+     * Tests that the {@code withAllowGetters()} method creates a new, distinct
+     * {@link JsonIgnoreProperties.Value} instance with the {@code allowGetters}
+     * property set to true, while preserving all other properties from the original instance.
+     * This also verifies the immutability of the {@code Value} objects.
+     */
+    @Test
+    public void withAllowGettersShouldCreateNewInstanceWithGettersAllowedAndPreserveOtherProperties() {
+        // Arrange: Create an initial Value instance with ignoreUnknown=true
+        // and default values for other properties (e.g., allowGetters=false).
+        JsonIgnoreProperties.Value originalValue = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
+
+        // Act: Create a new Value instance by calling the wither method.
+        JsonIgnoreProperties.Value updatedValue = originalValue.withAllowGetters();
+
+        // Assert: Verify the properties of both the original and the new instance.
+
+        // 1. The original instance should be immutable and remain unchanged.
+        assertFalse("Original value's allowGetters should remain false", originalValue.getAllowGetters());
+        assertTrue("Original value's ignoreUnknown should remain true", originalValue.getIgnoreUnknown());
+
+        // 2. The new instance should reflect the change and preserve other properties.
+        assertTrue("Updated value's allowGetters should now be true", updatedValue.getAllowGetters());
+        assertTrue("Updated value should preserve the ignoreUnknown property", updatedValue.getIgnoreUnknown());
+        assertTrue("Updated value should preserve the default merge property", updatedValue.getMerge());
+        assertFalse("Updated value should preserve the default allowSetters property", updatedValue.getAllowSetters());
+
+        // 3. The two instances should be distinct and not equal.
+        assertNotEquals("The new instance should not be equal to the original", originalValue, updatedValue);
     }
 }
