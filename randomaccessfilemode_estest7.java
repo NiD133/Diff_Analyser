@@ -1,31 +1,32 @@
 package org.apache.commons.io;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileMode_ESTestTest7 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode#implies(RandomAccessFileMode)} method.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-        RandomAccessFileMode randomAccessFileMode1 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-        boolean boolean0 = randomAccessFileMode1.implies(randomAccessFileMode0);
-        assertFalse(boolean0);
+    /**
+     * Tests that a mode with a lower access level does not imply a mode with a
+     * higher access level.
+     *
+     * The access hierarchy is:
+     * READ_ONLY < READ_WRITE < READ_WRITE_SYNC_CONTENT < READ_WRITE_SYNC_ALL
+     */
+    @Test
+    public void testImpliesReturnsFalseWhenLowerAccessModeChecksAgainstHigherAccessMode() {
+        // Arrange
+        // READ_WRITE_SYNC_CONTENT has a lower access level than READ_WRITE_SYNC_ALL.
+        RandomAccessFileMode lowerAccessMode = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+        RandomAccessFileMode higherAccessMode = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
+
+        // Act
+        // Check if the lower access mode (SYNC_CONTENT) implies the higher one (SYNC_ALL).
+        boolean result = lowerAccessMode.implies(higherAccessMode);
+
+        // Assert
+        assertFalse("A mode with fewer permissions should not imply a mode with more permissions.", result);
     }
 }
