@@ -1,26 +1,36 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest12 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for the {@link ProxyReader} class.
+ * This test suite focuses on the delegation behavior of ProxyReader methods.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "");
-        int int0 = taggedReader0.read(charBuffer0);
-        assertEquals(0, int0);
+    /**
+     * Tests that calling read(CharBuffer) with an empty buffer returns 0,
+     * as specified by the java.io.Reader contract. The ProxyReader should
+     * correctly delegate this call.
+     */
+    @Test
+    public void readWithEmptyCharBufferShouldReturnZero() throws IOException {
+        // Arrange: Create a proxy reader and an empty destination buffer.
+        // A TaggedReader is used here as a concrete implementation of the abstract ProxyReader.
+        final Reader underlyingReader = new StringReader("some data");
+        final ProxyReader proxyReader = new TaggedReader(underlyingReader);
+        final CharBuffer emptyBuffer = CharBuffer.wrap("");
+
+        // Act: Attempt to read from the reader into the empty buffer.
+        final int charsRead = proxyReader.read(emptyBuffer);
+
+        // Assert: Verify that zero characters were read.
+        assertEquals("Reading into an empty buffer should return 0 characters", 0, charsRead);
     }
 }
