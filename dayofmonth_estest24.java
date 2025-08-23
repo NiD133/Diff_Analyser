@@ -1,44 +1,42 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-public class DayOfMonth_ESTestTest24 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for the isSupported() method in the DayOfMonth class.
+ */
+public class DayOfMonthImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        ChronoField chronoField0 = ChronoField.DAY_OF_MONTH;
-        dayOfMonth0.isSupported(chronoField0);
-        assertEquals(14, dayOfMonth0.getValue());
+    /**
+     * Tests that isSupported() correctly identifies DAY_OF_MONTH as a supported field.
+     */
+    @Test
+    public void isSupported_shouldReturnTrueForDayOfMonthField() {
+        // Arrange: Create an instance of DayOfMonth. The specific value doesn't matter.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+
+        // Act: Check if the DAY_OF_MONTH field is supported.
+        boolean isSupported = dayOfMonth.isSupported(ChronoField.DAY_OF_MONTH);
+
+        // Assert: The field should be supported.
+        assertTrue("DayOfMonth should support the DAY_OF_MONTH field.", isSupported);
+    }
+
+    /**
+     * Tests that isSupported() correctly identifies an unsupported field like MONTH_OF_YEAR.
+     */
+    @Test
+    public void isSupported_shouldReturnFalseForUnsupportedField() {
+        // Arrange: Create an instance of DayOfMonth.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+
+        // Act: Check if an unsupported field, like MONTH_OF_YEAR, is supported.
+        boolean isSupported = dayOfMonth.isSupported(ChronoField.MONTH_OF_YEAR);
+
+        // Assert: The field should not be supported.
+        assertFalse("DayOfMonth should not support the MONTH_OF_YEAR field.", isSupported);
     }
 }
