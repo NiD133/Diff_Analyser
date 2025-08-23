@@ -1,34 +1,43 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest18 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link GzipCompressorOutputStream}.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        File file0 = MockFile.createTempFile("?AT", "");
-        MockPrintStream mockPrintStream0 = new MockPrintStream(file0);
-        GzipParameters gzipParameters0 = new GzipParameters();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(mockPrintStream0, gzipParameters0);
-        byte[] byteArray0 = new byte[6];
-        gzipCompressorOutputStream0.write(byteArray0, 1188, (int) (byte) 0);
-        assertEquals(10L, file0.length());
+    /**
+     * Tests that calling write() with a length of zero is a no-op.
+     * The GZIP header is written upon stream creation, and a zero-length write
+     * should not add any more data to the stream.
+     */
+    @Test
+    public void writeWithZeroLengthDoesNotWriteAnyData() throws IOException {
+        // Arrange
+        // The GZIP header is 10 bytes long (ID1, ID2, CM, FLG, MTIME, XFL, OS).
+        final int GZIP_HEADER_SIZE = 10;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        // The GzipCompressorOutputStream writes the header to the underlying stream upon instantiation.
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(byteArrayOutputStream);
+
+        byte[] buffer = new byte[8]; // A dummy buffer for the write operation.
+        int offset = 0;
+        int lengthToWrite = 0; // The key aspect of this test: writing zero bytes.
+
+        // Act
+        // This call should not write any bytes from the buffer.
+        gzipOutputStream.write(buffer, offset, lengthToWrite);
+
+        // Assert
+        // We verify that the only data in the stream is the 10-byte header written by the constructor.
+        // We do not close the stream, as that would write the GZIP trailer.
+        assertEquals("The stream should only contain the 10-byte GZIP header.",
+                     GZIP_HEADER_SIZE, byteArrayOutputStream.size());
     }
 }
