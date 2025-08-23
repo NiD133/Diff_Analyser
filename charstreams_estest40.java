@@ -1,47 +1,36 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest40 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        CharBuffer charBuffer0 = CharStreams.createBuffer();
-        StringReader stringReader0 = new StringReader("");
-        Writer writer0 = CharStreams.asWriter(charBuffer0);
-        long long0 = CharStreams.copy(stringReader0, writer0);
-        assertEquals(0L, long0);
-        assertEquals(2048, charBuffer0.remaining());
+    @Test
+    public void copy_fromEmptyReaderToWriter_returnsZeroAndLeavesWriterUnchanged() throws IOException {
+        // Arrange: Create an empty source reader and a destination writer backed by a CharBuffer.
+        StringReader emptyReader = new StringReader("");
+        CharBuffer destinationBuffer = CharStreams.createBuffer();
+        Writer bufferWriter = CharStreams.asWriter(destinationBuffer);
+
+        // Capture the buffer's state before the operation.
+        int initialRemainingCapacity = destinationBuffer.remaining();
+
+        // Act: Attempt to copy characters from the empty reader to the writer.
+        long charsCopied = CharStreams.copy(emptyReader, bufferWriter);
+
+        // Assert: Verify that no characters were copied and the buffer remains untouched.
+        assertEquals("The number of characters copied should be 0 for an empty source.", 0L, charsCopied);
+        assertEquals(
+            "The destination buffer's capacity should be unchanged.",
+            initialRemainingCapacity,
+            destinationBuffer.remaining());
     }
 }
