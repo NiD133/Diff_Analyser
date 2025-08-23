@@ -1,36 +1,37 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest158 extends Elements_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test157() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("Tm", "Tm");
-        Elements elements0 = document0.getAllElements();
-        List<TextNode> list0 = elements0.textNodes();
-        assertFalse(list0.isEmpty());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Tests for the {@link Elements#textNodes()} method.
+ */
+public class ElementsTextNodesTest {
+
+    /**
+     * Verifies that textNodes() correctly finds and returns the direct child TextNodes
+     * from a collection of elements.
+     */
+    @Test
+    public void textNodesReturnsDirectChildTextNodes() {
+        // Arrange: Create a document where the <body> element contains a direct text node.
+        // The parsed structure will be: <html><head></head><body>Tm</body></html>
+        Document doc = Parser.parseBodyFragment("Tm", "");
+        Elements allElements = doc.getAllElements(); // This will include <html>, <head>, and <body>
+
+        // Act: Call the method under test to find all direct child text nodes.
+        List<TextNode> foundTextNodes = allElements.textNodes();
+
+        // Assert: The method should find the single text node within the <body> element.
+        assertFalse("The list of text nodes should not be empty.", foundTextNodes.isEmpty());
+        assertEquals("Should find exactly one text node.", 1, foundTextNodes.size());
+        assertEquals("The text content of the found node should match.", "Tm", foundTextNodes.get(0).text());
     }
 }
