@@ -1,46 +1,68 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest36 extends CollectionBag_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        Integer integer0 = new Integer(1);
-        HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) collectionBag0);
-        hashBag0.add(integer0);
-        collectionBag0.addAll(hashBag0);
-        boolean boolean0 = collectionBag0.retainAll(treeBag0);
-        assertTrue(collectionBag0.contains(1));
-        assertFalse(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for the {@link CollectionBag#retainAll(java.util.Collection)} method.
+ */
+public class CollectionBagRetainAllTest {
+
+    /**
+     * Tests that retainAll() returns false and does not modify the bag
+     * when the collection to be retained contains all elements of the bag.
+     */
+    @Test
+    public void retainAllShouldReturnFalseWhenNoElementsAreRemoved() {
+        // Arrange
+        final Bag<String> decoratedBag = new HashBag<>();
+        final CollectionBag<String> collectionBag = new CollectionBag<>(decoratedBag);
+        collectionBag.add("A");
+
+        // The collection to retain contains the same element as the bag.
+        final Bag<String> elementsToRetain = new HashBag<>();
+        elementsToRetain.add("A");
+
+        // Act
+        // retainAll should not modify the bag, as all its elements are in 'elementsToRetain'.
+        final boolean wasModified = collectionBag.retainAll(elementsToRetain);
+
+        // Assert
+        assertFalse("retainAll should return false as the bag was not modified", wasModified);
+        assertEquals("The bag size should remain unchanged", 1, collectionBag.size());
+        assertTrue("The bag should still contain the element 'A'", collectionBag.contains("A"));
+    }
+
+    /**
+     * Tests that retainAll() returns true and correctly removes elements
+     * that are not present in the given collection.
+     */
+    @Test
+    public void retainAllShouldReturnTrueWhenElementsAreRemoved() {
+        // Arrange
+        final Bag<String> decoratedBag = new HashBag<>();
+        final CollectionBag<String> collectionBag = new CollectionBag<>(decoratedBag);
+        collectionBag.add("A");
+        collectionBag.add("B");
+
+        // The collection to retain contains only one of the bag's elements.
+        final Bag<String> elementsToRetain = new HashBag<>();
+        elementsToRetain.add("B");
+
+        // Act
+        // retainAll should remove "A" from the bag.
+        final boolean wasModified = collectionBag.retainAll(elementsToRetain);
+
+        // Assert
+        assertTrue("retainAll should return true as the bag was modified", wasModified);
+        assertEquals("The bag size should be reduced to 1", 1, collectionBag.size());
+        assertFalse("The bag should no longer contain 'A'", collectionBag.contains("A"));
+        assertTrue("The bag should still contain 'B'", collectionBag.contains("B"));
     }
 }
