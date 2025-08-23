@@ -1,28 +1,36 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the LookupTranslator.
+ * This particular test focuses on its behavior with invalid input indices.
+ */
+// The original test class name is preserved for context.
 public class LookupTranslator_ESTestTest5 extends LookupTranslator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        CharSequence[][] charSequenceArray0 = new CharSequence[0][3];
-        LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-        StringWriter stringWriter0 = new StringWriter();
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        // Undeclared exception!
-        try {
-            lookupTranslator0.translate((CharSequence) stringBuffer0, 2955, (Writer) stringWriter0);
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the translate method throws a StringIndexOutOfBoundsException
+     * when the provided index is outside the bounds of the input CharSequence.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class)
+    public void translateShouldThrowExceptionForOutOfBoundsIndex() throws IOException {
+        // Arrange: Create a translator with an empty lookup table.
+        // The content of the lookup table is irrelevant for this boundary check.
+        final CharSequence[][] emptyLookupTable = new CharSequence[0][0];
+        final LookupTranslator translator = new LookupTranslator(emptyLookupTable);
+
+        final CharSequence emptyInput = "";
+        final Writer writer = new StringWriter();
+        // Any index >= 0 is out of bounds for an empty string. We use 1 for clarity.
+        final int outOfBoundsIndex = 1;
+
+        // Act: Attempt to translate at an index that does not exist in the input.
+        // The @Test(expected=...) annotation handles the assertion.
+        translator.translate(emptyInput, outOfBoundsIndex, writer);
     }
 }
