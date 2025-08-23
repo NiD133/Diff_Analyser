@@ -1,38 +1,34 @@
 package org.jfree.data.general;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class DefaultPieDataset_ESTestTest22 extends DefaultPieDataset_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = null;
+/**
+ * Tests for the constructor of the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDatasetConstructorTest {
+
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when the
+     * source KeyedValues object is null. The public contract of the constructor
+     * is to not accept a null source.
+     */
+    @Test
+    public void constructorWithNullSourceShouldThrowIllegalArgumentException() {
+        // Arrange: Define a null source for the dataset.
+        KeyedValues<String> nullSource = null;
+        String expectedMessage = "Null 'source' argument.";
+
+        // Act & Assert: Attempt to create the dataset and verify the exception.
         try {
-            defaultPieDataset0 = new DefaultPieDataset<Integer>((KeyedValues<Integer>) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new DefaultPieDataset<>(nullSource);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'source' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Assert that the exception message is correct.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
