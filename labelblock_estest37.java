@@ -1,39 +1,38 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+
+/**
+ * This is an improved version of an auto-generated test for the LabelBlock class.
+ * The original class name is preserved for context.
+ */
 public class LabelBlock_ESTestTest37 extends LabelBlock_ESTest_scaffolding {
 
+    /**
+     * Verifies that the draw() method executes without errors when the label text is empty.
+     * An empty label should be handled gracefully, and the call should not have any
+     * unexpected side effects, such as altering the block's default properties.
+     */
     @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        Graphics2D graphics2D0 = mock(Graphics2D.class, new ViolatedAssumptionAnswer());
-        Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
-        labelBlock0.draw(graphics2D0, (Rectangle2D) rectangle2D_Float0);
-        assertNull(labelBlock0.getID());
+    public void drawWithEmptyLabelShouldCompleteSuccessfully() {
+        // Arrange: Create a LabelBlock with an empty string, a mock Graphics2D context,
+        // and a drawing area.
+        LabelBlock labelBlock = new LabelBlock("");
+        Graphics2D mockGraphics = mock(Graphics2D.class);
+        Rectangle2D drawArea = new Rectangle2D.Float();
+
+        // Act: Call the draw method. The primary goal is to ensure this operation
+        // completes without throwing an exception.
+        labelBlock.draw(mockGraphics, drawArea);
+
+        // Assert: Confirm that no unexpected side effects occurred. The ID, which is
+        // null by default, should remain null.
+        assertNull("The block ID should remain null after drawing.", labelBlock.getID());
     }
 }
