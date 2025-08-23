@@ -1,30 +1,37 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class RFC1522Codec_ESTestTest14 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BCodec} class, a concrete implementation of {@link RFC1522Codec}.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        try {
-            bCodec0.decodeText("=?UTF-8?Q?Q?=?=");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // This codec cannot decode Q encoded content
-            //
-            verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that attempting to decode a 'Q' (Quoted-Printable) encoded string
+     * with a BCodec (which handles 'B' or Base64 encoding) results in a
+     * DecoderException. The codec should reject strings with a mismatched
+     * encoding identifier.
+     */
+    @Test
+    public void bCodecShouldThrowExceptionWhenDecodingMismatchedQEncoding() throws Exception {
+        // Arrange
+        final BCodec bCodec = new BCodec();
+        // An RFC 1522 encoded-word with 'Q' encoding, which BCodec does not support.
+        // Format: =?charset?encoding?encoded-text?=
+        final String qEncodedText = "=?UTF-8?Q?Q?=";
+
+        // Assert: Configure the expected exception and its message
+        thrown.expect(DecoderException.class);
+        thrown.expectMessage("This codec cannot decode Q encoded content");
+
+        // Act: This call is expected to throw the configured exception
+        bCodec.decodeText(qEncodedText);
     }
 }
