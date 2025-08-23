@@ -1,49 +1,41 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import java.time.temporal.ChronoPeriod;
+import static org.junit.Assert.assertEquals;
 
-public class BritishCutoverChronology_ESTestTest39 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link BritishCutoverChronology}.
+ * This class demonstrates an improved version of a formerly unclear, auto-generated test.
+ */
+public class BritishCutoverChronology_ESTestTest39 {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
-        ChronoPeriod chronoPeriod0 = britishCutoverChronology0.INSTANCE.period(371, 371, 371);
-        BritishCutoverDate britishCutoverDate0 = BritishCutoverDate.ofEpochDay(371);
-        BritishCutoverDate britishCutoverDate1 = britishCutoverDate0.minus((TemporalAmount) chronoPeriod0);
-        assertFalse(britishCutoverDate1.equals((Object) britishCutoverDate0));
+    /**
+     * Tests that subtracting a ChronoPeriod from a BritishCutoverDate produces the correct result.
+     */
+    @Test
+    public void minus_whenSubtractingChronoPeriod_thenReturnsCorrectDate() {
+        // Arrange
+        // The original test used obscure numbers (e.g., epoch day 371) and a very large,
+        // arbitrary period (371 years, 371 months, 371 days). This made the test's
+        // purpose and correctness difficult to verify.
+        // This version uses clear, human-readable dates and a simple period.
+        BritishCutoverDate initialDate = BritishCutoverDate.of(1971, 1, 6);
+        ChronoPeriod periodToSubtract = BritishCutoverChronology.INSTANCE.period(1, 2, 3); // P1Y2M3D
+
+        // Calculate the expected result for clarity and correctness.
+        // 1971-01-06 minus 1 year   -> 1970-01-06
+        // 1970-01-06 minus 2 months -> 1969-11-06
+        // 1969-11-06 minus 3 days   -> 1969-11-03
+        BritishCutoverDate expectedDate = BritishCutoverDate.of(1969, 11, 3);
+
+        // Act
+        BritishCutoverDate actualDate = initialDate.minus(periodToSubtract);
+
+        // Assert
+        // The original test only checked that the result was different from the input,
+        // which is a weak assertion. This improved test verifies that the subtraction
+        // yields the correct date, making the test more robust and valuable.
+        assertEquals(expectedDate, actualDate);
     }
 }
