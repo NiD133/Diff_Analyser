@@ -1,34 +1,57 @@
 package org.apache.ibatis.type;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class EnumOrdinalTypeHandler_ESTestTest7 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn((-1824)).when(callableStatement0).getInt(anyInt());
-        // Undeclared exception!
-        try {
-            enumOrdinalTypeHandler0.getNullableResult(callableStatement0, (-1824));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Cannot convert -1824 to JdbcType by ordinal value.
-            //
-            verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
-        }
+/**
+ * Test suite for {@link EnumOrdinalTypeHandler}.
+ */
+public class EnumOrdinalTypeHandlerTest {
+
+    // Rule to enable Mockito annotations and simplify mock creation.
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    // Rule for testing exceptions in a declarative way.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Mock
+    private CallableStatement mockCallableStatement;
+
+    private EnumOrdinalTypeHandler<JdbcType> typeHandler;
+
+    @Before
+    public void setUp() {
+        // Initialize the handler for the JdbcType enum before each test.
+        typeHandler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+    }
+
+    @Test
+    public void getNullableResult_ShouldThrowIllegalArgumentException_WhenOrdinalIsInvalid() throws SQLException {
+        // Arrange
+        final int invalidOrdinal = -1; // An ordinal can never be negative.
+        final int anyColumnIndex = 1;
+        
+        // Configure the mock to return an invalid ordinal from the database.
+        when(mockCallableStatement.getInt(anyColumnIndex)).thenReturn(invalidOrdinal);
+
+        // Assert: Expect an exception with a specific message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot convert -1 to JdbcType by ordinal value.");
+
+        // Act: Attempt to get the result with the invalid ordinal.
+        typeHandler.getNullableResult(mockCallableStatement, anyColumnIndex);
     }
 }
