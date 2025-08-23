@@ -1,20 +1,36 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest41 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder();
-        StringBuilder stringBuilder1 = stringBuilder0.appendCodePoint(65536);
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuilder1, 65536, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that {@link CharSequenceUtils#lastIndexOf(CharSequence, int, int)}
+     * correctly finds a supplementary character (a character represented by a surrogate pair)
+     * when it is at the beginning of the CharSequence and the search also starts there.
+     */
+    @Test
+    public void testLastIndexOfWithSupplementaryCharacterFoundAtStart() {
+        // Arrange
+        // A supplementary character is a Unicode character outside the Basic Multilingual Plane (BMP),
+        // with a code point > 0xFFFF. U+10000 is the first such character.
+        // In Java, it's represented by a surrogate pair of two 'char's.
+        final int supplementaryCodePoint = 0x10000; // 65536
+        final CharSequence textWithSupplementaryChar = new StringBuilder().appendCodePoint(supplementaryCodePoint);
+
+        final int startIndex = 0;
+        final int expectedIndex = 0;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(textWithSupplementaryChar, supplementaryCodePoint, startIndex);
+
+        // Assert
+        assertEquals("The supplementary character should be found at index 0.",
+                expectedIndex, actualIndex);
     }
 }
