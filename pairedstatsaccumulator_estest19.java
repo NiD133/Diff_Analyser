@@ -1,22 +1,38 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest19 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add((-1.0), (-1.0));
-        pairedStatsAccumulator0.add((-1313.1264), 1.0);
-        double double0 = pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-        assertEquals((-1.0), double0, 0.01);
+    private static final double TOLERANCE = 1e-9;
+
+    /**
+     * Tests that the Pearson's correlation coefficient is -1.0 for a dataset
+     * with a perfect negative linear relationship.
+     */
+    @Test
+    public void pearsonsCorrelationCoefficient_forPerfectNegativeCorrelation_returnsNegativeOne() {
+        // Arrange: Create an accumulator and add two data points that are perfectly
+        // negatively correlated. Any two distinct points forming a line with a
+        // negative slope will have a correlation of -1.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(1.0, 3.0); // Point 1
+        accumulator.add(2.0, 1.0); // Point 2: As x increases, y decreases.
+
+        // Act: Calculate the Pearson's correlation coefficient.
+        double correlation = accumulator.pearsonsCorrelationCoefficient();
+
+        // Assert: The result should be -1.0. A small tolerance is used to account
+        // for potential floating-point inaccuracies.
+        assertEquals(
+                "Pearson's correlation for perfectly negatively correlated data should be -1.0",
+                -1.0,
+                correlation,
+                TOLERANCE);
     }
 }
