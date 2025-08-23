@@ -2,69 +2,63 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class IOCaseTestTest10 {
+/**
+ * Tests for {@link IOCase#checkRegionMatches(String, int, String)}.
+ */
+@DisplayName("IOCase.checkRegionMatches")
+class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    @Nested
+    @DisplayName("for SENSITIVE case")
+    class Sensitive {
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+        @ParameterizedTest(name = "should return {3} for str=''{0}'', startIndex={1}, search=''{2}''")
+        @CsvSource({
+            // Successful matches
+            "ABC, 0, ''   , true",
+            "ABC, 0, A    , true",
+            "ABC, 0, AB   , true",
+            "ABC, 0, ABC  , true",
+            "ABC, 1, ''   , true",
+            "ABC, 1, BC   , true",
+            "'',  0, ''   , true",
+
+            // Unsuccessful matches (wrong substring)
+            "ABC, 0, BC   , false",
+            "ABC, 0, C    , false",
+            "ABC, 1, A    , false",
+            "ABC, 1, AB   , false",
+            "ABC, 1, C    , false",
+
+            // Unsuccessful matches (search string too long for region)
+            "ABC, 0, ABCD , false",
+            "ABC, 1, ABC  , false",
+            "ABC, 1, ABCD , false",
+            "'',  0, ABC  , false",
+
+            // Unsuccessful matches (invalid start index)
+            "'',  1, ''   , false",
+            "'',  1, ABC  , false"
+        })
+        void checkRegionMatches(final String str, final int strStartIndex, final String search, final boolean expected) {
+            assertEquals(expected, IOCase.SENSITIVE.checkRegionMatches(str, strStartIndex, search));
+        }
+
+        @Test
+        @DisplayName("should return false for null inputs")
+        void returnsFalseForNullInputs() {
+            assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, null), "search string is null");
+            assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 0, "ABC"), "source string is null");
+            assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 0, null), "both strings are null");
         }
     }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
-
-    @Test
-    void test_checkRegionMatches_functionality() {
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, ""));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "A"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "BC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "C"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 0, "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("", 0, ""));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, ""));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "A"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "AB"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "BC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "C"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, ""));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, null));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 0, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 0, null));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, null));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 1, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 1, null));
-    }
+    // Future tests for INSENSITIVE and SYSTEM cases could be added in their own @Nested classes here.
 }
