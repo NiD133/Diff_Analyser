@@ -1,34 +1,24 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class TaiInstant_ESTestTest37 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test class for {@link TaiInstant}.
+ * This class focuses on specific behaviors of the TaiInstant methods.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        // Undeclared exception!
-        try {
-            taiInstant0.isBefore((TaiInstant) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.scale.TaiInstant", e);
-        }
+    /**
+     * Tests that the isBefore() method correctly throws a NullPointerException
+     * when a null argument is provided, as specified by its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isBefore_whenArgumentIsNull_throwsNullPointerException() {
+        // Arrange: Create an arbitrary instance of TaiInstant to test against.
+        TaiInstant testInstant = TaiInstant.ofTaiSeconds(0L, 0L);
+
+        // Act: Call the isBefore() method with a null argument.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        testInstant.isBefore(null);
     }
 }
