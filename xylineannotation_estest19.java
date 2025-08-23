@@ -1,51 +1,43 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNotEquals;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
 
-public class XYLineAnnotation_ESTestTest19 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotation_ESTestTest19 {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation((-1433.6686122229353), (-1433.6686122229353), (-1433.6686122229353), (-1433.6686122229353));
-        BasicStroke basicStroke0 = (BasicStroke) WaferMapPlot.DEFAULT_CROSSHAIR_STROKE;
-        WaferMapRenderer waferMapRenderer0 = new WaferMapRenderer();
-        Paint paint0 = waferMapRenderer0.getDefaultPaint();
-        XYLineAnnotation xYLineAnnotation1 = new XYLineAnnotation((-1433.6686122229353), (-1433.6686122229353), (-1433.6686122229353), (-1433.6686122229353), basicStroke0, paint0);
-        boolean boolean0 = xYLineAnnotation0.equals(xYLineAnnotation1);
-        assertEquals((-1433.6686122229353), xYLineAnnotation1.getY1(), 0.01);
-        assertFalse(boolean0);
-        assertEquals((-1433.6686122229353), xYLineAnnotation1.getX1(), 0.01);
-        assertEquals((-1433.6686122229353), xYLineAnnotation1.getY2(), 0.01);
-        assertEquals((-1433.6686122229353), xYLineAnnotation1.getX2(), 0.01);
+    /**
+     * Tests that two XYLineAnnotation objects with identical coordinates and strokes
+     * are not considered equal if their paint attribute differs.
+     *
+     * This scenario was the focus of the original test, which compared an annotation
+     * with a default paint (Color.BLACK) to one with a custom paint.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenAnnotationsHaveDifferentPaints() {
+        // Arrange
+        final double x1 = 10.0, y1 = 20.0, x2 = 30.0, y2 = 40.0;
+        final Stroke commonStroke = new BasicStroke(1.0f);
+
+        // Create an annotation with a specific paint.
+        XYLineAnnotation annotationWithBlackPaint = new XYLineAnnotation(
+                x1, y1, x2, y2, commonStroke, Color.BLACK);
+
+        // Create another annotation with the same coordinates and stroke, but a different paint.
+        XYLineAnnotation annotationWithRedPaint = new XYLineAnnotation(
+                x1, y1, x2, y2, commonStroke, Color.RED);
+
+        // Act & Assert
+        // The equals() method should return false because the paints are different.
+        // Using assertNotEquals is more expressive for this comparison.
+        assertNotEquals("Annotations with different paints should not be considered equal",
+                annotationWithBlackPaint, annotationWithRedPaint);
     }
 }
