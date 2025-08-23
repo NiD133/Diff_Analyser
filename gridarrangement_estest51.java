@@ -1,39 +1,27 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest51 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Tests for the {@link GridArrangement} class, focusing on exception handling.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement((-653), (-653));
-        assertNotNull(gridArrangement0);
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrangeNN((BlockContainer) null, (Graphics2D) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.block.GridArrangement", e);
-        }
+    /**
+     * Verifies that the arrangeNN() method throws a NullPointerException when the
+     * container argument is null. This is expected behavior as the method
+     * requires a valid container to perform its calculations.
+     */
+    @Test(expected = NullPointerException.class)
+    public void arrangeNNShouldThrowNullPointerExceptionForNullContainer() {
+        // Arrange: Create a standard 1x1 grid arrangement. The dimensions are
+        // not relevant for this test, as the null check should happen before
+        // they are used.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+
+        // Act & Assert: Call arrangeNN with a null container.
+        // This is expected to throw a NullPointerException.
+        // The Graphics2D context can also be null for this test case.
+        arrangement.arrangeNN(null, null);
     }
 }
