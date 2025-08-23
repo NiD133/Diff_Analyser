@@ -1,17 +1,31 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest7 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        String string0 = NumberOutput.toString((-2147483648L));
-        assertEquals("-2147483648", string0);
+    /**
+     * Tests that {@link NumberOutput#toString(long)} correctly converts the long value
+     * that corresponds to {@link Integer#MIN_VALUE}.
+     *
+     * This is an important edge case, as the implementation may have an optimized
+     * code path for long values that fit within the integer range.
+     */
+    @Test
+    public void shouldConvertIntegerMinValueAsLongToString() {
+        // Arrange: Define the input and the expected outcome clearly.
+        // Using the Integer.MIN_VALUE constant makes the test's intent explicit.
+        long intMinValueAsLong = Integer.MIN_VALUE;
+        String expectedResult = String.valueOf(Integer.MIN_VALUE);
+
+        // Act: Call the method under test.
+        String actualResult = NumberOutput.toString(intMinValueAsLong);
+
+        // Assert: Verify that the actual result matches the expected result.
+        assertEquals(expectedResult, actualResult);
     }
 }
