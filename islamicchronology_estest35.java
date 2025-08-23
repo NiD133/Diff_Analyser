@@ -1,22 +1,27 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IslamicChronology_ESTestTest35 extends IslamicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        Chronology chronology0 = islamicChronology0.withUTC();
-        assertSame(islamicChronology0, chronology0);
+/**
+ * Unit tests for {@link IslamicChronology}.
+ */
+public class IslamicChronologyTest {
+
+    @Test
+    public void withUTC_onAlreadyUtcInstance_returnsSameInstance() {
+        // Arrange: Obtain the canonical UTC instance of IslamicChronology.
+        // This is the specific instance that the withUTC() method is documented to return.
+        IslamicChronology utcChronology = IslamicChronology.getInstanceUTC();
+
+        // Act: Call the withUTC() method on the instance that is already in UTC.
+        Chronology result = utcChronology.withUTC();
+
+        // Assert: The method should return the exact same instance, confirming
+        // the optimization that avoids creating a new object.
+        assertSame("Calling withUTC() on a UTC-based chronology should return the same instance.",
+                   utcChronology, result);
     }
 }
