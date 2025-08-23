@@ -1,61 +1,36 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest77 extends CompositeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test76() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        Integer integer0 = new Integer(3205);
-        linkedHashSet0.add(integer0);
-        LinkedHashSet<Integer> linkedHashSet1 = new LinkedHashSet<Integer>();
-        linkedHashSet0.add((Integer) null);
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        compositeSet0.hashCode();
-        Set<Integer> set0 = compositeSet0.toSet();
-        assertTrue(set0.contains(3205));
+/**
+ * Unit tests for {@link CompositeSet}.
+ */
+public class CompositeSetTest {
+
+    /**
+     * Tests that toSet() returns a new Set containing all elements from the
+     * single underlying set, including null.
+     */
+    @Test
+    public void toSetShouldReturnSetWithAllElementsFromSingleCompositedSet() {
+        // Arrange: Create a source set with a non-null and a null element.
+        Set<Integer> sourceSet = new HashSet<>();
+        sourceSet.add(3205);
+        sourceSet.add(null);
+
+        // Create a CompositeSet containing the single source set.
+        CompositeSet<Integer> compositeSet = new CompositeSet<>(sourceSet);
+
+        // Act: Convert the CompositeSet back to a standard Set.
+        Set<Integer> resultSet = compositeSet.toSet();
+
+        // Assert: The resulting set should be equal to the original source set.
+        // assertEquals for sets correctly compares size and content.
+        assertEquals(sourceSet, resultSet);
     }
 }
