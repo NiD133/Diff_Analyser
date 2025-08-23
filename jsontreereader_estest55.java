@@ -1,29 +1,31 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest55 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test054() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.skipValue();
-        JsonToken jsonToken0 = jsonTreeReader0.peek();
-        assertEquals(JsonToken.END_DOCUMENT, jsonToken0);
+    /**
+     * Verifies that calling skipValue() on a reader for an empty JSON array
+     * consumes the array and advances the reader to the end of the document.
+     */
+    @Test
+    public void skipValueOnEmptyArray_advancesToEndOfDocument() throws Exception {
+        // Arrange: Create a JsonTreeReader for an empty JSON array.
+        JsonArray emptyArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyArray);
+
+        // Act: Skip the entire root value (the empty array).
+        reader.skipValue();
+        JsonToken nextToken = reader.peek();
+
+        // Assert: The reader should now be at the end of the document.
+        assertEquals("After skipping the root element, the reader should be at the end of the document.",
+                JsonToken.END_DOCUMENT, nextToken);
     }
 }
