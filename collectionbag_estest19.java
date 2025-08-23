@@ -1,54 +1,54 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
 import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest19 extends CollectionBag_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        Integer integer0 = new Integer(977);
-        treeBag0.add(integer0);
-        UniquePredicate<Integer> uniquePredicate0 = new UniquePredicate<Integer>();
-        NullIsExceptionPredicate<Integer> nullIsExceptionPredicate0 = new NullIsExceptionPredicate<Integer>(uniquePredicate0);
-        PredicatedSortedBag<Integer> predicatedSortedBag0 = PredicatedSortedBag.predicatedSortedBag((SortedBag<Integer>) treeBag0, (Predicate<? super Integer>) nullIsExceptionPredicate0);
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(predicatedSortedBag0);
-        // Undeclared exception!
+/**
+ * Contains tests for {@link CollectionBag}.
+ * This test class has been improved for clarity and maintainability.
+ */
+public class CollectionBag_ESTestTest19 { // Retaining original class name for context
+
+    /**
+     * Tests that addAll() throws an IllegalArgumentException when the underlying
+     * decorated bag is a PredicatedBag and its predicate rejects an element.
+     * This scenario is triggered by trying to add an element that already exists
+     * to a bag decorated with a UniquePredicate.
+     */
+    @Test
+    public void addAllShouldThrowExceptionWhenDecoratedBagPredicateRejectsElement() {
+        // Arrange
+        // 1. Create a base bag and add an element to it.
+        final SortedBag<Integer> baseBag = new TreeBag<>();
+        final Integer element = 977;
+        baseBag.add(element);
+
+        // 2. Decorate the base bag with a predicate that only allows unique elements.
+        // The predicated bag now contains one element, and the predicate has seen it once.
+        final Predicate<Integer> uniquePredicate = new UniquePredicate<>();
+        final SortedBag<Integer> predicatedBag =
+                PredicatedSortedBag.predicatedSortedBag(baseBag, uniquePredicate);
+
+        // 3. The CollectionBag under test decorates the predicated bag.
+        final CollectionBag<Integer> collectionBag = new CollectionBag<>(predicatedBag);
+
+        // Act & Assert
         try {
-            collectionBag0.addAll(predicatedSortedBag0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Cannot add Object '977' - Predicate 'org.apache.commons.collections4.functors.NullIsExceptionPredicate@4' rejected it
-            //
-            verifyException("org.apache.commons.collections4.collection.PredicatedCollection", e);
+            // Attempt to add all elements from the predicatedBag back into itself.
+            // This will try to add the element '977' a second time.
+            // The UniquePredicate will return false, causing the PredicatedBag to throw an exception.
+            collectionBag.addAll(predicatedBag);
+            fail("Expected an IllegalArgumentException to be thrown because the predicate should reject the duplicate element.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message clearly indicates that a predicate rejected the element.
+            final String message = e.getMessage();
+            assertTrue("Exception message should mention the rejected object.", message.contains("Cannot add Object '977'"));
+            assertTrue("Exception message should indicate that a predicate was the cause.", message.contains("rejected it"));
         }
     }
 }
