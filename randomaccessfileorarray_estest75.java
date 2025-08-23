@@ -1,41 +1,28 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test verifies the behavior of the RandomAccessFileOrArray class after it has been closed.
+ */
 public class RandomAccessFileOrArray_ESTestTest75 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test074() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readLongLE();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray after it has been closed
+     * results in a NullPointerException. This is the expected behavior as closing the resource
+     * releases its internal data source.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void readLongLE_afterClose_throwsNullPointerException() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray with some data and then close it.
+        // The content of the data is irrelevant for this test. A long is 8 bytes, so we use an array of that size.
+        byte[] anyData = new byte[8];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(anyData);
+        fileOrArray.close();
+
+        // Act & Assert: Attempt to read from the closed object.
+        // The @Test(expected = NullPointerException.class) annotation handles the assertion.
+        fileOrArray.readLongLE();
     }
 }
