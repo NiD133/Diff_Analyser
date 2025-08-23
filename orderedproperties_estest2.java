@@ -1,52 +1,42 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest2 extends OrderedProperties_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        BiConsumer<Object, Object> biConsumer0 = (BiConsumer<Object, Object>) mock(BiConsumer.class, new ViolatedAssumptionAnswer());
-        orderedProperties0.forEach(biConsumer0);
-        assertTrue(orderedProperties0.isEmpty());
+/**
+ * Test suite for {@link OrderedProperties}.
+ * This class contains the test case from the original example.
+ */
+// The original class name "OrderedProperties_ESTestTest2" is kept as requested,
+// but in a real-world scenario, it would be renamed to "OrderedPropertiesTest".
+public class OrderedProperties_ESTestTest2 {
+
+    /**
+     * Tests that calling forEach on an empty OrderedProperties instance
+     * does not invoke the consumer.
+     */
+    @Test
+    public void forEachShouldDoNothingOnEmptyProperties() {
+        // Arrange
+        final OrderedProperties emptyProperties = new OrderedProperties();
+        @SuppressWarnings("unchecked") // Necessary for mocking a generic type
+        final BiConsumer<Object, Object> mockConsumer = mock(BiConsumer.class);
+
+        // Act
+        emptyProperties.forEach(mockConsumer);
+
+        // Assert
+        // Verify that the consumer's 'accept' method was never called.
+        verify(mockConsumer, never()).accept(any(), any());
+        
+        // Also, confirm the properties object remains unchanged.
+        assertTrue("The properties should remain empty after the forEach call", emptyProperties.isEmpty());
     }
 }
