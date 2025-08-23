@@ -1,45 +1,40 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MergedStream_ESTestTest35 extends MergedStream_ESTest_scaffolding {
+/**
+ * Unit tests for the MergedStream class, focusing on the available() method.
+ */
+public class MergedStreamTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        File file0 = MockFile.createTempFile("8`3ZeQ", "8`3ZeQ");
-        MockFileInputStream mockFileInputStream0 = new MockFileInputStream(file0);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, mockFileInputStream0, (byte[]) null, 50000, 0);
-        int int0 = mergedStream0.available();
-        assertEquals(0, int0);
+    /**
+     * Tests that the available() method correctly delegates to the underlying stream
+     * when the internal prepended buffer is null.
+     */
+    @Test
+    public void availableShouldDelegateToUnderlyingStreamWhenBufferIsNull() throws IOException {
+        // Arrange
+        // 1. Create an underlying input stream with a known number of available bytes.
+        byte[] streamData = new byte[]{10, 20, 30, 40, 50};
+        InputStream underlyingStream = new ByteArrayInputStream(streamData);
+
+        // 2. Create a MergedStream with a null buffer. This configuration should
+        //    force it to delegate calls to the underlying stream.
+        //    The IOContext is not used by the available() method, so we can pass null.
+        //    The start and end parameters for the buffer are also irrelevant here.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, null, 0, 0);
+
+        // Act
+        // Call the available() method on the MergedStream.
+        int availableBytes = mergedStream.available();
+
+        // Assert
+        // The result should match the number of bytes available from the underlying stream.
+        assertEquals("available() should return the count from the underlying stream when the internal buffer is null.",
+                streamData.length, availableBytes);
     }
 }
