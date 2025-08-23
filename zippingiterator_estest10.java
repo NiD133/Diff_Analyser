@@ -1,27 +1,33 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ZippingIterator_ESTestTest10 extends ZippingIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ZippingIterator}.
+ */
+public class ZippingIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Iterator<Integer> iterator0 = linkedList0.descendingIterator();
-        ZippingIterator<Integer> zippingIterator0 = new ZippingIterator<Integer>(iterator0, iterator0, iterator0);
-        boolean boolean0 = zippingIterator0.hasNext();
-        assertFalse(boolean0);
+    /**
+     * Tests that hasNext() returns false when the ZippingIterator is
+     * constructed with only empty iterators.
+     */
+    @Test
+    public void hasNextShouldReturnFalseWhenAllIteratorsAreEmpty() {
+        // Arrange: Create three empty iterators.
+        final Iterator<Integer> emptyIterator1 = Collections.emptyIterator();
+        final Iterator<Integer> emptyIterator2 = Collections.emptyIterator();
+        final Iterator<Integer> emptyIterator3 = Collections.emptyIterator();
+
+        // Act: Create a ZippingIterator with the empty iterators.
+        final ZippingIterator<Integer> zippingIterator = new ZippingIterator<>(
+            emptyIterator1, emptyIterator2, emptyIterator3);
+
+        // Assert: The ZippingIterator should report that it has no elements.
+        assertFalse("A ZippingIterator with only empty iterators should not have a next element",
+                    zippingIterator.hasNext());
     }
 }
