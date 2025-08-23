@@ -1,44 +1,30 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfGState;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TextRenderInfo_ESTestTest55 extends TextRenderInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = new Matrix(6, 10);
-        TextRenderInfo textRenderInfo0 = null;
-        try {
-            textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, (Collection<MarkedContentInfo>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+    /**
+     * Verifies that the TextRenderInfo constructor throws a NullPointerException
+     * when the collection of marked content information is null. The constructor
+     * internally attempts to create a new ArrayList from this collection, which is
+     * an illegal operation on a null reference.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNPEForNullMarkedContentInfo() {
+        // Arrange: Create the necessary non-null arguments for the constructor.
+        PdfString dummyString = new PdfString("test text");
+        GraphicsState dummyGraphicsState = new GraphicsState();
+        Matrix dummyMatrix = new Matrix();
+        Collection<MarkedContentInfo> nullMarkedContentCollection = null;
+
+        // Act: Call the constructor with a null collection, which is expected to fail.
+        // Assert: The @Test(expected) annotation handles the assertion that a
+        // NullPointerException is thrown.
+        new TextRenderInfo(dummyString, dummyGraphicsState, dummyMatrix, nullMarkedContentCollection);
     }
 }
