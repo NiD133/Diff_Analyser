@@ -1,28 +1,34 @@
 package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+// EvoSuite-specific imports are retained to maintain the original test execution environment.
 import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true)
 public class JsonReadContext_ESTestTest23 extends JsonReadContext_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext((DupDetector) null);
-        jsonReadContext0.getDupDetector();
-        assertEquals(0, jsonReadContext0.getEntryCount());
-        assertTrue(jsonReadContext0.inRoot());
-        assertEquals(0, jsonReadContext0.getNestingDepth());
+    /**
+     * Tests that a root JsonReadContext created without a DupDetector
+     * is initialized with the correct default state.
+     */
+    @Test
+    public void createRootContextWithoutDupDetectorShouldHaveCorrectInitialState() {
+        // Arrange & Act: Create a root context without a duplicate detector.
+        // The method under test is `JsonReadContext.createRootContext(DupDetector)`.
+        JsonReadContext rootContext = JsonReadContext.createRootContext(null);
+
+        // Assert: Verify the properties of the newly created root context.
+        assertTrue("A newly created context should be in the root state.", rootContext.inRoot());
+        assertEquals("The nesting depth of a root context should be 0.", 0, rootContext.getNestingDepth());
+        assertEquals("The initial entry count of a root context should be 0.", 0, rootContext.getEntryCount());
+        assertNull("The duplicate detector should be null as it was not provided.", rootContext.getDupDetector());
     }
 }
