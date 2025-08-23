@@ -12,147 +12,59 @@ import static java.time.Month.MAY;
 import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static java.time.Month.SEPTEMBER;
-import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_MONTH;
-import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR;
-import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_MONTH;
-import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_YEAR;
-import static java.time.temporal.ChronoField.AMPM_OF_DAY;
-import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_AMPM;
-import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.DAY_OF_WEEK;
-import static java.time.temporal.ChronoField.DAY_OF_YEAR;
-import static java.time.temporal.ChronoField.EPOCH_DAY;
-import static java.time.temporal.ChronoField.ERA;
-import static java.time.temporal.ChronoField.HOUR_OF_AMPM;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.INSTANT_SECONDS;
-import static java.time.temporal.ChronoField.MICRO_OF_DAY;
-import static java.time.temporal.ChronoField.MICRO_OF_SECOND;
-import static java.time.temporal.ChronoField.MILLI_OF_DAY;
-import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
-import static java.time.temporal.ChronoField.MINUTE_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.NANO_OF_DAY;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.OFFSET_SECONDS;
-import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
-import static java.time.temporal.ChronoField.SECOND_OF_DAY;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-import static java.time.temporal.ChronoField.YEAR;
-import static java.time.temporal.ChronoField.YEAR_OF_ERA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import java.time.Month;
 import java.time.MonthDay;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.chrono.IsoChronology;
-import java.time.chrono.JapaneseDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.IsoFields;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQueries;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.RetryingTest;
-import com.google.common.testing.EqualsTester;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class DayOfMonthTestTest38 {
+/**
+ * Tests for {@link DayOfMonth}.
+ */
+public class DayOfMonthTest {
 
-    private static final int MAX_LENGTH = 31;
+    /**
+     * Provides test cases for combining DayOfMonth(31) with each month.
+     *
+     * @return a stream of arguments, where each argument is an input Month
+     *         and the expected resulting MonthDay.
+     */
+    private static Stream<Arguments> provider_atMonthWithDay31() {
+        return Stream.of(
+                // For months with 31 days, the day is unchanged
+                arguments(JANUARY, MonthDay.of(JANUARY, 31)),
+                arguments(MARCH, MonthDay.of(MARCH, 31)),
+                arguments(MAY, MonthDay.of(MAY, 31)),
+                arguments(JULY, MonthDay.of(JULY, 31)),
+                arguments(AUGUST, MonthDay.of(AUGUST, 31)),
+                arguments(OCTOBER, MonthDay.of(OCTOBER, 31)),
+                arguments(DECEMBER, MonthDay.of(DECEMBER, 31)),
 
-    private static final DayOfMonth TEST = DayOfMonth.of(12);
+                // For months with 30 days, the day is adjusted down to 30
+                arguments(APRIL, MonthDay.of(APRIL, 30)),
+                arguments(JUNE, MonthDay.of(JUNE, 30)),
+                arguments(SEPTEMBER, MonthDay.of(SEPTEMBER, 30)),
+                arguments(NOVEMBER, MonthDay.of(NOVEMBER, 30)),
 
-    private static final ZoneId PARIS = ZoneId.of("Europe/Paris");
-
-    private static class TestingField implements TemporalField {
-
-        public static final TestingField INSTANCE = new TestingField();
-
-        @Override
-        public TemporalUnit getBaseUnit() {
-            return ChronoUnit.DAYS;
-        }
-
-        @Override
-        public TemporalUnit getRangeUnit() {
-            return ChronoUnit.MONTHS;
-        }
-
-        @Override
-        public ValueRange range() {
-            return ValueRange.of(1, 28, 31);
-        }
-
-        @Override
-        public boolean isDateBased() {
-            return true;
-        }
-
-        @Override
-        public boolean isTimeBased() {
-            return false;
-        }
-
-        @Override
-        public boolean isSupportedBy(TemporalAccessor temporal) {
-            return temporal.isSupported(DAY_OF_MONTH);
-        }
-
-        @Override
-        public ValueRange rangeRefinedBy(TemporalAccessor temporal) {
-            return range();
-        }
-
-        @Override
-        public long getFrom(TemporalAccessor temporal) {
-            return temporal.getLong(DAY_OF_MONTH);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <R extends Temporal> R adjustInto(R temporal, long newValue) {
-            return (R) temporal.with(DAY_OF_MONTH, newValue);
-        }
+                // For February, the day is adjusted down to 29 (its maximum possible day)
+                arguments(FEBRUARY, MonthDay.of(FEBRUARY, 29))
+        );
     }
 
-    //-----------------------------------------------------------------------
-    @Test
-    public void test_atMonth_Month_31() {
-        DayOfMonth test = DayOfMonth.of(31);
-        assertEquals(MonthDay.of(1, 31), test.atMonth(JANUARY));
-        assertEquals(MonthDay.of(2, 29), test.atMonth(FEBRUARY));
-        assertEquals(MonthDay.of(3, 31), test.atMonth(MARCH));
-        assertEquals(MonthDay.of(4, 30), test.atMonth(APRIL));
-        assertEquals(MonthDay.of(5, 31), test.atMonth(MAY));
-        assertEquals(MonthDay.of(6, 30), test.atMonth(JUNE));
-        assertEquals(MonthDay.of(7, 31), test.atMonth(JULY));
-        assertEquals(MonthDay.of(8, 31), test.atMonth(AUGUST));
-        assertEquals(MonthDay.of(9, 30), test.atMonth(SEPTEMBER));
-        assertEquals(MonthDay.of(10, 31), test.atMonth(OCTOBER));
-        assertEquals(MonthDay.of(11, 30), test.atMonth(NOVEMBER));
-        assertEquals(MonthDay.of(12, 31), test.atMonth(DECEMBER));
+    @ParameterizedTest
+    @MethodSource("provider_atMonthWithDay31")
+    public void atMonth_whenDayIs31_adjustsToLastDayOfShorterMonths(Month month, MonthDay expectedMonthDay) {
+        // Arrange
+        DayOfMonth day31 = DayOfMonth.of(31);
+
+        // Act
+        MonthDay actualMonthDay = day31.atMonth(month);
+
+        // Assert
+        assertEquals(expectedMonthDay, actualMonthDay);
     }
 }
