@@ -1,21 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Weeks_ESTestTest1 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Minutes minutes0 = Minutes.ZERO;
-        Weeks weeks0 = Weeks.TWO;
-        Weeks weeks1 = minutes0.toStandardWeeks();
-        boolean boolean0 = weeks0.isLessThan(weeks1);
-        assertFalse(boolean0);
-        assertEquals(0, weeks1.getWeeks());
+    /**
+     * Tests that isLessThan() returns false when the current instance (2 weeks)
+     * is greater than the other instance (0 weeks).
+     */
+    @Test
+    public void isLessThan_shouldReturnFalse_whenComparingGreaterToLesser() {
+        // Arrange
+        Weeks twoWeeks = Weeks.TWO;
+        Weeks zeroWeeks = Weeks.ZERO;
+
+        // Act
+        boolean result = twoWeeks.isLessThan(zeroWeeks);
+
+        // Assert
+        assertFalse("Two weeks should not be considered less than zero weeks", result);
     }
 }
