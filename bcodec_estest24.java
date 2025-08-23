@@ -1,22 +1,27 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class BCodec_ESTestTest24 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link BCodec}.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        boolean boolean0 = bCodec0.isStrictDecoding();
-        assertFalse(boolean0);
+    /**
+     * Tests that a BCodec created with the default constructor has lenient decoding
+     * enabled, meaning strict decoding is false.
+     */
+    @Test
+    public void isStrictDecodingShouldBeFalseForDefaultCodec() {
+        // Arrange: Create a BCodec instance using the default constructor.
+        // The default behavior is lenient decoding.
+        final BCodec codec = new BCodec();
+
+        // Act: Check if the codec is in strict decoding mode.
+        final boolean isStrict = codec.isStrictDecoding();
+
+        // Assert: The result should be false, as the default policy is lenient.
+        assertFalse("Default BCodec should use lenient, not strict, decoding.", isStrict);
     }
 }
