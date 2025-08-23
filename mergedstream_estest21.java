@@ -1,45 +1,50 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains the refactored test case.
+ * The original scaffolding class is extended to maintain structural consistency.
+ */
 public class MergedStream_ESTestTest21 extends MergedStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        Enumeration<FilterInputStream> enumeration0 = (Enumeration<FilterInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false, false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, sequenceInputStream0, (byte[]) null, 1, 999);
-        mergedStream0.close();
+    /**
+     * Verifies that calling close() on a MergedStream is safe
+     * even when its internal buffer is null. This prevents potential
+     * NullPointerExceptions during resource cleanup.
+     */
+    @Test
+    public void closeShouldSucceedEvenIfBufferIsNull() throws IOException {
+        // Arrange
+        // 1. Create a minimal, valid IOContext required by the MergedStream constructor.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        ContentReference contentReference = ContentReference.redacted();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                contentReference,
+                true);
+
+        // 2. Use an empty, non-null underlying stream.
+        InputStream emptyUnderlyingStream = new ByteArrayInputStream(new byte[0]);
+
+        // 3. Instantiate MergedStream with a null buffer. The start/end pointers are
+        //    irrelevant in this case but must be provided.
+        MergedStream mergedStream = new MergedStream(ioContext, emptyUnderlyingStream, null, 0, 0);
+
+        // Act & Assert
+        // The test's goal is to ensure that close() executes without throwing an exception.
+        // In JUnit 4, the absence of an exception indicates a passing test.
+        mergedStream.close();
     }
 }
