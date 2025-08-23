@@ -1,25 +1,21 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
+// The EvoSuite runner and scaffolding are kept to maintain the existing test execution environment.
+@RunWith(EvoRunner.class)
 public class SegmentUtils_ESTestTest6 extends SegmentUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        // Undeclared exception!
-        try {
-            SegmentUtils.countInvokeInterfaceArgs((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
+    /**
+     * Tests that countInvokeInterfaceArgs throws a NullPointerException when the
+     * method descriptor string is null.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void countInvokeInterfaceArgsShouldThrowNullPointerExceptionForNullDescriptor() {
+        // This call is expected to throw a NullPointerException, which is verified
+        // by the 'expected' attribute of the @Test annotation.
+        SegmentUtils.countInvokeInterfaceArgs(null);
     }
 }
