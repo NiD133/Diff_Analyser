@@ -1,34 +1,34 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest58 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter} focusing on illegal state transitions.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        jsonTreeWriter0.name("com.google.gson.internal.bind.TypeAdapters$9");
-        // Undeclared exception!
+    /**
+     * Verifies that calling endArray() is not allowed when the writer is expecting a
+     * property value within a JSON object.
+     */
+    @Test
+    public void endArray_whenWritingObjectProperty_throwsIllegalStateException() throws IOException {
+        // Arrange: Start writing an object and provide a name for a property.
+        // The writer is now in a state where it expects a value to be written.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginObject();
+        writer.name("property");
+
+        // Act & Assert: Attempting to end an array at this point is an invalid state transition
+        // and should throw an IllegalStateException.
         try {
-            jsonTreeWriter0.endArray();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+            writer.endArray();
+            fail("An IllegalStateException should have been thrown.");
+        } catch (IllegalStateException expected) {
+            // This is the expected outcome, so the test passes.
         }
     }
 }
