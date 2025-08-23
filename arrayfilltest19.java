@@ -1,19 +1,26 @@
 package org.apache.commons.lang3;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import org.apache.commons.lang3.function.FailableIntFunction;
+
 import org.junit.jupiter.api.Test;
 
-public class ArrayFillTestTest19 extends AbstractLangTest {
+/**
+ * Tests for {@link ArrayFill}.
+ * This test class focuses on the behavior of the fill methods with null inputs.
+ */
+class ArrayFillTest extends AbstractLangTest {
 
     @Test
-    void testFillShortArrayNull() {
-        final short[] array = null;
-        final short val = 1;
-        final short[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
+    void fillShouldReturnNullForNullShortArray() {
+        // Arrange
+        final short[] inputArray = null;
+        // The fill value is arbitrary but required by the method signature.
+        final short fillValue = 1;
+
+        // Act
+        final short[] result = ArrayFill.fill(inputArray, fillValue);
+
+        // Assert
+        assertNull(result, "Calling fill with a null array should return null.");
     }
 }
