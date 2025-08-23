@@ -1,27 +1,41 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest17 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.name("");
-        jsonWriter0.setSerializeNulls(false);
-        JsonWriter jsonWriter1 = jsonWriter0.value(331.5379F);
-        assertSame(jsonTreeWriter0, jsonWriter1);
+public class JsonTreeWriter_ESTestTest17 {
+
+    @Test
+    public void valueFloat_providesFluentInterfaceAndWritesCorrectValue() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        float testValue = 331.5379F;
+
+        writer.beginObject();
+        writer.name("testProperty");
+
+        // Act
+        JsonWriter returnedWriter = writer.value(testValue);
+        writer.endObject();
+
+        // Assert
+        // 1. Verify the fluent interface by checking if the same instance is returned.
+        assertSame("The value() method should return the same writer instance for method chaining.",
+            writer, returnedWriter);
+
+        // 2. Verify the correctness of the generated JSON structure.
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.addProperty("testProperty", testValue);
+        JsonElement actualJson = writer.get();
+
+        assertEquals("The generated JSON object does not match the expected output.",
+            expectedJson, actualJson);
     }
 }
