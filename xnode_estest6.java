@@ -1,32 +1,45 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import org.w3c.dom.Node;
+
+import javax.imageio.metadata.IIOMetadataNode;
 import java.util.Properties;
 import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest6 extends XNode_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test005() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Supplier<String> supplier0 = (Supplier<String>) mock(Supplier.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(supplier0).get();
-        String string0 = xNode0.getStringAttribute("", supplier0);
-        assertNull(string0);
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getStringAttribute() returns the value from the default supplier
+     * when the requested attribute does not exist on the XML node.
+     * This specific case checks the behavior when the supplier provides a null value.
+     */
+    @Test
+    public void getStringAttributeWithSupplierShouldReturnSuppliedValueWhenAttributeIsMissing() {
+        // Arrange
+        // 1. Create a simple XML node with no attributes.
+        //    IIOMetadataNode is a convenient, concrete implementation of org.w3c.dom.Node.
+        Node nodeWithNoAttributes = new IIOMetadataNode();
+        XNode xnode = new XNode(null, nodeWithNoAttributes, new Properties());
+
+        // 2. Create a mock supplier that will return null as the default value.
+        @SuppressWarnings("unchecked")
+        Supplier<String> defaultValueSupplier = mock(Supplier.class);
+        when(defaultValueSupplier.get()).thenReturn(null);
+
+        // Act
+        // Attempt to get a non-existent attribute, providing the supplier for a default value.
+        String result = xnode.getStringAttribute("missingAttribute", defaultValueSupplier);
+
+        // Assert
+        // The result should be null, as that's what the default supplier returned.
+        assertNull(result);
     }
 }
