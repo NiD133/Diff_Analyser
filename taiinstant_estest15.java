@@ -1,29 +1,36 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest15 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the TaiInstant class, focusing on conversions.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(774L, 1L);
-        UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay((-2L));
-        TaiInstant taiInstant0 = TaiInstant.of(utcInstant1);
-        UtcInstant utcInstant2 = taiInstant0.toUtcInstant();
-        assertEquals(1L, utcInstant2.getNanoOfDay());
-        assertEquals(1, taiInstant0.getNano());
+    /**
+     * Tests that converting a UtcInstant to a TaiInstant and back again
+     * results in the original UtcInstant, ensuring the conversion is lossless.
+     */
+    @Test
+    public void conversionToTaiAndBackToUtcIsLossless() {
+        // Arrange: Create a UtcInstant. The specific date is arbitrary; the key is to
+        // verify that the entire value, including the nano-of-day, is preserved.
+        long modifiedJulianDay = -2L;
+        long nanoOfDay = 1L;
+        UtcInstant originalUtcInstant = UtcInstant.ofModifiedJulianDay(modifiedJulianDay, nanoOfDay);
+
+        // Act: Convert from UtcInstant to TaiInstant, and then back to UtcInstant.
+        TaiInstant taiInstant = TaiInstant.of(originalUtcInstant);
+        UtcInstant resultUtcInstant = taiInstant.toUtcInstant();
+
+        // Assert: The final UtcInstant should be identical to the original.
+        // This is a stronger guarantee than the original test's assertions.
+        assertEquals(originalUtcInstant, resultUtcInstant);
+
+        // We can also verify the intermediate state for clarity.
+        // The nano-of-day from UtcInstant should correspond to the nano-of-second
+        // in TaiInstant when the time is at the very start of the day.
+        assertEquals(nanoOfDay, taiInstant.getNano());
     }
 }
