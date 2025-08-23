@@ -3,58 +3,107 @@ package org.apache.commons.collections4.bloomfilter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-public class SparseBloomFilterTestTest1 extends AbstractBloomFilterTest<SparseBloomFilter> {
+/**
+ * Tests the {@code processBitMaps} method in {@link SparseBloomFilter} with various edge cases.
+ */
+public class SparseBloomFilterProcessBitMapsTest extends AbstractBloomFilterTest<SparseBloomFilter> {
 
     @Override
     protected SparseBloomFilter createEmptyFilter(final Shape shape) {
         return new SparseBloomFilter(shape);
     }
 
+    /**
+     * Tests that processing stops immediately if the predicate returns false on the first bitmap.
+     */
     @Test
-    void testBitMapExtractorEdgeCases() {
-        int[] values = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71 };
-        BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        // verify exit early before bitmap boundary
-        final int[] passes = new int[1];
-        assertFalse(bf.processBitMaps(l -> {
-            passes[0]++;
+    void processBitMaps_shouldExitEarly_whenPredicateReturnsFalseOnFirstCall() {
+        // Arrange
+        // Create a filter with indices that span multiple bitmaps.
+        int[] indices = {1, 65}; // Indices in first (0-63) and second (64-127) bitmaps.
+        BloomFilter bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+        final AtomicInteger callCounter = new AtomicInteger(0);
+
+        // Act
+        // The predicate increments the counter and immediately returns false, which should terminate processing.
+        final boolean result = bloomFilter.processBitMaps(bitmap -> {
+            callCounter.incrementAndGet();
             return false;
-        }));
-        assertEquals(1, passes[0]);
-        // verify exit early at bitmap boundary
-        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        passes[0] = 0;
-        assertFalse(bf.processBitMaps(l -> {
-            final boolean result = passes[0] == 0;
-            if (result) {
-                passes[0]++;
-            }
-            return result;
-        }));
-        assertEquals(1, passes[0]);
-        // verify add extra if all values in first bitmap
-        values = new int[] { 1, 2, 3, 4 };
-        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        passes[0] = 0;
-        assertTrue(bf.processBitMaps(l -> {
-            passes[0]++;
+        });
+
+        // Assert
+        assertFalse(result, "Processing should be terminated by the predicate");
+        assertEquals(1, callCounter.get(), "Predicate should have been called only once");
+    }
+
+    /**
+     * Tests that processing stops on the second bitmap if the predicate returns false on the second call.
+     */
+    @Test
+    void processBitMaps_shouldExitEarly_whenPredicateReturnsFalseOnSecondCall() {
+        // Arrange
+        // Create a filter with indices that span multiple bitmaps.
+        int[] indices = {1, 65}; // Indices in first and second bitmaps.
+        BloomFilter bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+        final AtomicInteger callCounter = new AtomicInteger(0);
+
+        // Act
+        // The predicate returns true for the first call and false for the second,
+        // terminating processing on the second bitmap.
+        final boolean result = bloomFilter.processBitMaps(bitmap -> callCounter.getAndIncrement() == 0);
+
+        // Assert
+        assertFalse(result, "Processing should be terminated on the second call");
+        assertEquals(2, callCounter.get(), "Predicate should have been called twice");
+    }
+
+    /**
+     * Tests that all bitmaps are processed, including empty ones, if the predicate always returns true.
+     */
+    @Test
+    void processBitMaps_shouldProcessAllBitmaps_whenPredicateAlwaysReturnsTrue() {
+        // Arrange
+        // getTestShape() creates a filter with 72 bits, which requires 2 longs for its bitmap representation.
+        final int expectedBitmapCount = 2;
+        // Create a filter with indices only in the first bitmap.
+        int[] indices = {1, 2, 3, 4};
+        BloomFilter bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+        final AtomicInteger callCounter = new AtomicInteger(0);
+
+        // Act
+        // The predicate always returns true, so all bitmaps should be processed.
+        final boolean result = bloomFilter.processBitMaps(bitmap -> {
+            callCounter.incrementAndGet();
             return true;
-        }));
-        assertEquals(2, passes[0]);
-        // verify exit early if all values in first bitmap and predicate returns false
-        // on 2nd block
-        values = new int[] { 1, 2, 3, 4 };
-        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        passes[0] = 0;
-        assertFalse(bf.processBitMaps(l -> {
-            final boolean result = passes[0] == 0;
-            if (result) {
-                passes[0]++;
-            }
-            return result;
-        }));
-        assertEquals(1, passes[0]);
+        });
+
+        // Assert
+        assertTrue(result, "Processing should complete successfully");
+        assertEquals(expectedBitmapCount, callCounter.get(), "Predicate should be called for each bitmap");
+    }
+
+    /**
+     * Tests that processing stops on a trailing empty bitmap if the predicate returns false.
+     */
+    @Test
+    void processBitMaps_shouldExitEarly_whenPredicateReturnsFalseOnEmptyTrailingBitmap() {
+        // Arrange
+        // getTestShape() creates a filter with 72 bits (2 bitmaps).
+        // Create a filter with indices only in the first bitmap.
+        int[] indices = {1, 2, 3, 4};
+        BloomFilter bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+        final AtomicInteger callCounter = new AtomicInteger(0);
+
+        // Act
+        // The predicate returns true for the first (non-empty) bitmap and false for the second (empty) one.
+        final boolean result = bloomFilter.processBitMaps(bitmap -> callCounter.getAndIncrement() == 0);
+
+        // Assert
+        assertFalse(result, "Processing should be terminated on the second (empty) bitmap");
+        assertEquals(2, callCounter.get(), "Predicate should have been called for both bitmaps");
     }
 }
