@@ -1,21 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ArraySorter_ESTestTest4 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Tests for {@link ArraySorter}.
+ *
+ * Note: The original test class name "ArraySorter_ESTestTest4" is an artifact
+ * of a test generation tool. A more conventional name would be "ArraySorterTest".
+ */
+public class ArraySorter_ESTestTest4 {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        long[] longArray0 = new long[0];
-        long[] longArray1 = ArraySorter.sort(longArray0);
-        assertSame(longArray1, longArray0);
+    /**
+     * Tests that sorting an empty long array returns the same array instance.
+     * The sort operation should be a no-op for an empty array.
+     */
+    @Test
+    public void whenSortingEmptyLongArray_thenReturnsSameInstance() {
+        // Arrange: Create an empty long array.
+        final long[] emptyArray = new long[0];
+
+        // Act: Call the sort method.
+        final long[] sortedArray = ArraySorter.sort(emptyArray);
+
+        // Assert: Verify that the method returned the exact same object instance.
+        // According to the contract, the array is sorted in-place and returned.
+        assertSame("Sorting an empty array should return the same instance.", emptyArray, sortedArray);
     }
 }
