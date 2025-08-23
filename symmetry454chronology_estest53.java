@@ -1,45 +1,36 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Symmetry454Chronology_ESTestTest53 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link Symmetry454Chronology} class.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
-        Era era0 = symmetry454Chronology0.eraOf(0);
-        assertEquals(IsoEra.BCE, era0);
-        int int0 = symmetry454Chronology0.prolepticYear(era0, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests the calculation of the proleptic year for the BCE era with a year-of-era of 0.
+     *
+     * This test verifies a specific behavior of Symmetry454Chronology where
+     * prolepticYear(BCE, 0) results in a proleptic year of 0. This is a key
+     * data point for understanding the chronology's year mapping.
+     */
+    @Test
+    public void prolepticYear_forBceEraAndYearOfEraZero_shouldReturnZero() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        final int yearOfEra = 0;
+
+        // Verify the precondition that era value 0 corresponds to BCE.
+        Era bceEra = chronology.eraOf(0);
+        assertEquals("Precondition failed: eraOf(0) should be BCE.", IsoEra.BCE, bceEra);
+
+        // Act
+        int prolepticYear = chronology.prolepticYear(bceEra, yearOfEra);
+
+        // Assert
+        assertEquals("The proleptic year for BCE era with year-of-era 0 should be 0.", 0, prolepticYear);
     }
 }
