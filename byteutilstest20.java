@@ -1,29 +1,33 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
 import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+
 import org.junit.jupiter.api.Test;
 
 public class ByteUtilsTestTest20 {
 
+    /**
+     * Tests that {@link ByteUtils#toLittleEndian(byte[], long, int, int)}
+     * correctly encodes a 32-bit value into a byte array where the most
+     * significant bit is set. This is a key test case for handling values
+     * that might be misinterpreted in a signed context.
+     */
     @Test
-    void testToLittleEndianToByteArrayUnsignedInt32() {
-        final byte[] b = new byte[4];
-        toLittleEndian(b, 2 + 3 * 256 + 4 * 256 * 256 + 128L * 256 * 256 * 256, 0, 4);
-        assertArrayEquals(new byte[] { 2, 3, 4, (byte) 128 }, b);
+    void toLittleEndianShouldCorrectlyEncode32BitValueWithHighBitSet() {
+        // Arrange
+        // The value 0x80040302L corresponds to the little-endian byte sequence
+        // {0x02, 0x03, 0x04, 0x80}. Using a hex literal makes the relationship
+        // between the number and its byte representation much clearer.
+        final long valueToEncode = 0x80040302L;
+        final byte[] expectedBytes = {2, 3, 4, (byte) 128};
+        final byte[] actualBytes = new byte[4];
+
+        // Act
+        toLittleEndian(actualBytes, valueToEncode, 0, 4);
+
+        // Assert
+        assertArrayEquals(expectedBytes, actualBytes,
+            "The byte array should contain the correct little-endian representation of the value.");
     }
 }
