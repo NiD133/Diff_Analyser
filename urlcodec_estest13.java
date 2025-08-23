@@ -1,21 +1,31 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest13 extends URLCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        String string0 = uRLCodec0.encode("");
-        assertNotNull(string0);
-        assertEquals("", string0);
+/**
+ * Test suite for the {@link URLCodec} class.
+ */
+public class URLCodecTest {
+
+    /**
+     * Tests that encoding an empty string results in an empty string.
+     * This is an important edge case to ensure the codec handles it gracefully.
+     */
+    @Test
+    public void shouldReturnEmptyStringWhenEncodingEmptyString() throws EncoderException {
+        // Arrange: Create a URLCodec instance and the input string.
+        URLCodec codec = new URLCodec();
+        String emptyInput = "";
+
+        // Act: Encode the empty string.
+        String encodedResult = codec.encode(emptyInput);
+
+        // Assert: Verify that the result is a non-null empty string.
+        assertNotNull("The encoded string should not be null.", encodedResult);
+        assertEquals("Encoding an empty string should result in an empty string.", emptyInput, encodedResult);
     }
 }
