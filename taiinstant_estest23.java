@@ -1,26 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest23 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TaiInstant} class.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        taiInstant0.getTaiSeconds();
-        assertEquals(0, taiInstant0.getNano());
+    /**
+     * Tests that creating a TaiInstant with zero seconds and zero nanoseconds
+     * correctly represents the TAI epoch.
+     */
+    @Test
+    public void ofTaiSeconds_withZeroValues_createsEpochInstant() {
+        // Arrange: Define the TAI epoch values.
+        long taiSeconds = 0L;
+        long nanoAdjustment = 0L;
+
+        // Act: Create the TaiInstant instance using the factory method.
+        TaiInstant epochInstant = TaiInstant.ofTaiSeconds(taiSeconds, nanoAdjustment);
+
+        // Assert: Verify that both the seconds and nanoseconds match the epoch values.
+        assertEquals("The TAI seconds should be zero for the epoch.", 0L, epochInstant.getTaiSeconds());
+        assertEquals("The nanoseconds should be zero for the epoch.", 0, epochInstant.getNano());
     }
 }
