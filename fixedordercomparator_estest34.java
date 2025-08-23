@@ -1,36 +1,40 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest34 extends FixedOrderComparator_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+/**
+ * This test verifies the behavior of the FixedOrderComparator when comparing an unknown object.
+ * It replaces an auto-generated test that was difficult to understand.
+ */
+public class FixedOrderComparator_ESTestTest34 { // Note: Class name kept for context
+
+    /**
+     * Tests that compare() throws an IllegalArgumentException by default
+     * when the first object to compare is not in the fixed order.
+     */
     @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(predicateArray0);
-        // Undeclared exception!
+    public void shouldThrowExceptionWhenComparingUnknownFirstObject() {
+        // Arrange: Create a comparator with a defined order of known objects.
+        final String[] knownOrder = {"Mercury", "Venus", "Earth"};
+        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(knownOrder);
+
+        final String knownObject = "Venus";
+        final String unknownObject = "Mars"; // This object is not in the known order.
+
+        // Act & Assert: Expect an exception when comparing the unknown object.
         try {
-            fixedOrderComparator0.compare(fixedOrderComparator0, (Object) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Attempting to compare unknown object org.apache.commons.collections4.comparators.FixedOrderComparator@1ccc9b9e
-            //
-            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+            comparator.compare(unknownObject, knownObject);
+            fail("Expected an IllegalArgumentException because 'Mars' is an unknown object.");
+        } catch (final IllegalArgumentException e) {
+            // Verify the exception message clearly identifies the unknown object.
+            final String expectedMessage = "Attempting to compare unknown object " + unknownObject;
+            assertTrue(
+                "The exception message should indicate which object is unknown.",
+                e.getMessage().contains(expectedMessage)
+            );
         }
     }
 }
