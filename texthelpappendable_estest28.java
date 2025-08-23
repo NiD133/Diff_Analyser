@@ -1,56 +1,40 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest28 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Test suite for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        Vector<Queue<String>> vector0 = new Vector<Queue<String>>();
-        TreeSet<String> treeSet0 = new TreeSet<String>();
-        PriorityQueue<String> priorityQueue0 = new PriorityQueue<String>((SortedSet<? extends String>) treeSet0);
-        vector0.add((Queue<String>) priorityQueue0);
-        LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.writeColumnQueues(vector0, linkedList0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 0, Size: 0
-            //
-            verifyException("java.util.LinkedList", e);
-        }
+    /**
+     * Tests that writeColumnQueues throws an IndexOutOfBoundsException when the list of styles
+     * is smaller than the list of column queues, as it cannot retrieve a style for each queue.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void writeColumnQueuesShouldThrowExceptionWhenStylesListIsSmallerThanQueuesList() throws IOException {
+        // Arrange
+        // An instance of the class under test. Using systemOut() is sufficient as no output
+        // is generated before the exception is thrown.
+        TextHelpAppendable textHelpAppendable = TextHelpAppendable.systemOut();
+
+        // Create a list containing a single column queue.
+        List<Queue<String>> columnQueues = new ArrayList<>();
+        columnQueues.add(new LinkedList<>());
+
+        // Create an empty list of styles. This list is shorter than the columnQueues list.
+        List<TextStyle> styles = Collections.emptyList();
+
+        // Act & Assert
+        // This call is expected to throw an IndexOutOfBoundsException because the method will
+        // attempt to access styles.get(0) when the list size is 0.
+        textHelpAppendable.writeColumnQueues(columnQueues, styles);
     }
 }
