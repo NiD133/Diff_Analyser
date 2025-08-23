@@ -1,24 +1,29 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class PhoneticEngine_ESTestTest28 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        NameType nameType0 = NameType.SEPHARDIC;
-        RuleType ruleType0 = RuleType.APPROX;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, true, 0);
-        boolean boolean0 = phoneticEngine0.isConcat();
-        assertEquals(0, phoneticEngine0.getMaxPhonemes());
-        assertTrue(boolean0);
+    @Test
+    public void constructorShouldCorrectlySetConfigurationProperties() {
+        // Arrange
+        final NameType nameType = NameType.SEPHARDIC;
+        final RuleType ruleType = RuleType.APPROX;
+        final boolean expectedConcat = true;
+        final int expectedMaxPhonemes = 0;
+
+        // Act
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, expectedConcat, expectedMaxPhonemes);
+
+        // Assert
+        // Verify that the getter methods return the values passed to the constructor.
+        assertTrue("The 'concat' property should be true as set in the constructor.", engine.isConcat());
+        assertEquals("The 'maxPhonemes' property should be 0 as set in the constructor.",
+                     expectedMaxPhonemes, engine.getMaxPhonemes());
     }
 }
