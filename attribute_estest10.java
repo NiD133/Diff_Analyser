@@ -1,30 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest10 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Attribute attribute0 = new Attribute("org.jsoup.select.Evaluator$IsOnlyOfType", "org.jsoup.select.Evaluator$IsOnlyOfType");
-        attribute0.setValue("");
-        attribute0.setValue("");
-        assertEquals("", attribute0.getValue());
+    /**
+     * Verifies that an attribute's value can be updated to an empty string.
+     * This test ensures that after calling setValue(""), the getValue() method
+     * correctly returns the new empty string value.
+     */
+    @Test
+    public void settingValueToEmptyStringIsReflectedInGetValue() {
+        // Arrange: Create an attribute with an initial non-empty value.
+        Attribute attribute = new Attribute("id", "initial-value");
+
+        // Act: Set the attribute's value to an empty string.
+        attribute.setValue("");
+
+        // Assert: Verify that the new value is indeed an empty string.
+        assertEquals("", attribute.getValue());
     }
 }
