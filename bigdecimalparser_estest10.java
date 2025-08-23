@@ -1,26 +1,25 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class BigDecimalParser_ESTestTest10 extends BigDecimalParser_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link BigDecimalParser} class, focusing on edge cases and invalid inputs.
+ */
+public class BigDecimalParserTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        // Undeclared exception!
-        try {
+    /**
+     * Verifies that {@code BigDecimalParser.parse(char[])} throws a {@code NullPointerException}
+     * when passed a null character array. This ensures the method correctly handles null inputs
+     * as a precondition failure.
+     */
+    @Test
+    public void parseWithNullCharArrayThrowsNullPointerException() {
+        // The method under test is an internal helper. It is not expected to perform
+        // extensive validation, but passing null is a fundamental error that should
+        // result in a NullPointerException.
+        assertThrows(NullPointerException.class, () -> {
             BigDecimalParser.parse((char[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-        }
+        });
     }
 }
