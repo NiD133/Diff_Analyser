@@ -1,29 +1,24 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest11 extends ThresholdingOutputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream(379);
-        // Undeclared exception!
-        try {
-            thresholdingOutputStream0.write((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.output.ThresholdingOutputStream", e);
-        }
+/**
+ * Tests for {@link ThresholdingOutputStream}.
+ */
+public class ThresholdingOutputStreamTest {
+
+    /**
+     * Tests that calling write() with a null byte array throws a NullPointerException.
+     * This is the expected behavior as per the contract of most I/O operations.
+     */
+    @Test
+    public void write_withNullByteArray_shouldThrowNullPointerException() {
+        // Arrange: Create a stream instance. The threshold value is not relevant for this test.
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(100);
+
+        // Act & Assert: Verify that a NullPointerException is thrown when writing a null array.
+        assertThrows(NullPointerException.class, () -> stream.write((byte[]) null));
     }
 }
