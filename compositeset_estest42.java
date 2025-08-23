@@ -1,0 +1,152 @@
+package org.apache.commons.collections4.set;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.Equator;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.functors.AnyPredicate;
+import org.apache.commons.collections4.functors.ChainedClosure;
+import org.apache.commons.collections4.functors.ConstantTransformer;
+import org.apache.commons.collections4.functors.DefaultEquator;
+import org.apache.commons.collections4.functors.EqualPredicate;
+import org.apache.commons.collections4.functors.ExceptionPredicate;
+import org.apache.commons.collections4.functors.FalsePredicate;
+import org.apache.commons.collections4.functors.IdentityPredicate;
+import org.apache.commons.collections4.functors.IfClosure;
+import org.apache.commons.collections4.functors.NonePredicate;
+import org.apache.commons.collections4.functors.NotNullPredicate;
+import org.apache.commons.collections4.functors.NotPredicate;
+import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
+import org.apache.commons.collections4.functors.NullIsTruePredicate;
+import org.apache.commons.collections4.functors.OnePredicate;
+import org.apache.commons.collections4.functors.OrPredicate;
+import org.apache.commons.collections4.functors.TransformerClosure;
+import org.apache.commons.collections4.functors.TruePredicate;
+import org.apache.commons.collections4.functors.UniquePredicate;
+import org.apache.commons.collections4.functors.WhileClosure;
+import org.apache.commons.collections4.iterators.IteratorChain;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.junit.runner.RunWith;
+
+public class CompositeSet_ESTestTest42 extends CompositeSet_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test41() throws Throwable {
+        Set<LinkedHashSet<Integer>>[] setArray0 = (Set<LinkedHashSet<Integer>>[]) Array.newInstance(Set.class, 4);
+        int int0 = 512;
+        LinkedHashSet<LinkedHashSet<Integer>> linkedHashSet0 = new LinkedHashSet<LinkedHashSet<Integer>>(512);
+        assertNotNull(linkedHashSet0);
+        assertTrue(linkedHashSet0.isEmpty());
+        assertEquals(0, linkedHashSet0.size());
+        setArray0[0] = (Set<LinkedHashSet<Integer>>) linkedHashSet0;
+        LinkedHashSet<Integer> linkedHashSet1 = new LinkedHashSet<Integer>();
+        assertNotNull(linkedHashSet1);
+        assertFalse(linkedHashSet1.contains(512));
+        assertTrue(linkedHashSet1.isEmpty());
+        assertEquals(0, linkedHashSet1.size());
+        boolean boolean0 = linkedHashSet0.add(linkedHashSet1);
+        assertTrue(linkedHashSet0.contains(linkedHashSet1));
+        assertFalse(linkedHashSet1.contains(512));
+        assertFalse(linkedHashSet0.isEmpty());
+        assertEquals(1, linkedHashSet0.size());
+        assertTrue(linkedHashSet1.isEmpty());
+        assertEquals(0, linkedHashSet1.size());
+        assertTrue(boolean0);
+        CompositeSet<LinkedHashSet<Integer>> compositeSet0 = new CompositeSet<LinkedHashSet<Integer>>(setArray0);
+        assertEquals(4, setArray0.length);
+        assertNotNull(compositeSet0);
+        assertTrue(compositeSet0.contains(linkedHashSet1));
+        setArray0[1] = (Set<LinkedHashSet<Integer>>) compositeSet0;
+        Set<LinkedHashSet<Integer>> set0 = compositeSet0.toSet();
+        assertEquals(4, setArray0.length);
+        assertNotNull(set0);
+        assertTrue(compositeSet0.contains(linkedHashSet1));
+        assertTrue(set0.contains(linkedHashSet1));
+        assertEquals(1, set0.size());
+        assertFalse(set0.isEmpty());
+        setArray0[2] = set0;
+        LinkedHashSet<LinkedHashSet<Integer>> linkedHashSet2 = new LinkedHashSet<LinkedHashSet<Integer>>();
+        assertNotNull(linkedHashSet2);
+        assertFalse(linkedHashSet2.contains(linkedHashSet1));
+        assertEquals(0, linkedHashSet2.size());
+        assertTrue(linkedHashSet2.isEmpty());
+        assertFalse(linkedHashSet2.equals((Object) linkedHashSet0));
+        boolean boolean1 = linkedHashSet0.add(linkedHashSet1);
+        assertNotSame(linkedHashSet0, linkedHashSet2);
+        assertTrue(linkedHashSet0.contains(linkedHashSet1));
+        assertFalse(linkedHashSet1.contains(512));
+        assertFalse(linkedHashSet0.isEmpty());
+        assertEquals(1, linkedHashSet0.size());
+        assertTrue(linkedHashSet1.isEmpty());
+        assertEquals(0, linkedHashSet1.size());
+        assertFalse(linkedHashSet0.equals((Object) linkedHashSet2));
+        assertFalse(boolean1 == boolean0);
+        assertFalse(boolean1);
+        boolean boolean2 = linkedHashSet2.add(linkedHashSet1);
+        assertNotSame(linkedHashSet2, linkedHashSet0);
+        assertFalse(linkedHashSet1.contains(512));
+        assertTrue(linkedHashSet2.contains(linkedHashSet1));
+        assertTrue(linkedHashSet1.isEmpty());
+        assertEquals(0, linkedHashSet1.size());
+        assertEquals(1, linkedHashSet2.size());
+        assertFalse(linkedHashSet2.isEmpty());
+        assertTrue(linkedHashSet2.equals((Object) linkedHashSet0));
+        assertTrue(boolean2 == boolean0);
+        assertFalse(boolean2 == boolean1);
+        assertTrue(boolean2);
+        boolean boolean3 = linkedHashSet2.add(linkedHashSet1);
+        assertNotSame(linkedHashSet2, linkedHashSet0);
+        assertFalse(linkedHashSet1.contains(512));
+        assertTrue(linkedHashSet2.contains(linkedHashSet1));
+        assertTrue(linkedHashSet1.isEmpty());
+        assertEquals(0, linkedHashSet1.size());
+        assertEquals(1, linkedHashSet2.size());
+        assertFalse(linkedHashSet2.isEmpty());
+        assertTrue(linkedHashSet2.equals((Object) linkedHashSet0));
+        assertFalse(boolean3 == boolean2);
+        assertFalse(boolean3 == boolean0);
+        assertTrue(boolean3 == boolean1);
+        assertFalse(boolean3);
+        setArray0[3] = (Set<LinkedHashSet<Integer>>) linkedHashSet2;
+        boolean boolean4 = linkedHashSet2.add(linkedHashSet1);
+        assertNotSame(linkedHashSet2, linkedHashSet0);
+        assertFalse(linkedHashSet1.contains(512));
+        assertTrue(linkedHashSet2.contains(linkedHashSet1));
+        assertTrue(linkedHashSet1.isEmpty());
+        assertEquals(0, linkedHashSet1.size());
+        assertEquals(1, linkedHashSet2.size());
+        assertFalse(linkedHashSet2.isEmpty());
+        assertTrue(linkedHashSet2.equals((Object) linkedHashSet0));
+        assertFalse(boolean4 == boolean2);
+        assertTrue(boolean4 == boolean3);
+        assertFalse(boolean4 == boolean0);
+        assertTrue(boolean4 == boolean1);
+        assertFalse(boolean4);
+        CompositeSet<LinkedHashSet<Integer>> compositeSet1 = null;
+        try {
+            compositeSet1 = new CompositeSet<LinkedHashSet<Integer>>(setArray0);
+            fail("Expecting exception: UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            //
+            // Collision adding composited set with no SetMutator set
+            //
+            verifyException("org.apache.commons.collections4.set.CompositeSet", e);
+        }
+    }
+}
